@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.6.0",
+    "@emotion/babel-plugin": "^11.11.0",
+    "@emotion/babel-preset-css-prop": "^11.11.0",
     "@storybook/addon-essentials": "^8.1.11",
     "@storybook/addon-interactions": "^8.1.11",
     "@storybook/addon-links": "^8.1.11",
@@ -32,6 +34,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "eslint-plugin-storybook": "^0.8.0",
+    "sass": "^1.77.6",
     "storybook": "^8.1.11",
     "typescript": "^5"
   }

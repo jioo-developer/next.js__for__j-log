@@ -13,9 +13,9 @@
     // 줄 간격 
 
     // 글자 색상 
-    --maincolor: "#333"
-    --subcolor:"#808080"
-    --pontcolor : "#20c997"
+    --maincolor: "#333";
+    --subcolor:"#808080";
+    --pointcolor : "#20c997";
     // 글자 색상 
 
     // margin & padding
@@ -24,4 +24,13 @@
     --gap-large:18px;
     --gap-xlarge:20px;
     // margin & padding
+
+    // width
+    --full : 100%;
+    --half : 50%;
+    --threeSlice : 25%;
+    --fourSlice : 20%;
+    // width
+
+    // width
 }
