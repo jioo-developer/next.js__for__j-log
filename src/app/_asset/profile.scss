@@ -1,0 +1,220 @@
+@import "mixin.scss";
+
+.profile_wrap {
+  @include reset();
+  @include size();
+
+  .sub_menu {
+    right: 85px;
+
+    @media #{$breakpoint-mobile} {
+      right: 15px;
+    }
+  }
+
+  .content {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+
+    @media #{$breakpoint-mobile} {
+      width: 90%;
+    }
+
+    .profile_area {
+      @include size();
+      display: flex;
+
+      @media #{$breakpoint-mobile} {
+        flex-direction: column;
+      }
+
+      .img_wrap {
+        @include flex();
+        width: 25%;
+        flex-direction: column;
+        border-right: 1px solid #eee;
+        padding-right: 25px;
+        box-sizing: border-box;
+
+        @media #{$breakpoint-mobile} {
+          width: 100%;
+          border: 0;
+          padding: 0;
+        }
+
+        input[type="file"] {
+          display: none;
+        }
+
+        .profileImg {
+          width: 130px;
+          height: auto;
+          cursor: pointer;
+
+          img {
+            width: 100%;
+            border-radius: 50%;
+          }
+
+          .img_area {
+            width: 100%;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px dotted #ddd;
+            box-sizing: border-box;
+            @include flex();
+            text-align: center;
+            color: #555;
+          }
+        }
+        .btn {
+          @include size();
+          @include flex();
+          height: 35px;
+          @include btn-Reset();
+          font-size: 16px;
+
+          @media #{$breakpoint-mobile} {
+            width: 80%;
+          }
+        }
+
+        .uploads {
+          margin: 20px 0 10px 0;
+          background: #12b886;
+          color: #fff;
+        }
+
+        .deletes {
+          color: #12b886;
+        }
+      }
+
+      .name_area {
+        display: flex;
+        flex-direction: column;
+        width: 65%;
+        padding-left: 25px;
+
+        @media #{$breakpoint-mobile} {
+          padding-left: 0;
+          @include flex();
+          flex-direction: column;
+          margin-top: 10px;
+          width: 100%;
+        }
+
+        .nickname {
+          width: 100%;
+          font-size: 50px;
+
+          @media #{$breakpoint-mobile} {
+            font-size: 35px;
+            text-align: center;
+          }
+        }
+
+        .sub_name {
+          font-size: 20px;
+          color: #666;
+          @media #{$breakpoint-mobile} {
+            font-size: 16px;
+          }
+        }
+
+        .form-control {
+          @include input-text();
+          width: 100%;
+          margin-bottom: 0;
+        }
+
+        .btn {
+          @include btn-Reset();
+          font-size: 15px;
+          margin-top: 13px;
+          color: #12b886;
+          text-decoration: underline;
+          text-align: left;
+          padding-left: 10px;
+        }
+        .nick_btn {
+          margin-right: 15px;
+        }
+      }
+    }
+
+    .suggest {
+      @include size();
+      display: flex;
+      margin-top: 70px;
+      border-bottom: 1px solid #eee;
+      box-sizing: border-box;
+      padding-bottom: 20px;
+
+      @media #{$breakpoint-mobile} {
+        margin-top: 35px;
+      }
+
+      .suggest_title {
+        margin-right: 50px;
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      .explan {
+        @include size();
+        margin-top: 28px;
+        color: #868e96;
+        @media #{$breakpoint-mobile} {
+          margin-top: 10px;
+        }
+      }
+    }
+
+    .withdrawal {
+      @extend .suggest;
+      border-bottom: 1px solid #eee;
+      box-sizing: border-box;
+      padding: 18px 0 20px 0;
+      margin-top: 0;
+      flex-direction: column;
+
+      .delete_wrap {
+        @include size();
+        display: flex;
+        align-items: center;
+
+        .withdrawal_title {
+          margin-right: 50px;
+          font-size: 18px;
+          font-weight: 500;
+        }
+
+        .btn {
+          width: 110px;
+          height: 35px;
+          background: rgb(255, 135, 135);
+          color: #fff;
+          border: 0;
+          outline: 0;
+          border-radius: 5px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .end_btn {
+      @include btn-Reset();
+      margin: 20px 0 0 auto;
+      font-size: 16px;
+      background: #12b886;
+      color: #fff;
+      height: 35px;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+  }
+}

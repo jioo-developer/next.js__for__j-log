@@ -1,0 +1,144 @@
+@import "mixin.scss";
+
+$color : #000;
+$rgba : rgba($color, 0.8);
+
+.App{
+    position: relative;
+}
+
+
+.sign_wrap{
+    @include reset();
+    @include media();
+
+    .logo{
+        display: flex;
+        flex-direction: column;
+        width: 85%;
+        padding-top: 175px
+    }
+
+    .login .logo img {
+        width: 100%
+    }
+
+    .logo_title{
+        margin:10px 0 23px 0;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .sign-form{
+        @include size();
+        display: flex;
+        flex-direction: column;
+
+        .form-control{
+            @include input-text();
+            &::placeholder{
+                color: gray;
+            }
+        }
+
+        .btn{
+            @include btn();
+            @include flex();
+            background: #2a96ee;
+            color: #fff;
+        }
+    }
+
+    .sns_sign{
+        display: flex;
+        @include size();
+
+        .sns-btn{
+            @include flex();
+            @include btn();
+            flex-direction: column;
+            width: 50%;
+            height: 100px;
+            background: #fff;
+            border-radius: 3px;
+            margin-top: 10px;
+
+            img{
+                width: 20px;
+                height: 20px;
+                margin-bottom: 10px;
+            }
+
+            .btn_title{
+                font-size: 15px;
+            }
+        }
+    }
+
+    .assistance{
+        @include flex();
+        @include size();
+        justify-content: space-between;
+        margin-top: 10px;
+
+        .ass_btn{
+            @include btn-Reset();
+            display: inline-block;
+            font-size: 14px;
+            color: #888;
+        }
+
+        a{
+            @extend .ass_btn;
+        }
+    }
+}
+
+.find{
+    @include flex();
+    @include size();
+    background: $rgba;
+    position: absolute;
+    inset: 0;
+
+    .find_wrap{
+        @include media();
+        background: #fff;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    .find-form{
+        @include size();
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px; 
+        
+        .form-control{
+            @include input-text();
+            &::placeholder{
+                color: gray;
+            }
+        }
+
+        .btn_wrap{
+            display: flex;
+            margin-left: auto;
+
+        .btn{
+            @include flex();
+            @include btn-Reset();
+            width: 53px;
+            height: 33px;
+            font-size: 15px;
+            background: #2a96ee;
+            color: #fff;
+
+            &:first-child{
+                margin-right: 10px;
+            }
+        }
+
+        }
+    }
+}

@@ -1,0 +1,179 @@
+@import "mixin.scss";
+
+.upload {
+  @include reset();
+  width: 50%;
+  padding-top: 10px;
+
+  @media #{$breakpoint-mobile} {
+    width: 90%;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    @include size();
+
+    .form-control {
+      @include size();
+    }
+
+    .titlearea {
+      font-size: 40px;
+      color: gray;
+      font-weight: 600;
+      border: 0;
+      margin-bottom: 25px;
+      box-sizing: border-box;
+      outline: 0;
+      background: transparent;
+      border-bottom: 1px solid rgb(217 216 216 / 93%);
+      padding-bottom: 13px;
+      &::placeholder {
+        color: rgb(177, 177, 177);
+      }
+
+      @media #{$breakpoint-mobile} {
+        font-size: 30px;
+      }
+    }
+
+    .textarea {
+      width: 100%;
+      outline: 0;
+      border: 0;
+      text-indent: 7px;
+      font-size: 18px;
+      border: 1px solid #eee;
+      box-sizing: border-box;
+      min-height: 600px;
+      margin-bottom: 30px;
+      padding-top: 15px;
+      position: relative;
+
+      textarea {
+        @include btn-Reset();
+        width: 100%;
+        cursor: inherit;
+        resize: none;
+        overflow: hidden;
+      }
+
+      .att {
+        float: left;
+        width: 100%;
+
+        @media #{$breakpoint-mobile} {
+          width: 90%;
+          height: auto;
+        }
+      }
+
+      @media #{$breakpoint-mobile} {
+        height: 350px;
+      }
+
+      &::placeholder {
+        color: rgb(177, 177, 177);
+      }
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .Attachment {
+      @include flex();
+      @include size();
+      height: 170px;
+      border: 4px dotted #ddd;
+      box-sizing: border-box;
+      color: gray;
+      border-radius: 5px;
+      margin-bottom: 30px;
+      cursor: pointer;
+
+      @media #{$breakpoint-mobile} {
+        height: 100px;
+      }
+    }
+
+    #file-upload-button {
+      display: none;
+    }
+
+    .image-att {
+      margin-bottom: 20px;
+    }
+  }
+
+  .bottom_wrap {
+    @include flex();
+    justify-content: space-between;
+    padding-bottom: 20px;
+
+    .post {
+      @include btn();
+      width: 112px;
+      height: 45px;
+      background: rgb(32, 201, 151);
+      color: #fff;
+
+      @media #{$breakpoint-mobile} {
+        width: 70%;
+      }
+    }
+
+    .none_text {
+      background: gray;
+      text-align: center;
+      line-height: 45px;
+    }
+
+    .delete {
+      @extend .post;
+      background: rgb(241, 243, 245);
+      color: #333;
+      text-align: center;
+      line-height: 45px;
+    }
+
+    .exit {
+      @include btn-Reset();
+      color: #666;
+      font-weight: 500;
+      font-size: 17px;
+    }
+  }
+  .warnning {
+    font-size: 14px;
+    color: gray;
+  }
+  figure {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+
+    div {
+      position: relative;
+
+      button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 26px;
+        height: 26px;
+        filter: drop-shadow(2px 4px 12px black);
+        img {
+          cursor: pointer;
+        }
+      }
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+}
