@@ -1,28 +1,27 @@
 
 /** @jsxImportSource @emotion/react */
-import { jsx, css } from '@emotion/react';
+import { css } from '@emotion/react';
 import "@/app/_asset/theme.scss"
 type propsType = {
-    // fontSize: 'small' | 'medium' | 'large' | 'xlarge' ,
-    // fontWeight : string,
-    // width : string | number,
+    width : string | number,
+    size : 'small' | 'medium' | 'large' | 'xlarge'
     children : React.ReactNode,
     theme : 'white' | 'success'
 }
   
-export const Button = ({theme,children}:propsType) => {
-    // const buttonStyle = css`
-    //     font-size : ${sizes[fontSize]}
-    //     font-weight: ${fontWeight};
-    //     width: ${width}px;
-    // `
-    return <button css={[style,themes[theme]]}>{children}</button>
+export const Button = ({width,size,theme,children}:propsType) => {
+    const buttonStyle = css`
+        width: ${width}px;
+    `
+    return <button css={[style,buttonStyle,sizes[size],themes[theme]]}>{children}</button>
 }
 
 const themes = {
   white : css`
   background:transparent;
   color : var(--maincolor);
+  border:1px solid #d1d1d1;
+  box-sizing:border-box;
   `,
   success : css`
   background: var(--pointcolor);
@@ -30,28 +29,32 @@ const themes = {
   `
 }
 
-// const sizes = {
-//     small: css`
-//       height: 1.75rem;
-//       font-size: 0.75rem;
-//       padding: 0 0.875rem;
-//     `,
-//     medium: css`
-//       height: 2.5rem;
-//       font-size: 1rem;
-//       padding: 0 1rem;
-//     `,
-//     large: css`
-//       height: 3rem;
-//       font-size: 1.125rem;
-//       padding: 0 1.5rem;
-//     `,
-//     xlarge : css`
-//     height: 4rem;
-//     font-size: 1.5rem;
-//     padding: 0 2rem;
-//     `
-//   };
+const sizes = {
+    small: css`
+      height: 1.75rem;
+      font-size: 0.75rem;
+      padding: 0 0.875rem;
+      font-weight:400;
+    `,
+    medium: css`
+      height: 2.5rem;
+      font-size: 1rem;
+      padding: 0 1rem;
+      font-weight:500;
+    `,
+    large: css`
+      height: 3rem;
+      font-size: 1.125rem;
+      padding: 0 1.5rem;
+      font-weight:700;
+    `,
+    xlarge : css`
+    height: 4rem;
+    font-size: 1.5rem;
+    padding: 0 2rem;
+    font-weight:bold;
+    `
+  };
 
   const style = css`
   outline: none;

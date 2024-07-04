@@ -7,9 +7,18 @@ export default {
 }
 
 export const button = () => {
-    return <Button theme="success">버튼</Button>
+    return <Button theme="white" width="200" size="small">버튼</Button>
 }
 
 button.story = {
-    name : 'Default'
+    name :'default'
 }
+
+export const successbutton = () => {
+    return <Button theme="success" width="200" size="small">버튼</Button>
+}
+
+successbutton.story = {
+    name : 'success'
+}
+
