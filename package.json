@@ -12,9 +12,15 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
+    "@tanstack/react-query": "^5.49.2",
+    "@tanstack/react-query-devtools": "^5.49.2",
+    "dotenv": "^16.4.5",
+    "firebase": "^10.12.3",
     "next": "14.2.4",
+    "next-auth": "^4.24.7",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.6.0",
