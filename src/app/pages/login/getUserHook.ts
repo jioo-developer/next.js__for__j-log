@@ -22,10 +22,10 @@ const getuser = () => {
 }
 
 const userQueryHook = () => {
-    const { data, isPending, isError, error,refetch}:QueryObserverResult<userData> = useQuery({
+    const { data, isLoading, isError, error,refetch}:QueryObserverResult<userData> = useQuery({
         queryKey: ['getuser'],
         queryFn: getuser,
       });
-      return {data,isPending,isError,error,refetch}
+      return {data,isLoading,isError,error,refetch}
 }
 export default userQueryHook;

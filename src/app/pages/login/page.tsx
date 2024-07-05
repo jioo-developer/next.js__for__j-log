@@ -1,17 +1,24 @@
 'use client'
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import "@/app/_asset/Sign.scss";
 import { authService } from "@/app/Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import userQueryHook from "./getUserHook";
-function Sign() {
+import { useRouter } from "next/navigation";
+function LoginPage() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  const { data } = userQueryHook(); 
+  const { data, refetch } = userQueryHook(); 
+  
+  const router = useRouter();
 
  function LoginLogic(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    signInWithEmailAndPassword(authService,id,password).then(()=>{}).catch((error)=>{
+
+    signInWithEmailAndPassword(authService,id,password).then(()=>{
+      refetch()
+      router.push('/')
+    }).catch((error)=>{
       const errorMessage = error.message;
       window.alert(errorMessage)
     })
@@ -19,7 +26,6 @@ function Sign() {
 
 
   return (
-    <>
       <div className="sign_wrap">
         <h1 className="logo">
           <img src="/img/logo.svg" alt="" />
@@ -51,8 +57,7 @@ function Sign() {
           </button>
         </form>
       </div>
-    </>
   );
 }
 
-export default Sign;
+export default LoginPage;

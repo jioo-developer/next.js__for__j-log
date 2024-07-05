@@ -2,18 +2,21 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import "@/app/_asset/theme.scss"
+import { MouseEventHandler } from 'react';
 type propsType = {
     width : string | number,
     size : 'small' | 'medium' | 'large' | 'xlarge'
     children : React.ReactNode,
-    theme : 'white' | 'success'
+    theme : 'white' | 'success',
+    onClick? : () => void
 }
   
-export const Button = ({width,size,theme,children}:propsType) => {
+export const Button = ({width,size,theme,children,onClick}:propsType) => {
     const buttonStyle = css`
         width: ${width}px;
     `
-    return <button css={[style,buttonStyle,sizes[size],themes[theme]]}>{children}</button>
+ 
+    return <button css={[style,buttonStyle,sizes[size],themes[theme]]} onClick={onClick}>{children}</button>
 }
 
 const themes = {
@@ -69,6 +72,7 @@ const sizes = {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor:pointer;
   &:focus {
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
   }
