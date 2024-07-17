@@ -8,7 +8,6 @@ export interface userData {
     uid: string;
   }
 
-
 const getuser = () => {
     return new Promise((resolve, reject) => {
         authService.onAuthStateChanged((user) => {
