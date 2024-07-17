@@ -31,6 +31,7 @@ const textPlaceHolader = {
 
   const style = ({width,fontSize}:styleProps) => css`
     width:${width}px;
+    font-size:${fontSize}px;
     @include input-text();
     @include size();
     margin-bottom: 15px;
