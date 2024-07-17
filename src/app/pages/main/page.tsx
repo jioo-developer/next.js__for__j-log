@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import userQueryHook from '../login/getUserHook'
+import userQueryHook from '../../_hooks/_login/getUserHook'
 import { Button } from '@/stories/atoms/Button';
 import { authService } from '@/app/Firebase';
 import { useRouter } from 'next/navigation';
@@ -25,7 +25,7 @@ const MainPage = () => {
   return (
       <div>
         메인
-        <Button width="70" size="small" theme='success' onClick={logout}>로그아웃</Button>
+        <Button width={200} height={50} theme='success' fontSize={18}>로그아웃</Button>
       </div> 
   )
 }
