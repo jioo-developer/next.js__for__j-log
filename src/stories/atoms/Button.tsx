@@ -2,77 +2,51 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import "@/app/_asset/theme.scss"
-import { MouseEventHandler } from 'react';
-type propsType = {
-    width : string | number,
-    size : 'small' | 'medium' | 'large' | 'xlarge'
-    children : React.ReactNode,
-    theme : 'white' | 'success',
-    onClick? : () => void
+import { styleProps } from '@/app/_utils/_type/commonType';
+
+interface propsType extends styleProps {
+  children : React.ReactNode,
+  theme : "white" | "success" | "primary",
+  onClick? : () => void
+  disable? : boolean
 }
-  
-export const Button = ({width,size,theme,children,onClick}:propsType) => {
-    const buttonStyle = css`
-        width: ${width}px;
-    `
- 
-    return <button css={[style,buttonStyle,sizes[size],themes[theme]]} onClick={onClick}>{children}</button>
+
+export const Button = ({width,height,fontSize,theme,children,disable,onClick}:propsType) => {
+    return <button css={[style({width,height,fontSize}),themes[theme]]} disabled={disable ? true : false} onClick={onClick}>{children}</button>
 }
 
 const themes = {
   white : css`
   background:transparent;
-  color : var(--maincolor);
+  color : var(--mainTextcolor);
   border:1px solid #d1d1d1;
   box-sizing:border-box;
   `,
   success : css`
-  background: var(--pointcolor);
+  background: var(--pointTextcolor);
   color: #fff
+  `,
+  primary : css `
+   background: #2a96ee;
+   color:#fff
   `
 }
 
-const sizes = {
-    small: css`
-      height: 1.75rem;
-      font-size: 0.75rem;
-      padding: 0 0.875rem;
-      font-weight:400;
-    `,
-    medium: css`
-      height: 2.5rem;
-      font-size: 1rem;
-      padding: 0 1rem;
-      font-weight:500;
-    `,
-    large: css`
-      height: 3rem;
-      font-size: 1.125rem;
-      padding: 0 1.5rem;
-      font-weight:700;
-    `,
-    xlarge : css`
-    height: 4rem;
-    font-size: 1.5rem;
-    padding: 0 2rem;
-    font-weight:bold;
-    `
-  };
 
-  const style = css`
+
+  const style = ({width,height,fontSize}:styleProps) => css`
+  width:${width}px;
+  height: ${height ? height + "px" : "auto"};
   outline: none;
   border: none;
+  cursor:pointer;
   box-sizing: border-box;
-  height: 2rem;
-  font-size: 0.875rem;
-  padding: 0 1rem;
-  border-radius: 0.25rem;
+  border-radius: 8px;
+  font-size:${fontSize}px;
   line-height: 1;
-  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor:pointer;
   &:focus {
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
   }
