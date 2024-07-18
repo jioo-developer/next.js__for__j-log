@@ -23,10 +23,7 @@ const MainPage = () => {
   } 
 
   return (
-      <div>
-        메인
-        <Button width={200} height={50} theme='success' fontSize={18}>로그아웃</Button>
-      </div> 
+    <Button width={200} height={50} theme='success' fontSize={18} onClick={logout}>로그아웃</Button>
   )
 }
 
