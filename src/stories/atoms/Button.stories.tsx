@@ -2,23 +2,30 @@ import React from "react";
 import { Button } from "./Button";
 
 export default {
-    title : 'atoms | Button',
-    component : Button
-}
+  title: "atoms | Button",
+  component: Button,
+};
 
 export const button = () => {
-    return <Button theme="white" width={200}>버튼</Button>
-}
+  return (
+    <Button theme="white" width={200}>
+      버튼
+    </Button>
+  );
+};
 
 button.story = {
-    name :'default'
-}
+  name: "default",
+};
 
 export const successbutton = () => {
-    return <Button theme="success" width={200} >버튼</Button>
-}
+  return (
+    <Button theme="success" width={200}>
+      버튼
+    </Button>
+  );
+};
 
 successbutton.story = {
-    name : 'success'
-}
-
+  name: "success",
+};
