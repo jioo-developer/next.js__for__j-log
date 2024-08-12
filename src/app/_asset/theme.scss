@@ -1,36 +1,34 @@
 :root {
-    // font size
-    --fontsize-small : 12px;
-    --fontsize-medium: 16px;
-    --fontsize-large:18px;
-    --fontsize-xlarge:20px;
-    // font size 
+  // font size
+  --fontsize-small: 12px;
+  --fontsize-medium: 16px;
+  --fontsize-large: 18px;
+  --fontsize-xlarge: 20px;
+  // font size
 
-    // 줄 간격 
-    --lineheight-one : 1;
-    --lineheight-heading:1.25;
-    --lineheight-body :1.5;
-    // 줄 간격 
+  // 줄 간격
+  --lineheight-one: 1;
+  --lineheight-heading: 1.25;
+  --lineheight-body: 1.5;
+  // 줄 간격
 
-    // 글자 색상 
-    --mainTextcolor: #333;
-    --subTextcolor:#808080;
-    --pointTextcolor : #20c997;
-    // 글자 색상 
+  // 글자 색상
+  --mainTextcolor: #333;
+  --subTextcolor: #808080;
+  --pointTextcolor: #20c997;
+  // 글자 색상
 
-    // margin & padding
-    --gap-small : 12px;
-    --gap-medium: 16px;
-    --gap-large:18px;
-    --gap-xlarge:20px;
-    // margin & padding
+  // margin & padding
+  --gap-small: 12px;
+  --gap-medium: 16px;
+  --gap-large: 18px;
+  --gap-xlarge: 20px;
+  // margin & padding
 
-    // width
-    --full : 100%;
-    --half : 50%;
-    --threeSlice : 25%;
-    --fourSlice : 20%;
-    // width
-
-    // width
+  // width
+  --full: 100%;
+  --half: 50%;
+  --threeSlice: 25%;
+  --fourSlice: 20%;
+  // width
 }

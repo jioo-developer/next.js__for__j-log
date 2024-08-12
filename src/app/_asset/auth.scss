@@ -92,6 +92,9 @@
     .check_text {
       display: inline-block;
       margin-left: 7px;
+      span {
+        color: #ff0000d9;
+      }
     }
 
     .check_wrap {
