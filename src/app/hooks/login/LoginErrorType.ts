@@ -7,6 +7,8 @@ export const LoginErrorHandler = (error: string) => {
     return "사용자를 찾을 수 없습니다.";
   } else if (error.includes("auth/wrong-password")) {
     return "잘못된 비밀번호입니다.";
+  } else if (error.includes(" (auth/user-not-found)")) {
+    return "해당 유저 이메일이 존재하지 않습니다.";
   } else {
     return error;
   }
