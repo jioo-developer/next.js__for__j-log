@@ -1,0 +1,5 @@
+button.noShadow {
+  &:focus {
+    box-shadow: none !important;
+  }
+}

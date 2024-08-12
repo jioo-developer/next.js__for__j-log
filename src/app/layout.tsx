@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@/app/_asset/theme.scss";
+import "@/app/_asset/common.scss";
 import { childrenProps } from "./utill/type/commonType";
 import ReactQueryProvider from "./provider/ReactQueryProvider";
 export const metadata: Metadata = {
