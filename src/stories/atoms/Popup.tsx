@@ -7,16 +7,21 @@ import { Button } from "@/stories/atoms/Button";
 import { popupMessageStore } from "@/app/store/common";
 
 type propsType = {
-  type: string;
-  rightAlign: boolean;
+  type?: string;
+  rightAlign?: boolean;
+  top?: boolean;
 };
 
-export const Popup = ({ type, rightAlign }: propsType) => {
+export const Popup = ({
+  type = "alert",
+  rightAlign,
+  top = false,
+}: propsType) => {
   const msgContent = popupMessageStore();
   return (
     <>
       <div css={[fullscreen, darkLayer]}></div>
-      <div css={[fullscreen, whiteBoxWrapper]}>
+      <div css={[fullscreen, whiteBoxWrapper, top && { position: "relative" }]}>
         <div css={[whiteBox, flexDirection]}>
           <p
             css={css`
@@ -44,10 +49,6 @@ export const Popup = ({ type, rightAlign }: propsType) => {
       </div>
     </>
   );
-};
-
-Popup.defaultProps = {
-  type: "alert",
 };
 
 const fullscreen = css`

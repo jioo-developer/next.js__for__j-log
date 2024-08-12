@@ -1,28 +1,29 @@
+/** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import "@/app/_asset/theme.scss";
 import "@/app/_asset/_mixin.scss";
 import { styleProps } from "@/app/utill/type/commonType";
-import { useInput } from "@/app/hooks/login/useInput";
-import { Ref } from "react";
+import { useInput } from "@/app/hooks/useInput";
+import { Dispatch, SetStateAction } from "react";
 
 interface propsType extends styleProps {
   type: "id" | "password" | "textarea" | "email" | "text";
-  ref?: Ref<HTMLInputElement> | null;
+  setstate?: Dispatch<SetStateAction<string>>;
 }
 
-export const Input = ({ width, fontSize, type, ref }: propsType) => {
+export const Input = ({ width, fontSize, type, setstate }: propsType) => {
   const { value, valueChangeHandler } = useInput("");
-  console.log(ref);
   return (
     <input
       required
       type={type === "id" || type === "text" ? "text" : type}
       className="form-control"
       placeholder={textPlaceHolader[type]}
-      onChange={valueChangeHandler}
+      onChange={(e) =>
+        setstate ? setstate(e.target.value) : valueChangeHandler
+      }
       css={style({ width, fontSize })}
       autoComplete="off"
-      ref={ref}
     />
   );
 };
