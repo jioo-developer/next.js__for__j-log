@@ -5,36 +5,32 @@ import { styleProps } from "@/app/utill/type/commonType";
 
 interface propsType extends styleProps {
   children: React.ReactNode;
-  theme: "white" | "success" | "primary";
+  theme?: "white" | "success" | "primary";
   onClick?: () => void;
   disable?: boolean;
+  className?: string;
 }
 
 export const Button = ({
-  width,
-  height,
-  fontSize,
-  theme,
+  width = 100,
+  height = 38,
+  fontSize = 16,
+  theme = "white",
   children,
   disable,
+  className,
   onClick,
 }: propsType) => {
   return (
     <button
       css={[style({ width, height, fontSize }), themes[theme]]}
       disabled={disable ? true : false}
+      className={className}
       onClick={onClick}
     >
       {children}
     </button>
   );
-};
-
-Button.defaultProps = {
-  fontSize: 16,
-  width: 100,
-  height: 38,
-  theme: "white",
 };
 
 const themes = {
@@ -55,7 +51,12 @@ const themes = {
 };
 
 const style = ({ width, height, fontSize }: styleProps) => css`
-  width: ${width}px;
+  width: ${width === "full"
+    ? "100%"
+    : width && width !== "full"
+      ? width + "px"
+      : null};
+
   height: ${height ? height + "px" : "auto"};
   outline: none;
   border: none;
