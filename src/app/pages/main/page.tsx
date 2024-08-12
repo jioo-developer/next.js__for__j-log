@@ -15,23 +15,30 @@ const MainPage = () => {
       router.push("/pages/login");
     });
   }
-
-  if (!isLoading) {
-    if (!data) {
-      router.push("/pages/login");
+  setTimeout(() => {
+    if (!isLoading) {
+      if (!data) {
+        router.push("/pages/login");
+      }
     }
-  }
+  }, 100);
 
   return (
-    <Button
-      width={200}
-      height={50}
-      theme="success"
-      fontSize={18}
-      onClick={logout}
-    >
-      로그아웃
-    </Button>
+    <>
+      {isLoading ? (
+        <div></div>
+      ) : (
+        <Button
+          width={200}
+          height={50}
+          theme="success"
+          fontSize={18}
+          onClick={logout}
+        >
+          로그아웃
+        </Button>
+      )}
+    </>
   );
 };
 
