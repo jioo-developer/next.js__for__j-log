@@ -22,12 +22,13 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-
   const [disable, setDisable] = useState(false);
+
   const msg = popupMessageStore();
-  const { data } = useLoadNickName();
-  const { refetch } = useUserQueryHook();
   const router = useRouter();
+
+  const { data } = useLoadNickName();
+  const { isLoading, refetch } = useUserQueryHook();
 
   function isNickName(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -110,14 +111,16 @@ const SignupPage = () => {
           setstate={setNickname}
         />
         <Checker allcheck items={authData} setState={setDisable} />
-        <Button
-          width={"full"}
-          theme="primary"
-          disable={disable}
-          className={disable ? "un_btn" : "btn"}
-        >
-          회원가입
-        </Button>
+        {!isLoading && (
+          <Button
+            width={"full"}
+            theme="primary"
+            disable={disable}
+            className={disable ? "un_btn" : "btn"}
+          >
+            회원가입
+          </Button>
+        )}
       </form>
       {msg.message !== "" && <Popup rightAlign top />}
     </div>

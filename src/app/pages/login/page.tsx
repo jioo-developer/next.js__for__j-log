@@ -63,7 +63,11 @@ const LoginPage = () => {
       <SocialLogin />
       {/* 비밀번호 찾기 및 회원가입 */}
       <div className="assistance">
-        <Button className="pw_reset ass_btn noShadow" width={120}>
+        <Button
+          className="pw_reset ass_btn noShadow"
+          width={120}
+          onClick={() => router.push("/pages/resetPw")}
+        >
           비밀번호 변경&amp;찾기
         </Button>
         <Button
