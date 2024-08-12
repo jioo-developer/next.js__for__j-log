@@ -5,17 +5,20 @@ import "@/app/_asset/_mixin.scss";
 import ButtonGroup from "../modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { popupMessageStore } from "@/app/store/common";
+import { ReactNode } from "react";
 
 type propsType = {
   type?: string;
   rightAlign?: boolean;
   top?: boolean;
+  children?: ReactNode;
 };
 
 export const Popup = ({
   type = "alert",
   rightAlign,
   top = false,
+  children,
 }: propsType) => {
   const msgContent = popupMessageStore();
   return (
@@ -39,11 +42,13 @@ export const Popup = ({
             >
               확인
             </Button>
-          ) : (
+          ) : type === "confirm" ? (
             <ButtonGroup rightAlign={rightAlign}>
               <Button theme="success">취소</Button>
               <Button>삭제</Button>
             </ButtonGroup>
+          ) : (
+            children
           )}
         </div>
       </div>
