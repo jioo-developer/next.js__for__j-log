@@ -27,16 +27,17 @@ const useDetailQueryHook = (pageId: string) => {
     refetch,
   }: QueryObserverResult<FirebaseData, Error> = useQuery({
     queryKey: ["getDetail", pageId],
-    queryFn: (queryKey) => {
+    queryFn: async (queryKey) => {
       const keyParams = queryKey.queryKey[1] as string;
-      getDetailHandler(keyParams);
+      return await getDetailHandler(keyParams);
     },
+    enabled: !!pageId,
   });
   if (error) {
-    errorHandler(error.message);
+    errorHandler("페이지 정보를 찾을 수 없습니다.");
   }
-  const postData = data;
-  const postRefetch = refetch;
-  return { postData, isLoading, error, postRefetch };
+  const pageData = data as FirebaseData;
+  const pageRefetch = refetch;
+  return { pageData, isLoading, error, pageRefetch };
 };
 export default useDetailQueryHook;

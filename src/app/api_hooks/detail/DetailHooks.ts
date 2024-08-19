@@ -6,13 +6,12 @@ export async function getDetailHandler(pageId: string) {
   try {
     const docRef = doc(db, "post", pageId);
     const snapshot = await getDoc(docRef);
-
     if (snapshot.exists()) {
       return snapshot.data() as FirebaseData;
     } else {
-      return new Error("페이지 정보를 불러 올 수 없습니다.");
+      throw new Error("해당 페이지 정보를 찾을 수 없습니다.");
     }
   } catch (error) {
-    return new Error("페이지 정보를 불러 올 수 없습니다.");
+    throw new Error("페이지 정보를 불러오는 중 오류가 발생했습니다.");
   }
 }
