@@ -11,7 +11,7 @@ type itemProps = {
 const PostItem = ({ item, index }: itemProps) => {
   const router = useRouter();
   function goDetail() {
-    router.push(`/detail?id=${item.pageId}`);
+    router.push(`/pages/detail/${item.pageId}`);
   }
 
   return (

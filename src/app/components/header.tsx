@@ -25,8 +25,8 @@ function Header() {
 
   function logout() {
     authService.signOut().then(() => {
-      refetch();
       router.push("/pages/login");
+      refetch();
     });
   }
 

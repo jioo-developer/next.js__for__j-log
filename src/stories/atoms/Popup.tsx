@@ -62,13 +62,6 @@ export const Popup = ({
             <Button theme="success" onClick={reset}>
               확인
             </Button>
-          ) : type === "confirm" ? (
-            <div className="direction-wrap">
-              <ButtonGroup rightAlign={rightAlign}>
-                <Button onClick={reset}>취소</Button>
-                <Button theme="success">삭제</Button>
-              </ButtonGroup>
-            </div>
           ) : (
             children
           )}
