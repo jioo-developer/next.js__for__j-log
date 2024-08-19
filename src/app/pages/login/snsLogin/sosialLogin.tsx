@@ -1,7 +1,7 @@
-import { onGoogle } from "@/app/api/login/googleLogin";
+import { onGoogle } from "@/app/pages/login/snsLogin/googleLogin";
 import Image from "next/image";
 
-const SocialLogin = () => {
+const SocialLoginPage = () => {
   return (
     <div className="sns_sign">
       <button className="sns-btn" name="google" onClick={() => onGoogle()}>
@@ -26,4 +26,4 @@ const SocialLogin = () => {
   );
 };
 
-export default SocialLogin;
+export default SocialLoginPage;
