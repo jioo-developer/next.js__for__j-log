@@ -3,20 +3,18 @@ import "@/app/_asset/Sign.scss";
 import { FormEvent, useState } from "react";
 import { authService } from "@/app/Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import useUserQueryHook from "../../hooks/login/getUserHook";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { useRouter } from "next/navigation";
 import { Button } from "@/stories/atoms/Button";
 import { Input } from "@/stories/atoms/Input";
-import SocialLogin from "./sosialLogin";
+import SocialLogin from "./snsLogin/sosialLogin";
 import Image from "next/image";
-import { popupMessageStore } from "@/app/store/common";
-import { Popup } from "@/stories/atoms/Popup";
-import { LoginErrorHandler } from "@/app/hooks/login/LoginErrorType";
+import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
+import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
 
 const LoginPage = () => {
-  const { refetch } = useUserQueryHook();
+  const { data, refetch } = useUserQueryHook();
   const router = useRouter();
-  const msg = popupMessageStore();
 
   const [id, setId] = useState("");
   const [pw, setpw] = useState("");
@@ -30,8 +28,12 @@ const LoginPage = () => {
       })
       .catch((error) => {
         const errorMessage = LoginErrorHandler(error.message);
-        popupMessageStore.setState({ message: errorMessage });
+        errorHandler(errorMessage);
       });
+  }
+
+  if (data) {
+    router.push("/");
   }
 
   return (
@@ -71,14 +73,12 @@ const LoginPage = () => {
           비밀번호 변경&amp;찾기
         </Button>
         <Button
-          className="ass_auth ass_btn noShadow"
+          className="ass_auth ass_btn noShadow text-right"
           onClick={() => router.push("/pages/signup")}
         >
           회원가입
         </Button>
       </div>
-      {/* 에러 메시지 팝업 */}
-      {msg.message !== "" && <Popup rightAlign />}
     </div>
   );
 };

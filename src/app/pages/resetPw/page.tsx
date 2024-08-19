@@ -1,8 +1,8 @@
 "use client";
 import "@/app/_asset/Sign.scss";
 import { authService } from "@/app/Firebase";
-import useUserQueryHook from "@/app/hooks/login/getUserHook";
-import { LoginErrorHandler } from "@/app/hooks/login/LoginErrorType";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { popupMessageStore } from "@/app/store/common";
 import { Button } from "@/stories/atoms/Button";
 import { Input } from "@/stories/atoms/Input";
@@ -11,8 +11,9 @@ import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
 
-const ResetPw = () => {
+const ResetPwPage = () => {
   const [findPw, setFindPw] = useState("");
   const msg = popupMessageStore();
   const { data } = useUserQueryHook();
@@ -22,23 +23,21 @@ const ResetPw = () => {
     router.push("/pages/login");
   }
 
-  const resetHandler = () => {
-    sendPasswordResetEmail(authService, findPw)
-      .then(() => {
-        popupMessageStore.setState({
-          message: "입력하신 메일로 비밀번호 안내드렸습니다.",
-        });
-        routerHandler();
-      })
-      .catch((error) => {
-        const errorMessage = LoginErrorHandler(error.message);
-        popupMessageStore.setState({ message: errorMessage });
-      });
+  const resetHandler = async () => {
+    try {
+      await sendPasswordResetEmail(authService, findPw);
+      errorHandler("입력하신 메일로 비밀번호 안내드렸습니다.");
+      routerHandler();
+    } catch (error) {
+      const errorMessage = LoginErrorHandler((error as Error).message);
+      errorHandler(errorMessage);
+    }
   };
+
   return (
     <>
-      {data && (
-        <section className="find">
+      {!data && (
+        <section className="find full-popup">
           <div className="find_wrap">
             <p>비밀번호를 잊어 버리셨나요?</p>
             <div className="find-form">
@@ -65,4 +64,4 @@ const ResetPw = () => {
   );
 };
 
-export default ResetPw;
+export default ResetPwPage;

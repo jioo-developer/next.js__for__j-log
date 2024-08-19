@@ -5,12 +5,14 @@ import { Input } from "@/stories/atoms/Input";
 import { Button } from "@/stories/atoms/Button";
 import Image from "next/image";
 import Checker from "@/stories/atoms/Checker";
-import useLoadNickName from "@/app/hooks/signup/getNicknamehooks";
 import { Popup } from "@/stories/atoms/Popup";
 import { popupMessageStore } from "@/app/store/common";
-import signupHandler from "@/app/hooks/signup/signuphooks";
+import signupHandler from "@/app/common/handler/signupHandler";
 import { useRouter } from "next/navigation";
-import useUserQueryHook from "@/app/hooks/login/getUserHook";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import useNickQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
+import nicknameHandler from "@/app/common/handler/nickname/nicknameCheckHandler";
+import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
 
 const authData = [
   { id: "auth", text: "회원가입및 운영약관 동의", important: true },
@@ -27,21 +29,16 @@ const SignupPage = () => {
   const msg = popupMessageStore();
   const router = useRouter();
 
-  const { data } = useLoadNickName();
+  const { nicknameData } = useNickQueryHook();
   const { isLoading, refetch } = useUserQueryHook();
 
   function isNickName(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (data) {
-      const overlapFilter = data.some((item) => {
-        return Object.values(item).includes(nickname);
-      });
-      if (overlapFilter) {
-        popupMessageStore.setState({ message: "이미 사용중인 닉네임 입니다." });
-        setNickname("");
-      } else {
-        createAccount(email, password, nickname);
-      }
+    if (nicknameHandler({ nicknameData, nickname })) {
+      errorHandler("이미 사용중인 닉네임 입니다");
+      setNickname("");
+    } else {
+      createAccount(email, password, nickname);
     }
   }
 
@@ -51,14 +48,10 @@ const SignupPage = () => {
     nickname: string
   ) {
     const signupResult = await signupHandler(email, password, nickname);
-    if (signupResult !== null || signupResult !== undefined) {
+    if (signupResult) {
       refetch();
       router.push("/pages/main");
-      popupMessageStore.setState({ message: "회원가입을 환영합니다." });
-    } else {
-      popupMessageStore.setState({
-        message: "회원가입 중 오류가 발생했습니다.",
-      });
+      errorHandler("회원가입을 환영합니다!");
     }
   }
 
