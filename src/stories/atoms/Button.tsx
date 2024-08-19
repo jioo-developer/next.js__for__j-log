@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import "@/app/_asset/theme.scss";
-import { styleProps } from "@/app/utill/type/commonType";
+import { styleProps } from "@/app/common/type/commonType";
 
 interface propsType extends styleProps {
   children: React.ReactNode;
