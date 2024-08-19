@@ -1,6 +1,6 @@
 @import "mixin.scss";
 
-.App {
+body {
   background: #f9f9f9c7;
 
   .in_wrap {
@@ -71,6 +71,7 @@
         .text_wrap {
           display: flex;
           flex-direction: column;
+          gap: 16px;
           padding: 16px;
           height: 150px;
           box-sizing: border-box;
@@ -93,7 +94,6 @@
           .post_date {
             font-size: 14px;
             color: gray;
-            position: absolute;
             bottom: 15px;
           }
         }

@@ -10,7 +10,7 @@ $rgba: rgba($color, 0.8);
 .sign_wrap {
   @include reset();
   @include media();
-
+  gap: 16px;
   .logo {
     display: flex;
     flex-direction: column;
@@ -23,7 +23,6 @@ $rgba: rgba($color, 0.8);
   }
 
   .logo_title {
-    margin: 10px 0 23px 0;
     font-size: 20px;
     text-align: center;
   }
@@ -77,7 +76,6 @@ $rgba: rgba($color, 0.8);
     @include flex();
     @include size();
     justify-content: space-between;
-    margin-top: 10px;
 
     .ass_btn {
       @include btn-Reset();
