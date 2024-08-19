@@ -21,10 +21,11 @@ const LoginPage = () => {
 
   function LoginHandler(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     signInWithEmailAndPassword(authService, id, pw)
       .then(() => {
         refetch();
-        router.push("/");
+        router.push("/pages/main");
       })
       .catch((error) => {
         const errorMessage = LoginErrorHandler(error.message);
@@ -33,7 +34,7 @@ const LoginPage = () => {
   }
 
   if (data) {
-    router.push("/");
+    router.push("/pages/main");
   }
 
   return (
