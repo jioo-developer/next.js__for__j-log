@@ -1,27 +1,26 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import "@/app/_asset/theme.scss";
-import "@/app/_asset/_mixin.scss";
-import ButtonGroup from "../modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { popupMessageStore } from "@/app/store/common";
 import { ReactNode } from "react";
+import { popupInit } from "@/app/common/handler/error/ErrorHandler";
 
 type propsType = {
-  type?: "alert" | "confirm" | "custom";
+  type?: "alert" | string;
   rightAlign?: boolean;
   top?: boolean;
+  width?: number | string;
   height?: number | string;
-  children?: ReactNode;
   direction?: "row" | "column";
   textAlign?: "left" | "center" | "right";
   subText?: string;
+  children?: ReactNode;
 };
 
 export const Popup = ({
   type = "alert",
-  height = "auto",
-  rightAlign,
+  width = "25rem;",
+  height = "auto;",
   top = false,
   textAlign = "left",
   subText,
@@ -29,14 +28,11 @@ export const Popup = ({
 }: propsType) => {
   const msgContent = popupMessageStore();
 
-  function reset() {
-    popupMessageStore.setState({ message: "" });
-  }
   return (
     <>
       <div css={[fullscreen, darkLayer]}></div>
       <div css={[fullscreen, whiteBoxWrapper, top && { position: "relative" }]}>
-        <div css={[whiteBox(height), flexDirection]}>
+        <div css={[whiteBox(width, height), flexDirection]}>
           <p
             css={css`
               margin-bottom: 1.5rem !important;
@@ -57,9 +53,8 @@ export const Popup = ({
               {subText}
             </p>
           )}
-
           {type === "alert" ? (
-            <Button theme="success" onClick={reset}>
+            <Button theme="success" onClick={popupInit}>
               확인
             </Button>
           ) : (
@@ -99,11 +94,11 @@ const flexDirection = css`
 `;
 
 //   width: ${direction === "row" ? "25rem;" : "18rem;"}
-const whiteBox = (height: string | number) => css`
+const whiteBox = (width: string | number, height: string | number) => css`
   box-sizing: border-box;
   border-radius: 4px;
-  width: 25rem;
-  height : ${height ? height + "px;" : "auto;"}
+  width: ${width}
+  height : ${height === "auto" ? "auto;" : height + "px;"}
   background: white;
   box-shadow: 0px 4px 8px 8px rgba(0, 0, 0, 0.05);
   padding: 2rem;
