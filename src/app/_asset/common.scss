@@ -1,3 +1,5 @@
+@import "mixin.scss";
+
 button.noShadow {
   &:focus {
     box-shadow: none !important;
@@ -42,4 +44,11 @@ button.noShadow {
   width: 100%;
   flex-direction: column;
   margin-top: auto;
+}
+
+.form-control {
+  @include input-text();
+  &::placeholder {
+    color: gray;
+  }
 }
