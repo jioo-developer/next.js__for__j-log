@@ -1,7 +1,6 @@
 import { authService, db } from "@/app/Firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { errorHandler } from "./error/ErrorHandler";
 
 const signupHandler = async (
   email: string,
@@ -25,12 +24,11 @@ const signupHandler = async (
       // 사용자 프로필 업데이트
       await updateProfile(user, {
         displayName: nickname,
-        photoURL: "/img/default.svg",
       });
     }
     return user;
-  } catch {
-    errorHandler("회원가입 도중 에러가 발생하였습니다.");
+  } catch (error) {
+    throw new Error((error as Error).message);
   }
 };
 

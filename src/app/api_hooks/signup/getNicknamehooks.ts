@@ -1,4 +1,3 @@
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
 import { db } from "@/app/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { collection, getDocs } from "firebase/firestore";
@@ -26,9 +25,6 @@ const useNickQueryHook = () => {
 
   const nicknameData = data;
 
-  if (error) {
-    errorHandler(error.message);
-  }
   return { nicknameData, error };
 };
 

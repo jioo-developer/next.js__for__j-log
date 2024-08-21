@@ -1,4 +1,4 @@
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { getDetailHandler } from "./DetailHooks";
 
@@ -34,7 +34,7 @@ const useDetailQueryHook = (pageId: string) => {
     enabled: !!pageId,
   });
   if (error) {
-    errorHandler("페이지 정보를 찾을 수 없습니다.");
+    popuprHandler({ message: "페이지 정보를 찾을 수 없습니다." });
   }
   const pageData = data as FirebaseData;
   const pageRefetch = refetch;

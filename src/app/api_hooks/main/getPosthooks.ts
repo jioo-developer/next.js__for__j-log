@@ -1,6 +1,5 @@
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { getPostData } from "./posthooks";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
 
 export type postProps = {
   user: string;
@@ -30,9 +29,6 @@ const usePostQueryHook = () => {
   const postData = data;
   const postRefetch = refetch;
 
-  if (error) {
-    errorHandler(error.message);
-  }
   return { isLoading, postData, error, postRefetch };
 };
 
