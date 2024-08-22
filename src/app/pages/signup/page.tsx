@@ -38,16 +38,20 @@ const SignupPage = () => {
 
   function isNickName(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (nicknameHandler({ nicknameData, nickname })) {
-      popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+    if (nicknameData) {
+      if (nicknameHandler({ nicknameData, nickname })) {
+        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+      } else {
+        createAccount({ email, password, nickname });
+      }
     } else {
-      createAccount({ email, password, nickname });
+      popuprHandler({ message: "닉네임 중복체크 중 에러가 발생하였습니다" });
     }
   }
 
   async function createAccount({ email, password, nickname }: accountType) {
     try {
-      await signupHandler(email, password, nickname);
+      await signupHandler({ email, password, nickname });
       refetch();
       router.push("/pages/main");
       popuprHandler({ message: "회원가입을 환영합니다!" });

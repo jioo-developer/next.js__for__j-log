@@ -2,16 +2,21 @@ import { authService, db } from "@/app/Firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
-const signupHandler = async (
-  email: string,
-  password: string,
-  nickname: string
-) => {
+type propsType = {
+  email: string;
+  password: string;
+  nickname: string;
+};
+
+const signupHandler = async ({ email, password, nickname }: propsType) => {
+  // 회원생성로직
   const createUser = await createUserWithEmailAndPassword(
     authService,
     email,
     password
   );
+  // 회원생성로직
+
   const user = createUser.user;
 
   if (user) {

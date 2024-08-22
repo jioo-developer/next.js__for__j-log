@@ -1,14 +1,12 @@
 type propsType = {
-  nicknameData: string[] | undefined;
+  nicknameData: string[];
   nickname: string;
 };
 
 const nicknameHandler = ({ nicknameData, nickname }: propsType) => {
-  if (nicknameData) {
-    return nicknameData.some((item) => {
-      return Object.values(item).includes(nickname);
-    });
-  } else return false;
+  return nicknameData.some((item) => {
+    return Object.values(item).includes(nickname);
+  });
 };
 
 export default nicknameHandler;
