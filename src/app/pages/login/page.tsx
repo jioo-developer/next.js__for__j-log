@@ -10,10 +10,10 @@ import { Input } from "@/stories/atoms/Input";
 import SocialLogin from "./snsLogin/sosialLogin";
 import Image from "next/image";
 import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 
 const LoginPage = () => {
-  const { data, refetch } = useUserQueryHook();
+  const { refetch } = useUserQueryHook();
   const router = useRouter();
 
   const [id, setId] = useState("");
@@ -21,7 +21,6 @@ const LoginPage = () => {
 
   function LoginHandler(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     signInWithEmailAndPassword(authService, id, pw)
       .then(() => {
         refetch();
@@ -29,12 +28,8 @@ const LoginPage = () => {
       })
       .catch((error) => {
         const errorMessage = LoginErrorHandler(error.message);
-        errorHandler(errorMessage);
+        popuprHandler({ message: errorMessage });
       });
-  }
-
-  if (data) {
-    router.push("/pages/main");
   }
 
   return (
