@@ -8,18 +8,14 @@ import { Dispatch, SetStateAction } from "react";
 type popupPropsType = {
   message: string;
   type?: string;
-  state?: (
-    params?: any
-  ) => void | Dispatch<SetStateAction<string | number>> | undefined;
+  state?: (params?: any) => void | Dispatch<SetStateAction<string>> | undefined;
 };
 
 export function popupInit() {
   popupMessageStore.setState({ message: "", isClick: false });
 }
 
-const isSetState = (
-  state: any
-): state is Dispatch<SetStateAction<string | number>> => {
+const isSetState = (state: any): state is Dispatch<SetStateAction<string>> => {
   return typeof state === "function";
 };
 

@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction } from "react";
 
 interface propsType extends styleProps {
   type: "id" | "password" | "textarea" | "email" | "text";
-  setstate?: Dispatch<SetStateAction<string | number>>;
+  setstate?: Dispatch<SetStateAction<string>>;
 }
 
 export const Input = ({ width, fontSize = 14, type, setstate }: propsType) => {
