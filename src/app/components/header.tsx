@@ -8,10 +8,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { globalRefetch } from "../store/common";
 import { ChangeEvent, useEffect, useState } from "react";
 
+const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
+
 function Header() {
   const [tabState, setTab] = useState(false);
 
-  const { isLoading, data, refetch } = useUserQueryHook();
+  const { data, refetch } = useUserQueryHook();
   const { postRefetch } = usePostQueryHook();
 
   const router = useRouter();
@@ -35,9 +37,9 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header>
-      {data ? (
-        <>
+    <>
+      {activePathName.includes(pathname) && data && (
+        <header>
           <div
             className="title"
             onClick={() => {
@@ -47,7 +49,6 @@ function Header() {
           >
             {data.displayName}.log
           </div>
-
           <label className="menu" htmlFor="menuToggle">
             <input
               type="checkbox"
@@ -59,7 +60,7 @@ function Header() {
               <Image
                 width={40}
                 height={40}
-                src={data.photoURL as string}
+                src={data.photoURL ? data.photoURL : "/img/default.svg"}
                 alt="프로필 이미지"
                 className="profile"
                 referrerPolicy="no-referrer"
@@ -74,14 +75,12 @@ function Header() {
             />
           </label>
           <ul className="sub_menu">
-            <li onClick={() => router.push("/pages/member/profile")}>설정</li>
+            <li onClick={() => router.push("/pages/member/mypage")}>설정</li>
             <li onClick={() => logout()}>로그아웃</li>
           </ul>
-        </>
-      ) : isLoading ? null : (
-        <div className="not-login-logo">J-LOG</div>
+        </header>
       )}
-    </header>
+    </>
   );
 }
 
