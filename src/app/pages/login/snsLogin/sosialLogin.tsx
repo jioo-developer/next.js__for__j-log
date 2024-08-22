@@ -70,7 +70,7 @@ const SocialLoginPage = () => {
       router.push("/pages/main");
     } catch {
       popuprHandler({
-        message: "2차비밀번호 설정중 에러가 발생하였습니다",
+        message: "2차비밀번호 설정 중 에러가 발생하였습니다",
       });
     }
   }

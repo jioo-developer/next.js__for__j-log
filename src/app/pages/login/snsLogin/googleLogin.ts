@@ -17,8 +17,16 @@ export async function onGoogle() {
 export async function isSecondpw(id: string) {
   const docRef = await doc(db, "nickname", id);
   const docSnap = await getDoc(docRef);
-  if (docSnap.exists() && docSnap.data().service) {
-    return true;
+  if (docSnap.exists()) {
+    // 이미 문서가 있는 지 체크
+    if (docSnap.data().service && docSnap.data().password) {
+      return true;
+      // 문서 안에 service 타입과 패스워드가 있는지 체크
+    } else {
+      return false;
+      // 문서 안에 service 타입과 패스워드가 있는지 체크
+    }
+    // 이미 문서가 있는 지 체크
   } else {
     return false;
   }

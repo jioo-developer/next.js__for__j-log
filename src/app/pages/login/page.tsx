@@ -28,8 +28,14 @@ const LoginPage = () => {
       })
       .catch((error) => {
         const errorMessage = LoginErrorHandler(error.message);
-        popuprHandler({ message: errorMessage });
+        if (errorMessage) {
+          popuprHandler({ message: errorMessage });
+        } else {
+          popuprHandler({ message: "로그인 도중 에러가 발생했습니다" });
+        }
       });
+
+    // 굳이 then catch를 쓴 이유는 firebase 고유 에러가 있기 때문에 error params를 받아야되서
   }
 
   return (

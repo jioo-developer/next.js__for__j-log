@@ -53,7 +53,9 @@ const SignupPage = () => {
       popuprHandler({ message: "회원가입을 환영합니다!" });
     } catch (error) {
       const errorMessage = LoginErrorHandler((error as Error).message);
-      if (errorMessage.includes("그 외 에러")) {
+      if (errorMessage) {
+        popuprHandler({ message: errorMessage });
+      } else {
         popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
       }
     }
