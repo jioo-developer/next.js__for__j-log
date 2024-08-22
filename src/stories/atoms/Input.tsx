@@ -8,11 +8,11 @@ import { Dispatch, SetStateAction } from "react";
 
 interface propsType extends styleProps {
   type: "id" | "password" | "textarea" | "email" | "text";
-  setstate?: Dispatch<SetStateAction<string>>;
+  setstate?: Dispatch<SetStateAction<string | number>>;
 }
 
-export const Input = ({ width, fontSize, type, setstate }: propsType) => {
-  const { value, valueChangeHandler } = useInput("");
+export const Input = ({ width, fontSize = 14, type, setstate }: propsType) => {
+  const { valueChangeHandler } = useInput("");
   return (
     <input
       required
@@ -37,7 +37,7 @@ const textPlaceHolader = {
 };
 
 const style = ({ width, fontSize }: styleProps) => css`
-  width: ${width}px;
+  width: ${width === "full" ? "100%;" : width + "px;"}
   font-size: ${fontSize}px;
   @include input-text();
   @include size();
