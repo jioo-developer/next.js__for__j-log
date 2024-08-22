@@ -10,6 +10,6 @@ export const LoginErrorHandler = (error: string) => {
   } else if (error.includes(" (auth/user-not-found)")) {
     return "해당 유저 이메일이 존재하지 않습니다.";
   } else {
-    return error;
+    return "그 외 에러";
   }
 };
