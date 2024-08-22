@@ -5,14 +5,13 @@ import { Input } from "@/stories/atoms/Input";
 import { Button } from "@/stories/atoms/Button";
 import Image from "next/image";
 import Checker from "@/stories/atoms/Checker";
-import { Popup } from "@/stories/atoms/Popup";
-import { popupMessageStore } from "@/app/store/common";
 import signupHandler from "@/app/common/handler/signupHandler";
 import { useRouter } from "next/navigation";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import useNickQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
 import nicknameHandler from "@/app/common/handler/nickname/nicknameCheckHandler";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 
 const authData = [
   { id: "auth", text: "회원가입및 운영약관 동의", important: true },
@@ -20,13 +19,18 @@ const authData = [
   { id: "location", text: "위치정보 이용약관 동의", important: false },
 ];
 
+type accountType = {
+  email: string;
+  password: string;
+  nickname: string;
+};
+
 const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [disable, setDisable] = useState(false);
 
-  const msg = popupMessageStore();
   const router = useRouter();
 
   const { nicknameData } = useNickQueryHook();
@@ -35,30 +39,30 @@ const SignupPage = () => {
   function isNickName(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (nicknameHandler({ nicknameData, nickname })) {
-      errorHandler("이미 사용중인 닉네임 입니다");
-      setNickname("");
+      popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
     } else {
-      createAccount(email, password, nickname);
+      createAccount({ email, password, nickname });
     }
   }
 
-  async function createAccount(
-    email: string,
-    password: string,
-    nickname: string
-  ) {
-    const signupResult = await signupHandler(email, password, nickname);
-    if (signupResult) {
+  async function createAccount({ email, password, nickname }: accountType) {
+    try {
+      await signupHandler(email, password, nickname);
       refetch();
       router.push("/pages/main");
-      errorHandler("회원가입을 환영합니다!");
+      popuprHandler({ message: "회원가입을 환영합니다!" });
+    } catch (error) {
+      const errorMessage = LoginErrorHandler((error as Error).message);
+      if (errorMessage.includes("그 외 에러")) {
+        popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
+      }
     }
   }
 
   return (
     <div className="Auth_wrap">
       <div className="title_area">
-        <button onClick={() => router.push("/")}>
+        <button onClick={() => router.push("/pages/login")}>
           <Image
             src="/img/backbtn.svg"
             className="close"
@@ -115,7 +119,6 @@ const SignupPage = () => {
           </Button>
         )}
       </form>
-      {msg.message !== "" && <Popup rightAlign top />}
     </div>
   );
 };
