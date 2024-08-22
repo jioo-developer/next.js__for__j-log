@@ -3,7 +3,8 @@ import create from "zustand";
 export const popupMessageStore = create(() => ({
   message: "",
   type: "alert",
-  clickFunc: () => {},
+  state: () => {},
+  isClick: false,
 }));
 
 export const globalRefetch = create(() => ({
