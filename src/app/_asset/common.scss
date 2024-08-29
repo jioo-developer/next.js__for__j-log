@@ -48,6 +48,7 @@ button.noShadow {
 
 .form-control {
   @include input-text();
+  @include size();
   &::placeholder {
     color: gray;
   }

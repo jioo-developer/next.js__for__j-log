@@ -133,11 +133,13 @@
         .btn {
           @include btn-Reset();
           font-size: 15px;
-          margin-top: 13px;
           color: #12b886;
           text-decoration: underline;
+          padding: 0 5px;
+          box-sizing: border-box;
+          margin-top: 10px;
           text-align: left;
-          padding-left: 10px;
+          justify-content: flex-start !important;
         }
         .nick_btn {
           margin-right: 15px;

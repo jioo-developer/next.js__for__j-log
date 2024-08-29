@@ -62,6 +62,7 @@
     .un_btn {
       @extend .btn;
       background: gray;
+      pointer-events: none;
     }
   }
 
