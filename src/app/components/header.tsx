@@ -2,24 +2,19 @@
 import "@/app/_asset/header.scss";
 import { authService } from "../Firebase";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import usePostQueryHook from "@/app/api_hooks/main/getPosthooks";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { globalRefetch } from "../store/common";
 import { ChangeEvent, useEffect, useState } from "react";
 
 const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
 
 function Header() {
   const [tabState, setTab] = useState(false);
-
   const { data, refetch } = useUserQueryHook();
-  const { postRefetch } = usePostQueryHook();
+  const [displayName, setName] = useState("");
 
   const router = useRouter();
   const pathname = usePathname();
-
-  const refetchState = globalRefetch().refetch; //삭제금지
 
   function closeTab(e?: ChangeEvent<HTMLInputElement>) {
     setTab(e ? true : false);
@@ -27,8 +22,8 @@ function Header() {
 
   function logout() {
     authService.signOut().then(() => {
-      router.push("/pages/login");
       refetch();
+      router.push("/pages/login");
     });
   }
 
@@ -36,18 +31,16 @@ function Header() {
     closeTab();
   }, [pathname]);
 
+  useEffect(() => {
+    setName(data?.displayName as string);
+  }, [data]);
+
   return (
     <>
       {activePathName.includes(pathname) && data && (
         <header>
-          <div
-            className="title"
-            onClick={() => {
-              router.push("/pages/main");
-              postRefetch();
-            }}
-          >
-            {data.displayName}.log
+          <div className="title" onClick={() => router.push("/pages/main")}>
+            {displayName}.log
           </div>
           <label className="menu" htmlFor="menuToggle">
             <input
