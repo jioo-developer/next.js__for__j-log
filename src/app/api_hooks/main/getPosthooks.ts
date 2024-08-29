@@ -1,5 +1,6 @@
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
-import { getPostData } from "./posthooks";
+import { db } from "@/app/Firebase";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 export type postProps = {
   user: string;
@@ -16,20 +17,33 @@ export type postProps = {
   id: string;
 };
 
-const usePostQueryHook = () => {
-  const {
-    isLoading,
-    data,
-    error,
-    refetch,
-  }: QueryObserverResult<postProps[], Error> = useQuery({
-    queryKey: ["getPost"],
-    queryFn: getPostData,
-  });
-  const postData = data;
-  const postRefetch = refetch;
+async function getPostData() {
+  const collectionRef = collection(db, "post");
+  const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  const snapshot = await getDocs(queryData);
 
-  return { isLoading, postData, error, postRefetch };
+  if (snapshot.docs.length > 0) {
+    const postArray = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    return postArray;
+  } else {
+    return [];
+  }
+}
+
+const usePostQueryHook = () => {
+  const { data, isLoading, error }: QueryObserverResult<postProps[], Error> =
+    useQuery({
+      queryKey: ["getPost"],
+      queryFn: getPostData,
+      staleTime: 1 * 60 * 1000, // 1분
+      notifyOnChangeProps: ["data"],
+    });
+  const postData = data ? data : [];
+
+  return { isLoading, postData, error };
 };
 
 export default usePostQueryHook;
