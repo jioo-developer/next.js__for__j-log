@@ -1,56 +1,57 @@
 "use client";
 import "@/app/_asset/detail.scss";
-import useDetailQueryHook, {
-  FirebaseData,
-} from "@/app/api_hooks/detail/getDetailHooks";
+import useFavoriteMutate from "@/app/api_hooks/detail/favoriteMutate";
+import useDetailQueryHook from "@/app/api_hooks/detail/getDetailHooks";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import cookieHandler from "@/app/common/handler/cookieHandler";
-import useFavorite from "@/app/common/handler/detail/favoriteHandler";
 import DeleteHandler from "@/app/common/handler/detail/pageDeleteHanlder";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import Reply from "@/app/components/ReplyComponent";
 import { db } from "@/app/Firebase";
 import { popupMessageStore } from "@/app/store/common";
 import { User } from "firebase/auth";
 import { deleteDoc, doc } from "firebase/firestore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const DetailPage = () => {
   const router = useRouter();
   const { id } = useParams() as { id: string };
   const { data } = useUserQueryHook();
-  const { pageData, isLoading, pageRefetch } = useDetailQueryHook(id);
+  const { pageData, isLoading } = useDetailQueryHook(id);
 
   const user = data as User;
 
+  const ispopupClick = popupMessageStore().isClick;
+
+  const favoriteQuery = useFavoriteMutate();
+
+  useEffect(() => {
+    if (ispopupClick) {
+      pageDeleteHandler(ispopupClick);
+    }
+  }, [ispopupClick]);
+
   async function favoriteHandler() {
-    const getcookie = `${user.uid as string}-Cookie`;
-    if (document.cookie.includes(getcookie) && pageData) {
-      try {
-        await useFavorite({ pageData, id });
-        pageRefetch();
-        cookieHandler(getcookie, "done");
-      } catch {
-        throw new Error("좋아요 반영이 되지 않았습니다.");
-      }
+    const email = user.email as string;
+    const getcookie = `${email}-Cookie`;
+    if (!document.cookie.includes(getcookie)) {
+      const ref = doc(db, "post", id);
+      favoriteQuery.mutate({ email, pageData, ref, id });
     }
   }
 
-  async function pageDeleteHandler(boolean?: boolean) {
-    if (!boolean) {
-      popupMessageStore.setState((prev) => {
-        console.log(prev);
-        return { message: "정말 삭제 하시겠습니까?" };
-      });
-      return;
+  async function pageDeleteHandler(params?: boolean) {
+    if (!params) {
+      popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
     } else {
       try {
-        await DeleteHandler(pageData as FirebaseData);
+        await DeleteHandler(pageData);
         const locate = doc(db, "post", id);
         await deleteDoc(locate);
         router.push("/pages/main");
       } catch {
-        errorHandler("해당 페이지 삭제에 실패 하셨습니다");
+        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
       }
     }
   }
@@ -60,8 +61,7 @@ const DetailPage = () => {
   }
 
   return (
-    pageData &&
-    user && (
+    (pageData.user && user) ?? (
       <div className="detail_wrap">
         <div className="in_wrap">
           <section className="sub_header">
@@ -121,6 +121,7 @@ const DetailPage = () => {
                   <span>👍</span>추천&nbsp;{pageData.favorite}
                 </button>
               </div>
+              <Reply pageId={id} />
             </div>
           </section>
         </div>

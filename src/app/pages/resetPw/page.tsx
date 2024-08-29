@@ -11,9 +11,10 @@ import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 const ResetPwPage = () => {
   const [findPw, setFindPw] = useState("");
+
   const { data } = useUserQueryHook();
 
-  const isPopClick = popupMessageStore().isClick;
+  const isPopupClick = popupMessageStore().isClick;
   const msg = popupMessageStore().message;
 
   const router = useRouter();
@@ -33,10 +34,10 @@ const ResetPwPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isPopClick) {
+    if (isPopupClick) {
       resetHandler();
     }
-  }, [isPopClick]);
+  }, [isPopupClick]);
 
   useEffect(() => {
     popupMessageStore.subscribe((state, prevState) => {

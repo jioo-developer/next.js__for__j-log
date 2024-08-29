@@ -5,13 +5,10 @@ import { Input } from "@/stories/atoms/Input";
 import { Button } from "@/stories/atoms/Button";
 import Image from "next/image";
 import Checker from "@/stories/atoms/Checker";
-import signupHandler from "@/app/common/handler/signupHandler";
 import { useRouter } from "next/navigation";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import useNickQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
-import nicknameHandler from "@/app/common/handler/nickname/nicknameCheckHandler";
 import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
-import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
+import useNameQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
+import useSignupHandler from "@/app/common/handler/signupHandler";
 
 const authData = [
   { id: "auth", text: "회원가입및 운영약관 동의", important: true },
@@ -19,48 +16,29 @@ const authData = [
   { id: "location", text: "위치정보 이용약관 동의", important: false },
 ];
 
-type accountType = {
-  email: string;
-  password: string;
-  nickname: string;
-};
-
 const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [disable, setDisable] = useState(false);
+  const [disable, setDisable] = useState(true);
 
   const router = useRouter();
+  const { nicknameData, error, isLoading } = useNameQueryHook();
 
-  const { nicknameData } = useNickQueryHook();
-  const { isLoading, refetch } = useUserQueryHook();
+  const crateAccount = useSignupHandler();
 
-  function isNickName(e: FormEvent<HTMLFormElement>) {
+  function accountHandler(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (nicknameData) {
-      if (nicknameHandler({ nicknameData, nickname })) {
+    if (!error && nicknameData) {
+      const isNamecheck = nicknameData.includes(nickname);
+      if (isNamecheck) {
         popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
       } else {
-        createAccount({ email, password, nickname });
-      }
-    } else {
-      popuprHandler({ message: "닉네임 중복체크 중 에러가 발생하였습니다" });
-    }
-  }
-
-  async function createAccount({ email, password, nickname }: accountType) {
-    try {
-      await signupHandler({ email, password, nickname });
-      refetch();
-      router.push("/pages/main");
-      popuprHandler({ message: "회원가입을 환영합니다!" });
-    } catch (error) {
-      const errorMessage = LoginErrorHandler((error as Error).message);
-      if (errorMessage) {
-        popuprHandler({ message: errorMessage });
-      } else {
-        popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
+        crateAccount.mutate({
+          email: email,
+          password: password,
+          nickname: nickname,
+        });
       }
     }
   }
@@ -79,7 +57,7 @@ const SignupPage = () => {
         </button>
         <p>회원가입</p>
       </div>
-      <form className="auth-form" onSubmit={(e) => isNickName(e)}>
+      <form className="auth-form" onSubmit={(e) => accountHandler(e)}>
         <p className="id_title">
           이메일&nbsp;<span>*</span>
         </p>
@@ -114,16 +92,13 @@ const SignupPage = () => {
           setstate={setNickname}
         />
         <Checker allcheck items={authData} setState={setDisable} />
-        {!isLoading && (
-          <Button
-            width={"full"}
-            theme="primary"
-            disable={disable}
-            className={disable ? "un_btn" : "btn"}
-          >
-            회원가입
-          </Button>
-        )}
+        <Button
+          width={"full"}
+          theme="primary"
+          className={disable ? "un_btn" : "btn"}
+        >
+          회원가입
+        </Button>
       </form>
     </div>
   );

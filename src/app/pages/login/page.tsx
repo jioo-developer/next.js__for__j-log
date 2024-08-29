@@ -1,41 +1,26 @@
 "use client";
 import "@/app/_asset/Sign.scss";
 import { FormEvent, useState } from "react";
-import { authService } from "@/app/Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { useRouter } from "next/navigation";
 import { Button } from "@/stories/atoms/Button";
 import { Input } from "@/stories/atoms/Input";
 import SocialLogin from "./snsLogin/sosialLogin";
 import Image from "next/image";
-import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import useLoginHook from "@/app/api_hooks/login/setUserHook";
 
 const LoginPage = () => {
-  const { refetch } = useUserQueryHook();
-  const router = useRouter();
-
   const [id, setId] = useState("");
   const [pw, setpw] = useState("");
 
-  function LoginHandler(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    signInWithEmailAndPassword(authService, id, pw)
-      .then(() => {
-        refetch();
-        router.push("/pages/main");
-      })
-      .catch((error) => {
-        const errorMessage = LoginErrorHandler(error.message);
-        if (errorMessage) {
-          popuprHandler({ message: errorMessage });
-        } else {
-          popuprHandler({ message: "로그인 도중 에러가 발생했습니다" });
-        }
-      });
+  const router = useRouter();
 
-    // 굳이 then catch를 쓴 이유는 firebase 고유 에러가 있기 때문에 error params를 받아야되서
+  const loginMutation = useLoginHook();
+  // 컴포넌트나 커스텀 훅의 내부에서만 호출
+
+  function LoginHandler(e: FormEvent<HTMLFormElement>) {
+    // mutation을 여기서 불러오면 안됨
+    e.preventDefault();
+    loginMutation.mutate({ id: id, pw: pw });
   }
 
   return (

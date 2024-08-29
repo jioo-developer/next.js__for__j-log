@@ -6,62 +6,63 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import useNickQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
-import Quit from "@/app/pages/member/quit/page";
-
-import { globalRefetch } from "@/app/store/common";
-import nameChangeHandler from "@/app/common/handler/nickname/nicknameChangeHandler";
 import onFileChange from "@/app/common/handler/file/onFileChangeHandler";
 import storageUpload from "@/app/common/handler/file/storageUploadHandler";
 import { updateProfile, User } from "firebase/auth";
 import { authService } from "@/app/Firebase";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { Input } from "@/stories/atoms/Input";
+import useNameChanger from "@/app/api_hooks/mypage/nameChangeHandler";
+import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
+import { Button } from "@/stories/atoms/Button";
+import { useRouter } from "next/navigation";
+import QuitPage from "../quit/page";
 
 function MyPage() {
   const [nickname, setnickname] = useState("");
   const [nameToggle, setnameToggle] = useState(false);
-  const [toggleQuit, setQuit] = useState(false);
+  const [quit, setQuit] = useState(false);
 
-  const refetchState = globalRefetch();
-
+  const { data } = useUserQueryHook();
   const { nicknameData } = useNickQueryHook();
-  const { data, refetch } = useUserQueryHook();
+
+  const nameChangeMutate = useNameChanger();
+
+  const router = useRouter();
 
   useEffect(() => {
     if (data) {
       setnickname(data.displayName as string);
     }
-  }, [data, refetchState]);
+  }, [data]);
 
-  async function nameHandler() {
+  async function changeNameHandler() {
     if (nicknameData) {
-      try {
-        await nameChangeHandler({ data, nicknameData, nickname });
-        refetch();
-        globalRefetch.setState({ refetch: !refetch });
+      const isNamecheck = nicknameData.includes(nickname);
+      if (isNamecheck) {
+        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+      } else {
+        nameChangeMutate.mutate({ data, nickname });
         setnameToggle(!nameToggle);
-      } catch {
-        errorHandler("닉네임을 변경에 실패하였습니다.");
       }
     }
   }
 
-  async function ImageHandler(e: ChangeEvent<HTMLInputElement>) {
+  async function changeImageHandler(e: ChangeEvent<HTMLInputElement>) {
     const user = authService.currentUser;
     const theFiles = Array.from(e.target.files || []);
     if (theFiles.length > 0) {
       try {
         const { result, files } = await onFileChange(theFiles);
         const upload = await storageUpload(result, files);
-
         try {
           await updateProfile(user as User, { photoURL: upload[0] });
-          refetch();
-          globalRefetch.setState({ refetch: !refetch });
+          router.push("/pages/main");
         } catch {
-          errorHandler("프로필 변경에 실패하였습니다.");
+          popuprHandler({ message: "프로필 변경에 실패하였습니다." });
         }
       } catch (error) {
-        errorHandler("프로필 업로드에 실패하였습니다.");
+        popuprHandler({ message: "프로필 업로드에 실패하였습니다." });
       }
     }
   }
@@ -76,7 +77,9 @@ function MyPage() {
                 type="file"
                 accept="image/*"
                 id="img_check"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => ImageHandler(e)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  changeImageHandler(e)
+                }
               />
               <figure className="profileImg">
                 <Image
@@ -92,34 +95,39 @@ function MyPage() {
             </div>
             <div className="name_area">
               {nameToggle ? (
-                <input
+                <Input
                   type="text"
+                  width={375}
+                  height={45}
+                  fontSize={16}
                   value={nickname}
-                  className="form-control"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setnickname(e.target.value)
-                  }
+                  setstate={setnickname}
                 />
               ) : (
                 <b className="nickname">{data.displayName}</b>
               )}
-
-              <button
-                className="btn comment_btn"
-                onClick={() =>
-                  !nameToggle ? setnameToggle(!nameToggle) : nameHandler()
-                }
-              >
-                {nameToggle ? "수정완료" : "닉네임 수정"}
-              </button>
-              {nameToggle && (
-                <button
-                  className="btn comment_btn"
-                  onClick={() => nameToggle && setnameToggle(!nameToggle)}
+              <ButtonGroup rightAlign={false}>
+                <Button
+                  width={"auto"}
+                  className="btn"
+                  onClick={() => {
+                    !nameToggle
+                      ? setnameToggle(!nameToggle)
+                      : changeNameHandler();
+                  }}
                 >
-                  취소
-                </button>
-              )}
+                  {nameToggle ? "수정완료" : "수정"}
+                </Button>
+                {nameToggle && (
+                  <Button
+                    className="btn comment_btn"
+                    width={"auto"}
+                    onClick={() => nameToggle && setnameToggle(!nameToggle)}
+                  >
+                    취소
+                  </Button>
+                )}
+              </ButtonGroup>
             </div>
           </div>
           <div className="suggest">
@@ -129,13 +137,7 @@ function MyPage() {
           <div className="withdrawal">
             <div className="delete_wrap">
               <p className="withdrawal_title">회원 탈퇴</p>
-              <button
-                className="btn"
-                onClick={() => {
-                  setQuit(true);
-                  errorHandler("정말로 탈퇴하시겠어요?");
-                }}
-              >
+              <button className="btn" onClick={() => setQuit(!quit)}>
                 회원 탈퇴
               </button>
             </div>
@@ -150,7 +152,7 @@ function MyPage() {
             </p>
           </div>
         </section>
-        {toggleQuit && <Quit />}
+        {quit && <QuitPage />}
       </div>
     )
   );

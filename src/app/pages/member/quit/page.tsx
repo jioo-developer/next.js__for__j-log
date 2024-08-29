@@ -1,90 +1,80 @@
 "use client";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { errorHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 import {
-  LoginTypeCheck,
   deleteUserDB,
+  LoginTypeCheck,
 } from "@/app/common/handler/quit/quitHandler";
 import originDeleteHandler from "@/app/common/handler/quit/originquit";
 import SocialDeleteHandler from "@/app/common/handler/quit/socialquit";
 import { popupMessageStore } from "@/app/store/common";
-import { Button } from "@/stories/atoms/Button";
-import { Input } from "@/stories/atoms/Input";
-import { Popup } from "@/stories/atoms/Popup";
-import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
+import { useEffect, useState } from "react";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 const QuitPage = () => {
-  const msgContent = popupMessageStore();
-  const router = useRouter();
-  const { data } = useUserQueryHook();
   const [quitPw, setPw] = useState("");
-  const [subCon, setSub] = useState(true);
+  const { data } = useUserQueryHook();
+  const isPopupClick = popupMessageStore().isClick;
 
-  async function deleteHandler() {
-    errorHandler("비밀번호를 입력해주세요");
-    if (data && quitPw !== "") {
+  const router = useRouter();
+
+  useEffect(() => {
+    popuprHandler({
+      message: "정말로 계정을 삭제 하시겠습니까?",
+      type: "confirm",
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isPopupClick) {
+      console.log("false");
+    } else if (isPopupClick && quitPw === "") {
+      deleteProcess();
+    } else if (isPopupClick && quitPw !== "") {
+      deleteHandler(true);
+    }
+  }, [isPopupClick]);
+
+  async function deleteProcess() {
+    const accountType = await LoginTypeCheck(data as User);
+    popupMessageStore.setState({ isClick: false });
+    if (accountType === "sosial") {
+      popuprHandler({
+        message: "회원탈퇴에 사용 될 2차비밀번호를 입력해주세요",
+        type: "prompt",
+        state: setPw,
+      });
+    } else {
+      deleteHandler(false);
+    }
+  }
+
+  async function deleteHandler(isSosial?: boolean) {
+    if (isSosial) {
+      try {
+        const result = (await SocialDeleteHandler()).user;
+        result.delete().then(() => deleteUserDB(isSosial));
+        router.push("/pages/login");
+      } catch {
+        popuprHandler({ message: "회원탈퇴 중 에러가 발생하였습니다" });
+      }
+    } else {
       const password = quitPw;
-      const userHandler = await LoginTypeCheck({ data, password });
-      if (!userHandler) {
-        errorHandler("첫 가입시 입력하신 비밀번호랑 다릅니다.");
-      } else {
-        try {
-          if (userHandler === "social") {
-            const result = (await SocialDeleteHandler()).user;
-            result.delete().then(() => deleteUserDB(userHandler));
-          } else {
-            const result = (await originDeleteHandler({ data, password })).user;
-            result.delete().then(() => deleteUserDB());
-          }
-          errorHandler("회원탈퇴가 완료되었습니다");
-          setSub(true);
-        } catch {
-          errorHandler("사용자 재인증에 실패하였습니다");
-        }
+      try {
+        const result = await originDeleteHandler({
+          data: data as User,
+          password,
+        });
+        result.user.delete().then(() => deleteUserDB());
+        router.push("/pages/login");
+      } catch {
+        popuprHandler({ message: "회원탈퇴 중 에러가 발생하였습니다" });
       }
     }
   }
 
-  if (msgContent.message !== "") {
-    return (
-      <Popup
-        direction="column"
-        type="custom"
-        textAlign="center"
-        height={250}
-        subText={
-          subCon ? "탈퇴하시면 모든 정보를 복구 할 수 없습니다." : undefined
-        }
-      >
-        <div className="direction-wrap">
-          {subCon ? (
-            <ButtonGroup>
-              <Button>취소</Button>
-              <Button
-                theme="success"
-                onClick={() => {
-                  errorHandler("");
-                  setSub(false);
-                  deleteHandler();
-                }}
-              >
-                확인
-              </Button>
-            </ButtonGroup>
-          ) : (
-            <>
-              <Input type="password" setstate={setPw} />
-              <Button>확인</Button>
-            </>
-          )}
-        </div>
-      </Popup>
-    );
-  } else {
-    router.push("/pages/member/profile");
-  }
+  return <div></div>;
 };
 
 export default QuitPage;

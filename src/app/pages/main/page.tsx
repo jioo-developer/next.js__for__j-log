@@ -2,7 +2,7 @@
 import React from "react";
 import userQueryHook from "@/app/api_hooks/login/getUserHook";
 import { useRouter } from "next/navigation";
-import SkeletonItem from "@/app/components/skeletonItem";
+import SkeletonItem from "@/app/components/SkeletonItem";
 import PostItem from "@/app/components/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPosthooks";
 
@@ -19,25 +19,25 @@ const MainPage = () => {
     }
   }, 100);
 
-  const skeletonRendering = () => {
+  const fallbackHandler = () => {
     return [1, 2, 3].map((item) => {
       return <SkeletonItem key={item} />;
     });
   };
 
-  const Rendering = () => {
-    if (data && postData && postData.length > 0) {
+  const showDataHandler = () => {
+    if (postData.length > 0) {
       return postData.map((item, index) => {
         return <PostItem item={item} index={index} key={index} />;
       });
     } else {
-      skeletonRendering();
+      return <div></div>;
     }
   };
 
   return (
     <div className="post_section">
-      {isLoading ? skeletonRendering() : Rendering()}
+      {isLoading ? fallbackHandler() : showDataHandler()}
     </div>
   );
 };
