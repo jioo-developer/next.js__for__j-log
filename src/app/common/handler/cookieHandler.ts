@@ -1,4 +1,4 @@
-export default function cookieHandler(name: string, value: string) {
+export default function cookieHandler(name: string) {
   const time = new Date();
   const result = new Date(
     time.getFullYear(),
@@ -10,7 +10,5 @@ export default function cookieHandler(name: string, value: string) {
   );
   result.setMilliseconds(999);
   result.setHours(result.getHours() + 9);
-  document.cookie = `${name}=${encodeURIComponent(
-    value
-  )}; expires=${result.toUTCString()};`;
+  document.cookie = `${name}-Cookie=${encodeURIComponent("done")}; expires=${result.toUTCString()};`;
 }
