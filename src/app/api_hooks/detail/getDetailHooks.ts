@@ -1,6 +1,7 @@
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/app/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
-import { getDetailHandler } from "./DetailHooks";
+import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 
 export type FirebaseData = {
   url: string[];
@@ -19,25 +20,39 @@ export type FirebaseData = {
   favorite: number;
 };
 
-const useDetailQueryHook = (pageId: string) => {
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  }: QueryObserverResult<FirebaseData, Error> = useQuery({
-    queryKey: ["getDetail", pageId],
-    queryFn: async (queryKey) => {
-      const keyParams = queryKey.queryKey[1] as string;
-      return await getDetailHandler(keyParams);
-    },
-    enabled: !!pageId,
-  });
-  if (error) {
-    popuprHandler({ message: "페이지 정보를 찾을 수 없습니다." });
+async function getDetailHandler(pageId: string) {
+  try {
+    const docRef = doc(db, "post", pageId);
+    const snapshot = await getDoc(docRef);
+    if (snapshot.exists()) {
+      return snapshot.data();
+    } else {
+      throw new Error("페이지 정보를 불러오는 중 오류가 발생했습니다.");
+    }
+  } catch (error) {
+    throw new Error("페이지 정보를 불러오는 중 오류가 발생했습니다.");
   }
-  const pageData = data as FirebaseData;
-  const pageRefetch = refetch;
-  return { pageData, isLoading, error, pageRefetch };
+}
+
+const useDetailQueryHook = (pageId: string) => {
+  const { data, isLoading, error }: QueryObserverResult<FirebaseData, Error> =
+    useQuery({
+      queryKey: ["getPage", pageId],
+      queryFn: async (queryKey) => {
+        const keyParams = queryKey.queryKey[1] as string;
+        return await getDetailHandler(keyParams);
+      },
+      staleTime: 1 * 60 * 1000, // 1분
+      notifyOnChangeProps: ["data"],
+
+      enabled: !!pageId,
+      initialData: {},
+    });
+  const pageData = data;
+  if (error) {
+    popuprHandler({ message: error.message });
+    window.location.href = "/";
+  }
+  return { pageData, isLoading, error };
 };
 export default useDetailQueryHook;
