@@ -1,27 +1,26 @@
 import { authService, db, storageService } from "@/app/Firebase";
 import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
-import { userProps } from "../../type/commonType";
 import { User } from "firebase/auth";
+import { popuprHandler } from "../error/ErrorHandler";
 
-export async function LoginTypeCheck({ data, password }: userProps) {
-  const docRef = doc(db, "nickname", `${data.uid}-G`);
+export async function LoginTypeCheck(data: User) {
+  const user = data;
+  const docRef = doc(db, "nickname", user.uid);
   const docSnap = await getDoc(docRef);
-  const socialPW = docSnap.data();
-
-  if (socialPW) {
-    // socialPw 이 있으면
-    if (password === socialPW.password) {
-      return "social";
+  if (docSnap.exists()) {
+    if (docSnap.data().service !== "password") {
+      return "sosial";
     } else {
       return "origin";
     }
   } else {
-    return false;
+    popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
+    throw new Error("회원가입 도중 에러가 발생하였습니다");
   }
 }
 
-export async function deleteUserDB(type?: string) {
+export async function deleteUserDB(isSosial?: boolean) {
   const user = authService.currentUser as User;
   const imageRef = ref(storageService, `${user.uid}`); // Storage 참조 생성
 
@@ -34,12 +33,14 @@ export async function deleteUserDB(type?: string) {
     deleteObject(imageRef), // 이미지 삭제
   ];
 
-  if (type === "social") {
+  if (isSosial) {
     deletePromises.push(
       // 소셜 계정과 관련된 추가 문서 삭제
       deleteDoc(doc(db, "nickname", `${user.uid}-G`))
     );
   }
 
-  Promise.all(deletePromises);
+  Promise.all(deletePromises).then(() => {
+    authService.signOut();
+  });
 }

@@ -1,6 +1,10 @@
 import { authService, db } from "@/app/Firebase";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { popuprHandler } from "./error/ErrorHandler";
+import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 
 type propsType = {
   email: string;
@@ -8,29 +12,52 @@ type propsType = {
   nickname: string;
 };
 
-const signupHandler = async ({ email, password, nickname }: propsType) => {
-  // 회원생성로직
-  const createUser = await createUserWithEmailAndPassword(
-    authService,
-    email,
-    password
-  );
-  // 회원생성로직
+// 회원가입 계정 생성 로직
 
-  const user = createUser.user;
+const useSignupHandler = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ email, password, nickname }: propsType) => {
+      // 회원생성로직
+      const createUser = await createUserWithEmailAndPassword(
+        authService,
+        email,
+        password
+      );
+      // 회원생성로직
 
-  if (user) {
-    // Firestore에 닉네임 저장
-    await setDoc(doc(db, "nickname", user.uid), {
-      id: user.uid,
-      nickname: nickname,
-    });
+      const user = createUser.user;
 
-    // 사용자 프로필 업데이트
-    await updateProfile(user, {
-      displayName: nickname,
-    });
-  }
+      if (user) {
+        // Firestore에 닉네임 저장
+        await setDoc(doc(db, "nickname", user.uid), {
+          id: user.uid,
+          nickname: nickname,
+        });
+
+        // 사용자 프로필 업데이트
+        await updateProfile(user, {
+          displayName: nickname,
+        });
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ["getuser"],
+      });
+      router.push("/pages/main");
+      popuprHandler({ message: "회원가입을 환영합니다!" });
+    },
+    onError: (error) => {
+      const errorMessage = LoginErrorHandler((error as Error).message);
+      if (errorMessage) {
+        popuprHandler({ message: errorMessage });
+      } else {
+        popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
+      }
+    },
+  });
 };
 
-export default signupHandler;
+export default useSignupHandler;

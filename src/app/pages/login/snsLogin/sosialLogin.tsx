@@ -3,10 +3,10 @@ import {
   popuprHandler,
 } from "@/app/common/handler/error/ErrorHandler";
 import {
-  isSecondpw,
+  isSecondaryPw,
   onGoogle,
-  secondPassword,
-} from "@/app/pages/login/snsLogin/googleLogin";
+  useSecondaryHandler,
+} from "@/app/api_hooks/login/snsLogin/googleLogin";
 import { popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -28,18 +28,20 @@ const SocialLoginPage = () => {
   });
 
   const router = useRouter();
-  const ispopClick = popupMessageStore().isClick;
+  const ispopupClick = popupMessageStore().isClick;
+
+  const signupMutation = useSecondaryHandler();
 
   useEffect(() => {
-    if (ispopClick) {
-      secondSubmit();
+    if (ispopupClick) {
+      setSecondaryPw();
     }
-  }, [ispopClick]);
+  }, [ispopupClick]);
 
   async function LoginHandler() {
     try {
       const googleUser = await onGoogle();
-      const isUserSecondPw = await isSecondpw(googleUser.userId);
+      const isUserSecondPw = await isSecondaryPw(googleUser.userId);
       if (!isUserSecondPw) {
         popuprHandler({
           message: "회원탈퇴에 사용 될 2차 비밀번호를 입력해주세요.",
@@ -61,18 +63,11 @@ const SocialLoginPage = () => {
     }
   }
 
-  async function secondSubmit() {
+  async function setSecondaryPw() {
     const newObj = { ...userObj };
     newObj.pw = parseInt(pw);
     popupInit();
-    try {
-      await secondPassword(newObj);
-      router.push("/pages/main");
-    } catch {
-      popuprHandler({
-        message: "2차비밀번호 설정 중 에러가 발생하였습니다",
-      });
-    }
+    await signupMutation.mutate(newObj);
   }
 
   return (

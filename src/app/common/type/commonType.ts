@@ -21,7 +21,7 @@ export interface styleProps {
 
 export type changeHanlderType = {
   data: User | undefined;
-  nicknameData: string[];
+  nicknameData?: string[];
   nickname: string;
 };
 
