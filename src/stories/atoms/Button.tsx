@@ -52,10 +52,10 @@ const themes = {
 
 const style = ({ width, height, fontSize }: styleProps) => css`
   width: ${width === "full"
-    ? "100%"
-    : width && width !== "full"
-      ? width + "px"
-      : null};
+    ? "100%;"
+    : width === "auto"
+      ? "auto"
+      : width + "px;"};
 
   height: ${height ? height + "px" : "auto"};
   outline: none;

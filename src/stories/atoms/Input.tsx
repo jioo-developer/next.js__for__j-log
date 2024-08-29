@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
 import "@/app/_asset/theme.scss";
-import "@/app/_asset/_mixin.scss";
+import { css } from "@emotion/react";
 import { styleProps } from "@/app/common/type/commonType";
 import { useInput } from "@/app/common/hook/useInput";
 import { Dispatch, SetStateAction } from "react";
@@ -9,9 +8,16 @@ import { Dispatch, SetStateAction } from "react";
 interface propsType extends styleProps {
   type: "id" | "password" | "textarea" | "email" | "text";
   setstate?: Dispatch<SetStateAction<string>>;
+  value?: string | number;
 }
 
-export const Input = ({ width, fontSize = 14, type, setstate }: propsType) => {
+export const Input = ({
+  width,
+  fontSize = 14,
+  type,
+  setstate,
+  value,
+}: propsType) => {
   const { valueChangeHandler } = useInput("");
   return (
     <input
@@ -19,6 +25,7 @@ export const Input = ({ width, fontSize = 14, type, setstate }: propsType) => {
       type={type === "id" || type === "text" ? "text" : type}
       className="form-control"
       placeholder={textPlaceHolader[type]}
+      value={value && value}
       onChange={(e) =>
         setstate ? setstate(e.target.value) : valueChangeHandler
       }
@@ -39,10 +46,7 @@ const textPlaceHolader = {
 const style = ({ width, fontSize }: styleProps) => css`
   width: ${width === "full" ? "100%;" : width + "px;"}
   font-size: ${fontSize}px;
-  @include input-text();
-  @include size();
   margin-bottom: 15px;
-
   &::placeholder {
     color: gray;
   }
