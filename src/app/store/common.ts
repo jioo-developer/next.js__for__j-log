@@ -7,6 +7,7 @@ export const popupMessageStore = create(() => ({
   isClick: false,
 }));
 
-export const globalRefetch = create(() => ({
-  refetch: false,
+export const pageInfoStore = create(() => ({
+  pgId: "",
+  editMode: false,
 }));
