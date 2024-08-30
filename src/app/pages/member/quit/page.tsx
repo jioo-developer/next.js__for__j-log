@@ -7,10 +7,14 @@ import {
 import originDeleteHandler from "@/app/common/handler/quit/originquit";
 import SocialDeleteHandler from "@/app/common/handler/quit/socialquit";
 import { popupMessageStore } from "@/app/store/common";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
+
+type propsType = {
+  quit: Dispatch<SetStateAction<boolean>>;
+};
 
 const QuitPage = () => {
   const [quitPw, setPw] = useState("");
@@ -29,9 +33,12 @@ const QuitPage = () => {
   useEffect(() => {
     if (!isPopupClick) {
       console.log("false");
+      // 팝업 클릭이 그저 false 일 떄
     } else if (isPopupClick && quitPw === "") {
       deleteProcess();
+      // 팝업 클릭은 되어 있지만 quitPw은 변경이 없을 때
     } else if (isPopupClick && quitPw !== "") {
+      // 팝업 클릭도 있었고 quitPw도 변경이 되었을 때
       deleteHandler(true);
     }
   }, [isPopupClick]);

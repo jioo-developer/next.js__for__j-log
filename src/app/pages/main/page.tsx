@@ -26,13 +26,9 @@ const MainPage = () => {
   };
 
   const showDataHandler = () => {
-    if (postData.length > 0) {
-      return postData.map((item, index) => {
-        return <PostItem item={item} index={index} key={index} />;
-      });
-    } else {
-      return <div></div>;
-    }
+    return postData.map((item, index) => {
+      return <PostItem item={item} index={index} key={index} />;
+    });
   };
 
   return (

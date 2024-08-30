@@ -31,7 +31,7 @@ const ResetPwPage = () => {
         state: setFindPw,
       });
     }
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     if (isPopupClick) {
