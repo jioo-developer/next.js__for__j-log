@@ -5,6 +5,9 @@ import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { User } from "next-auth";
+import { popuprHandler } from "../common/handler/error/ErrorHandler";
 
 const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
 
@@ -15,16 +18,20 @@ function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   function closeTab(e?: ChangeEvent<HTMLInputElement>) {
     setTab(e ? true : false);
   }
 
   function logout() {
-    authService.signOut().then(() => {
-      refetch();
+    try {
+      authService.signOut();
+      queryClient.clear();
       router.push("/pages/login");
-    });
+    } catch {
+      popuprHandler({ message: "로그아웃에 실패하였습니다" });
+    }
   }
 
   useEffect(() => {
@@ -35,9 +42,11 @@ function Header() {
     setName(data?.displayName as string);
   }, [data]);
 
+  const isActive = activePathName.some((path) => pathname.startsWith(path));
+
   return (
     <>
-      {activePathName.includes(pathname) && data && (
+      {isActive && data && (
         <header>
           <div className="title" onClick={() => router.push("/pages/main")}>
             {displayName}.log

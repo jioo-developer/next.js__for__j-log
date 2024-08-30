@@ -1,36 +1,36 @@
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "@/app/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 
 export type FirebaseData = {
-  url: string[];
-  title: string;
-  writer: string;
-  profile: string;
-  pageId: string;
   user: string;
+  pageId: string;
+  profile: string;
+  date: string;
   timeStamp: {
     seconds: number;
     nanoseconds: number;
   };
-  text: string;
+  title: string;
   fileName: string[];
-  date: string;
+  url: string[];
   favorite: number;
+  text: string;
+  writer: string;
+  id: string;
 };
 
 async function getDetailHandler(pageId: string) {
-  try {
-    const docRef = doc(db, "post", pageId);
-    const snapshot = await getDoc(docRef);
-    if (snapshot.exists()) {
-      return snapshot.data();
-    } else {
-      throw new Error("페이지 정보를 불러오는 중 오류가 발생했습니다.");
-    }
-  } catch (error) {
-    throw new Error("페이지 정보를 불러오는 중 오류가 발생했습니다.");
+  const collectionRef = collection(db, "post");
+  // const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  // const snapshot = await getDocs(queryData);
+  const snapshot = await getDocs(collectionRef);
+  if (snapshot.docs.length > 0) {
+    const filterDocs = snapshot.docs.filter((item) => item.id === pageId);
+    const docData = filterDocs.map((doc) => doc.data());
+    return docData[0];
+  } else {
+    return null;
   }
 }
 
@@ -44,15 +44,9 @@ const useDetailQueryHook = (pageId: string) => {
       },
       staleTime: 1 * 60 * 1000, // 1분
       notifyOnChangeProps: ["data"],
-
       enabled: !!pageId,
-      initialData: {},
     });
-  const pageData = data;
-  if (error) {
-    popuprHandler({ message: error.message });
-    window.location.href = "/";
-  }
-  return { pageData, isLoading, error };
+
+  return { pageData: data, isLoading, error };
 };
 export default useDetailQueryHook;
