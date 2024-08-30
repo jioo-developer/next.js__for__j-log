@@ -27,8 +27,8 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
   const allChecker = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.id === "all_check") {
       if (e.target.checked) {
-        const allcheck = items.map((item) => item.id);
-        setCheck(allcheck);
+        const checkAll = items.map((item) => item.id);
+        setCheck(checkAll);
       } else {
         setCheck([]);
       }

@@ -2,7 +2,7 @@
 import "@/app/_asset/theme.scss";
 import { css } from "@emotion/react";
 import { styleProps } from "@/app/common/type/commonType";
-import { useInput } from "@/app/common/hook/useInput";
+import { useInput } from "@/app/common/handler/useInput";
 import { Dispatch, SetStateAction } from "react";
 
 interface propsType extends styleProps {
