@@ -1,16 +1,18 @@
 import "@/app/_asset/home.scss";
 import Image from "next/image";
-import { postProps } from "@/app/api_hooks/main/getPosthooks";
 import { useRouter } from "next/navigation";
+import { pageInfoStore } from "../store/common";
+import { FirebaseData } from "../api_hooks/detail/getDetailHooks";
 
 type itemProps = {
-  item: postProps;
+  item: FirebaseData;
   index: number;
 };
 
 const PostItem = ({ item, index }: itemProps) => {
   const router = useRouter();
   function goDetail() {
+    pageInfoStore.setState({ pgId: item.pageId });
     router.push(`/pages/detail/${item.pageId}`);
   }
 
@@ -20,7 +22,9 @@ const PostItem = ({ item, index }: itemProps) => {
         <Image
           width={320}
           height={180}
-          src={item.url.length > 0 ? item.url[0] : "/img/no-image.jpg"}
+          src={
+            item.url && item.url.length > 0 ? item.url[0] : "/img/no-image.jpg"
+          }
           alt="썸네일"
         />
       </figure>
@@ -32,7 +36,7 @@ const PostItem = ({ item, index }: itemProps) => {
       <div className="writer_wrap">
         <div className="id writter-id">
           <Image
-            src={item.profile}
+            src={item.profile ? item.profile : "/img/default.svg"}
             alt=""
             width={40}
             height={40}

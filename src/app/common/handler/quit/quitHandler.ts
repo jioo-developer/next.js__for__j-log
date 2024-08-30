@@ -41,6 +41,8 @@ export async function deleteUserDB(isSosial?: boolean) {
   }
 
   Promise.all(deletePromises).then(() => {
-    authService.signOut();
+    authService.signOut().then(() => {
+      window.location.reload();
+    });
   });
 }

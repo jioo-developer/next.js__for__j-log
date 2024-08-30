@@ -11,7 +11,6 @@ function useNameChanger() {
     mutationFn: async ({ data, nickname }: changeHanlderType) => {
       const user = data as userData;
       const userNameRef = doc(db, "nickname", user.uid as string);
-      const newTitleDocRef = doc(db, "nickname", user.uid);
 
       await updateDoc(userNameRef, {
         nickname: deleteField(),

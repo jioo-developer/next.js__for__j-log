@@ -126,7 +126,6 @@ const Reply = ({ pageId }: { pageId: string }) => {
         />
         <button className="btn">댓글 작성</button>
       </form>
-      ;
     </>
   );
 };
