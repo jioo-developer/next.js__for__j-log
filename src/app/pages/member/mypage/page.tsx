@@ -17,6 +17,7 @@ import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { useRouter } from "next/navigation";
 import QuitPage from "../quit/page";
+import { popupMessageStore } from "@/app/store/common";
 
 function MyPage() {
   const [nickname, setnickname] = useState("");
@@ -28,6 +29,8 @@ function MyPage() {
 
   const nameChangeMutate = useNameChanger();
 
+  const msg = popupMessageStore().message;
+
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +38,14 @@ function MyPage() {
       setnickname(data.displayName as string);
     }
   }, [data]);
+
+  useEffect(() => {
+    popupMessageStore.subscribe((state, prevState) => {
+      if (prevState.message !== "" && state.message === "") {
+        setQuit(false);
+      }
+    });
+  }, [msg]);
 
   async function changeNameHandler() {
     if (nicknameData) {
