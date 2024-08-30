@@ -8,7 +8,6 @@ import {
 import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
 import cookieHandler from "@/app/common/handler/cookieHandler";
 import { FirebaseData } from "./getDetailHooks";
-import { postProps } from "../main/getPosthooks";
 
 type propsType = {
   email: string;
@@ -36,7 +35,7 @@ const useFavoriteMutate = () => {
       queryClient.refetchQueries({
         queryKey: ["getPage", id],
       });
-      queryClient.setQueryData<postProps>(["getPage"], (oldData) => {
+      queryClient.setQueryData<FirebaseData>(["getPage"], (oldData) => {
         if (!oldData) return oldData;
         return {
           ...oldData,

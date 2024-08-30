@@ -2,6 +2,8 @@ import { authService } from "@/app/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { User } from "firebase/auth";
 
+// 로그인 호출 관련 hook
+
 const getuser = (): Promise<User> => {
   return new Promise((resolve, reject) => {
     authService.onAuthStateChanged((user) => {

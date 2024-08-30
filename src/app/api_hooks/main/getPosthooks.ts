@@ -1,27 +1,13 @@
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { db } from "@/app/Firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
-
-export type postProps = {
-  user: string;
-  pageId: string;
-  profile: string;
-  date: string;
-  timestamp: { second: number; nanoseconds: number };
-  title: string;
-  fileName: string | string[];
-  url: string[];
-  favorite: number;
-  text: string;
-  writer: string;
-  id: string;
-};
+import { FirebaseData } from "../detail/getDetailHooks";
 
 async function getPostData() {
   const collectionRef = collection(db, "post");
-  const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
-  const snapshot = await getDocs(queryData);
-
+  // const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  // const snapshot = await getDocs(queryData);
+  const snapshot = await getDocs(collectionRef);
   if (snapshot.docs.length > 0) {
     const postArray = snapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -34,7 +20,7 @@ async function getPostData() {
 }
 
 const usePostQueryHook = () => {
-  const { data, isLoading, error }: QueryObserverResult<postProps[], Error> =
+  const { data, isLoading, error }: QueryObserverResult<FirebaseData[], Error> =
     useQuery({
       queryKey: ["getPost"],
       queryFn: getPostData,
