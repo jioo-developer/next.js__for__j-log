@@ -1,13 +1,18 @@
 "use client";
 import "@/app/_asset/detail.scss";
 import useFavoriteMutate from "@/app/api_hooks/detail/favoriteMutate";
-import useDetailQueryHook from "@/app/api_hooks/detail/getDetailHooks";
+import useDetailQueryHook, {
+  FirebaseData,
+} from "@/app/api_hooks/detail/getDetailHooks";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import DeleteHandler from "@/app/common/handler/detail/pageDeleteHanlder";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import {
+  popupInit,
+  popuprHandler,
+} from "@/app/common/handler/error/ErrorHandler";
 import Reply from "@/app/components/ReplyComponent";
 import { db } from "@/app/Firebase";
-import { popupMessageStore } from "@/app/store/common";
+import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import { User } from "firebase/auth";
 import { deleteDoc, doc } from "firebase/firestore";
 import Image from "next/image";
@@ -16,15 +21,36 @@ import { useEffect } from "react";
 
 const DetailPage = () => {
   const router = useRouter();
-  const { id } = useParams() as { id: string };
+
+  const pageParams = useParams().id as string;
+  const id = pageInfoStore().pgId === "" ? pageParams : pageInfoStore().pgId;
+
   const { data } = useUserQueryHook();
   const { pageData, isLoading } = useDetailQueryHook(id);
-
   const user = data as User;
+
+  const msg = popupMessageStore().message;
 
   const ispopupClick = popupMessageStore().isClick;
 
   const favoriteQuery = useFavoriteMutate();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!pageData) {
+        popuprHandler({ message: "페이지 정보가 조회 되지 않습니다." });
+      }
+    }
+  }, [pageData, isLoading]);
+
+  useEffect(() => {
+    popupMessageStore.subscribe((state, prevState) => {
+      const target = "페이지 정보가 조회 되지 않습니다.";
+      if (prevState.message === target && state.message === "") {
+        router.push("/pages/main");
+      }
+    });
+  }, [msg]);
 
   useEffect(() => {
     if (ispopupClick) {
@@ -37,7 +63,12 @@ const DetailPage = () => {
     const getcookie = `${email}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
       const ref = doc(db, "post", id);
-      favoriteQuery.mutate({ email, pageData, ref, id });
+      favoriteQuery.mutate({
+        email,
+        pageData: pageData as FirebaseData,
+        ref,
+        id,
+      });
     }
   }
 
@@ -46,9 +77,12 @@ const DetailPage = () => {
       popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
     } else {
       try {
-        await DeleteHandler(pageData);
+        if ((pageData as FirebaseData).fileName.length > 0) {
+          await DeleteHandler(pageData as FirebaseData);
+        }
         const locate = doc(db, "post", id);
         await deleteDoc(locate);
+        popupInit();
         router.push("/pages/main");
       } catch {
         popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
@@ -61,7 +95,8 @@ const DetailPage = () => {
   }
 
   return (
-    (pageData.user && user) ?? (
+    pageData &&
+    user && (
       <div className="detail_wrap">
         <div className="in_wrap">
           <section className="sub_header">
@@ -69,7 +104,7 @@ const DetailPage = () => {
             <div className="writer_wrap">
               <div className="left_wrap">
                 <Image
-                  src={pageData.profile}
+                  src={pageData.profile ? pageData.profile : "/img/default.svg"}
                   width={40}
                   height={40}
                   alt="프로필"
@@ -83,7 +118,10 @@ const DetailPage = () => {
                   <div className="right_wrap">
                     <button
                       className="edit"
-                      onClick={() => router.push(`/detail?id=${id}`)}
+                      onClick={() => {
+                        pageInfoStore.setState({ editMode: true });
+                        router.push("/pages/editor");
+                      }}
                     >
                       수정
                     </button>
@@ -100,7 +138,8 @@ const DetailPage = () => {
           <section className="content_wrap">
             <pre className="text">{pageData.text}</pre>
             <div className="grid">
-              {pageData.url.length > 0 &&
+              {pageData.url &&
+                pageData.url.length > 0 &&
                 pageData.url.map((value, index) => {
                   return (
                     <Image
