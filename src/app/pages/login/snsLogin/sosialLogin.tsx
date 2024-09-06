@@ -1,7 +1,4 @@
-import {
-  popupInit,
-  popuprHandler,
-} from "@/app/common/handler/error/ErrorHandler";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import {
   isSecondaryPw,
   onGoogle,
@@ -28,13 +25,16 @@ const SocialLoginPage = () => {
   });
 
   const router = useRouter();
+
   const ispopupClick = popupMessageStore().isClick;
 
-  const signupMutation = useSecondaryHandler();
+  const setSecondPw = useSecondaryHandler();
 
   useEffect(() => {
     if (ispopupClick) {
-      setSecondaryPw();
+      const newObj = { ...userObj };
+      newObj.pw = parseInt(pw);
+      setSecondPw.mutate(newObj);
     }
   }, [ispopupClick]);
 
@@ -63,26 +63,13 @@ const SocialLoginPage = () => {
     }
   }
 
-  async function setSecondaryPw() {
-    const newObj = { ...userObj };
-    newObj.pw = parseInt(pw);
-    popupInit();
-    await signupMutation.mutate(newObj);
-  }
-
   return (
     <div className="sns_sign">
-      <div className="blind"></div>
       <button className="sns-btn" name="google" onClick={LoginHandler}>
         <Image src="/img/google.svg" alt="구글 로그인" width={20} height={20} />
         <figcaption className="btn_title">구글로 시작하기</figcaption>
       </button>
-      <button
-        className="sns-btn"
-        name="facebook"
-        // onClick={onFacebook}
-        // disabled={disabled}
-      >
+      <button className="sns-btn" name="facebook">
         <Image
           src="/img/facebook.svg"
           alt="페이스북 로그인"

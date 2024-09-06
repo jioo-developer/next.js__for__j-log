@@ -5,7 +5,7 @@ import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { popupMessageStore } from "@/app/store/common";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
@@ -13,9 +13,6 @@ const ResetPwPage = () => {
   const [findPw, setFindPw] = useState("");
 
   const { data } = useUserQueryHook();
-
-  const isPopupClick = popupMessageStore().isClick;
-  const msg = popupMessageStore().message;
 
   const router = useRouter();
 
@@ -33,11 +30,8 @@ const ResetPwPage = () => {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (isPopupClick) {
-      resetHandler();
-    }
-  }, [isPopupClick]);
+  // 팝업 취소 시 login 페이지로 라우팅
+  const msg = popupMessageStore().message;
 
   useEffect(() => {
     popupMessageStore.subscribe((state, prevState) => {
@@ -47,6 +41,20 @@ const ResetPwPage = () => {
       }
     });
   }, [msg]);
+
+  // 팝업 취소 시 login 페이지로 라우팅
+
+  // 팝업 확인 누를 시 비밀번호 찾기 로직 실행
+
+  const isPopupClick = popupMessageStore().isClick;
+
+  useEffect(() => {
+    if (isPopupClick) {
+      resetHandler();
+    }
+  }, [isPopupClick]);
+
+  // 팝업 확인 누를 시 비밀번호 찾기 로직 실행
 
   const resetHandler = async () => {
     try {

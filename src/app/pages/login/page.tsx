@@ -17,9 +17,8 @@ const LoginPage = () => {
   const loginMutation = useLoginHook();
   // 컴포넌트나 커스텀 훅의 내부에서만 호출
 
-  function LoginHandler(e: FormEvent<HTMLFormElement>) {
+  function LoginHandler() {
     // mutation을 여기서 불러오면 안됨
-    e.preventDefault();
     loginMutation.mutate({ id: id, pw: pw });
   }
 
@@ -29,7 +28,13 @@ const LoginPage = () => {
         <Image src="/img/logo.svg" alt="로고" width={300} height={115} />
         <figcaption className="logo_title">J.log</figcaption>
       </h1>
-      <form onSubmit={LoginHandler} className="sign-form">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          LoginHandler();
+        }}
+        className="sign-form"
+      >
         <Input
           type="id"
           width={375}

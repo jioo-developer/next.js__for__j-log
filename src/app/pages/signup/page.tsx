@@ -6,9 +6,9 @@ import { Button } from "@/stories/atoms/Button";
 import Image from "next/image";
 import Checker from "@/stories/atoms/Checker";
 import { useRouter } from "next/navigation";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
-import useNameQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
-import useSignupHandler from "@/app/common/handler/signupHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import useNameQueryHook from "@/app/api_hooks/common/getNicknamehooks";
+import useSignupHandler from "@/app/api_hooks/signup/signupHook";
 
 const authData = [
   { id: "auth", text: "회원가입및 운영약관 동의", important: true },
@@ -23,12 +23,12 @@ const SignupPage = () => {
   const [disable, setDisable] = useState(true);
 
   const router = useRouter();
+
   const { nicknameData, error, isLoading } = useNameQueryHook();
 
   const crateAccount = useSignupHandler();
 
-  function accountHandler(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function accountHandler() {
     if (!error && nicknameData) {
       const isNamecheck = nicknameData.includes(nickname);
       if (isNamecheck) {
@@ -57,7 +57,13 @@ const SignupPage = () => {
         </button>
         <p>회원가입</p>
       </div>
-      <form className="auth-form" onSubmit={(e) => accountHandler(e)}>
+      <form
+        className="auth-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          accountHandler();
+        }}
+      >
         <p className="id_title">
           이메일&nbsp;<span>*</span>
         </p>

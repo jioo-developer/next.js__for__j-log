@@ -3,16 +3,16 @@ import "@/app/_asset/profile.scss";
 import Image from "next/image";
 import React, { ChangeEvent, useEffect, useState } from "react";
 
-import useNickQueryHook from "@/app/api_hooks/signup/getNicknamehooks";
+import useNickQueryHook from "@/app/api_hooks/common/getNicknamehooks";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
-import onFileChange from "@/app/common/handler/file/onFileChangeHandler";
-import storageUpload from "@/app/common/handler/file/storageUploadHandler";
+import onFileChange from "@/app/handler/file/onFileChangeHandler";
+import storageUpload from "@/app/handler/file/storageUploadHandler";
 import { updateProfile, User } from "firebase/auth";
 import { authService } from "@/app/Firebase";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { Input } from "@/stories/atoms/Input";
-import useNameChanger from "@/app/api_hooks/mypage/nameChangeHandler";
+import useNameChanger from "@/app/handler/mypage/nameChangeHandler";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { useRouter } from "next/navigation";
@@ -24,19 +24,16 @@ function MyPage() {
   const [nameToggle, setnameToggle] = useState(false);
   const [quit, setQuit] = useState(false);
 
+  const router = useRouter();
+  const msg = popupMessageStore().message;
+
   const { data } = useUserQueryHook();
   const { nicknameData } = useNickQueryHook();
 
   const nameChangeMutate = useNameChanger();
 
-  const msg = popupMessageStore().message;
-
-  const router = useRouter();
-
   useEffect(() => {
-    if (data) {
-      setnickname(data.displayName as string);
-    }
+    data && setnickname(data.displayName as string);
   }, [data]);
 
   useEffect(() => {
@@ -163,7 +160,7 @@ function MyPage() {
             </p>
           </div>
         </section>
-        {quit && <QuitPage />}
+        {quit && <QuitPage userData={data} />}
       </div>
     )
   );
