@@ -1,27 +1,17 @@
 "use client";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
-import {
-  deleteUserDB,
-  LoginTypeCheck,
-} from "@/app/common/handler/quit/quitHandler";
-import originDeleteHandler from "@/app/common/handler/quit/originquit";
-import SocialDeleteHandler from "@/app/common/handler/quit/socialquit";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { isCredential } from "@/app/handler/quit/userCredential/credentialHandler";
+import originDeleteHandler from "@/app/handler/quit/originquit";
+import SocialDeleteHandler from "@/app/handler/quit/socialquit";
 import { popupMessageStore } from "@/app/store/common";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { User } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { deleteUserDB, quitError } from "@/app/handler/quit/deleteDB";
 
-type propsType = {
-  quit: Dispatch<SetStateAction<boolean>>;
-};
-
-const QuitPage = () => {
+const QuitPage = ({ userData }: { userData: User }) => {
   const [quitPw, setPw] = useState("");
-  const { data } = useUserQueryHook();
   const isPopupClick = popupMessageStore().isClick;
-
-  const router = useRouter();
+  const [loginType, setType] = useState<string | null>(null);
 
   useEffect(() => {
     popuprHandler({
@@ -31,52 +21,40 @@ const QuitPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!isPopupClick) {
-      console.log("false");
-      // 팝업 클릭이 그저 false 일 떄
-    } else if (isPopupClick && quitPw === "") {
-      deleteProcess();
-      // 팝업 클릭은 되어 있지만 quitPw은 변경이 없을 때
-    } else if (isPopupClick && quitPw !== "") {
-      // 팝업 클릭도 있었고 quitPw도 변경이 되었을 때
-      deleteHandler(true);
+    if (isPopupClick) {
+      // 클릭 인식
+      if (!loginType) {
+        deleteHandler();
+      } else {
+        deleteHandler(true);
+      }
     }
   }, [isPopupClick]);
 
-  async function deleteProcess() {
-    const accountType = await LoginTypeCheck(data as User);
-    popupMessageStore.setState({ isClick: false });
-    if (accountType === "sosial") {
-      popuprHandler({
-        message: "회원탈퇴에 사용 될 2차비밀번호를 입력해주세요",
-        type: "prompt",
-        state: setPw,
-      });
-    } else {
-      deleteHandler(false);
-    }
-  }
-
   async function deleteHandler(isSosial?: boolean) {
-    if (isSosial) {
-      try {
-        const result = (await SocialDeleteHandler()).user;
-        result.delete().then(() => deleteUserDB(isSosial));
-        router.push("/pages/login");
-      } catch {
-        popuprHandler({ message: "회원탈퇴 중 에러가 발생하였습니다" });
+    if (!loginType) {
+      const Credential = await isCredential(userData);
+      // 계정 타입을 체크
+
+      if (Credential === "sosial") {
+        setType(Credential);
+        //state에 저장
+        popuprHandler({
+          message: "회원탈퇴에 사용 될 2차비밀번호를 입력해주세요",
+          type: "prompt",
+          state: setPw,
+        });
       }
     } else {
-      const password = quitPw;
       try {
-        const result = await originDeleteHandler({
-          data: data as User,
-          password,
-        });
-        result.user.delete().then(() => deleteUserDB());
-        router.push("/pages/login");
+        deleteUserDB();
+        if (isSosial) {
+          SocialDeleteHandler();
+        } else {
+          originDeleteHandler({ data, password: quitPw });
+        }
       } catch {
-        popuprHandler({ message: "회원탈퇴 중 에러가 발생하였습니다" });
+        quitError();
       }
     }
   }
