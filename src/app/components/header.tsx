@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from "next-auth";
-import { popuprHandler } from "../common/handler/error/ErrorHandler";
+import { popuprHandler } from "../handler/error/ErrorHandler";
 
 const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
 

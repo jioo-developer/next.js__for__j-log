@@ -3,10 +3,10 @@ import "./globals.css";
 import "@/app/_asset/theme.scss";
 import "@/app/_asset/home.scss";
 import "@/app/_asset/common.scss";
-import { childrenProps } from "@/app/common/type/commonType";
+import { childrenProps } from "@/app/type_global/commonType";
 import ReactQueryProvider from "./provider/ReactQueryProvider";
 import Header from "./components/Header";
-import { ReturnPopup } from "@/app/common/handler/error/ErrorHandler";
+import { ReturnPopup } from "@/app/handler/error/ErrorHandler";
 
 export const metadata: Metadata = {
   title: "Create Next App",

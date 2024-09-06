@@ -201,10 +201,7 @@
             }
           }
           .edit_comment {
-            display: flex;
-            width: 70px;
-            justify-content: space-between;
-            margin: 0 15px 0 auto;
+            margin-left: auto;
 
             .btns {
               width: 44%;
@@ -247,6 +244,10 @@
         .block {
           display: block;
         }
+      }
+
+      .reply_wrap + form {
+        order: 0;
       }
 
       textarea {

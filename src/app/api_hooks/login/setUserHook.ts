@@ -2,7 +2,7 @@ import { authService } from "@/app/Firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signInWithEmailAndPassword, User } from "firebase/auth";
 import { LoginErrorHandler } from "./LoginErrorHandler";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { useRouter } from "next/navigation";
 
 type propsType = {

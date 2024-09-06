@@ -1,10 +1,10 @@
 import { authService, db } from "@/app/Firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { objType } from "../../../pages/login/snsLogin/sosialLogin";
+import { objType } from "@/app/pages/login/snsLogin/sosialLogin";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { popuprHandler } from "@/app/common/handler/error/ErrorHandler";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 export async function onGoogle() {
   const provider = new GoogleAuthProvider();
@@ -39,6 +39,7 @@ export async function isSecondaryPw(id: string) {
     return false;
   }
 }
+
 export const useSecondaryHandler = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -52,6 +53,9 @@ export const useSecondaryHandler = () => {
         // 닉네임을 넣는 이유는 해당 uid가 어떤 유저의 것인지 알기 위함
         // 만약 nickname이 null 일 때 uid를 대신 넣어주기
       });
+    },
+    onSettled: () => {
+      popupInit();
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
