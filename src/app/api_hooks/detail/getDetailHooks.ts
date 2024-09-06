@@ -35,7 +35,7 @@ async function getDetailHandler(pageId: string) {
 }
 
 const useDetailQueryHook = (pageId: string) => {
-  const { data, isLoading, error }: QueryObserverResult<FirebaseData, Error> =
+  const { data, isLoading, error }: QueryObserverResult<FirebaseData> =
     useQuery({
       queryKey: ["getPage", pageId],
       queryFn: async (queryKey) => {
