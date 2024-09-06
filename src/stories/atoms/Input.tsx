@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import "@/app/_asset/theme.scss";
 import { css } from "@emotion/react";
-import { styleProps } from "@/app/common/type/commonType";
-import { useInput } from "@/app/common/handler/useInput";
+import { styleProps } from "@/app/type_global/commonType";
+import { useInput } from "@/app/handler/useInput";
 import { Dispatch, SetStateAction } from "react";
 
 interface propsType extends styleProps {

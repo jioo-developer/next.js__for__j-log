@@ -3,7 +3,7 @@ import { css } from "@emotion/react";
 import { Button } from "@/stories/atoms/Button";
 import { popupMessageStore } from "@/app/store/common";
 import { ReactNode } from "react";
-import { popupInit } from "@/app/common/handler/error/ErrorHandler";
+import { popupInit } from "@/app/handler/error/ErrorHandler";
 
 type propsType = {
   type?: "alert" | string;

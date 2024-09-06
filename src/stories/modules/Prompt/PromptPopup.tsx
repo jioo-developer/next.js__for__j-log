@@ -3,7 +3,7 @@ import { Button } from "@/stories/atoms/Button";
 import { Input } from "@/stories/atoms/Input";
 import { Popup } from "@/stories/atoms/Popup";
 import ButtonGroup from "../ButtonGroup/ButtonGroup";
-import { popupInit } from "@/app/common/handler/error/ErrorHandler";
+import { popupInit } from "@/app/handler/error/ErrorHandler";
 
 const PromptPopup = () => {
   const inputState = popupMessageStore().state;

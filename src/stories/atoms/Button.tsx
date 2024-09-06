@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import "@/app/_asset/theme.scss";
-import { styleProps } from "@/app/common/type/commonType";
+import { styleProps } from "@/app/type_global/commonType";
 
 interface propsType extends styleProps {
   children: React.ReactNode;
@@ -51,11 +51,13 @@ const themes = {
 };
 
 const style = ({ width, height, fontSize }: styleProps) => css`
-  width: ${width === "full"
-    ? "100%;"
-    : width === "auto"
-      ? "auto"
-      : width + "px;"};
+  width: ${
+    width === "full"
+      ? "100% !important;"
+      : width === "auto"
+        ? "auto  !important;"
+        : width + "px  !important;"
+  }
 
   height: ${height ? height + "px" : "auto"};
   outline: none;
