@@ -1,39 +1,33 @@
 "use client";
 import "@/app/_asset/detail.scss";
-import useFavoriteMutate from "@/app/api_hooks/detail/favoriteMutate";
+import { useFavoriteMutate } from "@/app/handler/detail/favoriteHandler";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHooks";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import DeleteHandler from "@/app/common/handler/detail/pageDeleteHanlder";
-import {
-  popupInit,
-  popuprHandler,
-} from "@/app/common/handler/error/ErrorHandler";
-import Reply from "@/app/components/ReplyComponent";
-import { db } from "@/app/Firebase";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import Reply from "@/app/pages/detail/_reply/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import { User } from "firebase/auth";
-import { deleteDoc, doc } from "firebase/firestore";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { cookieHandler } from "@/app/handler/commonHandler";
+import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
+import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
 
 const DetailPage = () => {
   const router = useRouter();
 
-  const pageParams = useParams().id as string;
-  const id = pageInfoStore().pgId === "" ? pageParams : pageInfoStore().pgId;
+  const { data: user } = useUserQueryHook();
 
-  const { data } = useUserQueryHook();
-  const { pageData, isLoading } = useDetailQueryHook(id);
-  const user = data as User;
+  const pageInfo = useGetPageInfo();
+  const { pageData, isLoading } = useDetailQueryHook(pageInfo);
 
   const msg = popupMessageStore().message;
-
   const ispopupClick = popupMessageStore().isClick;
 
-  const favoriteQuery = useFavoriteMutate();
+  const favoriteMutate = useFavoriteMutate();
 
   useEffect(() => {
     if (!isLoading) {
@@ -52,37 +46,28 @@ const DetailPage = () => {
     });
   }, [msg]);
 
-  useEffect(() => {
-    if (ispopupClick) {
-      pageDeleteHandler(ispopupClick);
-    }
-  }, [ispopupClick]);
-
   async function favoriteHandler() {
-    const email = user.email as string;
+    const email = (user as User).email as string;
     const getcookie = `${email}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
-      const ref = doc(db, "post", id);
-      favoriteQuery.mutate({
-        email,
-        pageData: pageData as FirebaseData,
-        ref,
-        id,
-      });
+      const value = (pageData as FirebaseData).favorite;
+      favoriteMutate.mutate({ value, id: pageInfo });
+      cookieHandler(email);
     }
   }
 
-  async function pageDeleteHandler(params?: boolean) {
-    if (!params) {
+  useEffect(() => {
+    if (ispopupClick) {
+      pageDeleteHandler(true);
+    }
+  }, [ispopupClick]);
+
+  async function pageDeleteHandler(isClick?: boolean) {
+    if (!isClick) {
       popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
     } else {
       try {
-        if ((pageData as FirebaseData).fileName.length > 0) {
-          await DeleteHandler(pageData as FirebaseData);
-        }
-        const locate = doc(db, "post", id);
-        await deleteDoc(locate);
-        popupInit();
+        pageDelete(pageData as FirebaseData);
         router.push("/pages/main");
       } catch {
         popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
@@ -127,7 +112,7 @@ const DetailPage = () => {
                     </button>
                     <button
                       className="delete"
-                      onClick={() => pageDeleteHandler()}
+                      onClick={() => pageDeleteHandler}
                     >
                       삭제
                     </button>
@@ -138,8 +123,7 @@ const DetailPage = () => {
           <section className="content_wrap">
             <pre className="text">{pageData.text}</pre>
             <div className="grid">
-              {pageData.url &&
-                pageData.url.length > 0 &&
+              {pageData.url.length > 0 &&
                 pageData.url.map((value, index) => {
                   return (
                     <Image
@@ -160,7 +144,7 @@ const DetailPage = () => {
                   <span>👍</span>추천&nbsp;{pageData.favorite}
                 </button>
               </div>
-              <Reply pageId={id} />
+              <Reply />
             </div>
           </section>
         </div>
