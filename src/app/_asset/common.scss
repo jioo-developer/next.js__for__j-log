@@ -53,3 +53,13 @@ button.noShadow {
     color: gray;
   }
 }
+
+.use__item {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  p {
+    font-size: 14px;
+    color: #888;
+  }
+}

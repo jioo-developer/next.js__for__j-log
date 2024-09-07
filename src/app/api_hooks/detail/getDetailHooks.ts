@@ -18,6 +18,7 @@ export type FirebaseData = {
   text: string;
   writer: string;
   id: string;
+  priority?: boolean;
 };
 
 async function getDetailHandler(pageId: string) {
