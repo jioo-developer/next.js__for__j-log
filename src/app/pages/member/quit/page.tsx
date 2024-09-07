@@ -8,7 +8,7 @@ import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { deleteUserDB, quitError } from "@/app/handler/quit/deleteDB";
 
-const QuitPage = ({ userData }: { userData: User }) => {
+const QuitPage = ({ user }: { user: User }) => {
   const [quitPw, setPw] = useState("");
   const isPopupClick = popupMessageStore().isClick;
   const [loginType, setType] = useState<string | null>(null);
@@ -33,7 +33,7 @@ const QuitPage = ({ userData }: { userData: User }) => {
 
   async function deleteHandler(isSosial?: boolean) {
     if (!loginType) {
-      const Credential = await isCredential(userData);
+      const Credential = await isCredential(user);
       // 계정 타입을 체크
 
       if (Credential === "sosial") {
@@ -51,7 +51,7 @@ const QuitPage = ({ userData }: { userData: User }) => {
         if (isSosial) {
           SocialDeleteHandler();
         } else {
-          originDeleteHandler({ data, password: quitPw });
+          originDeleteHandler({ data: user, password: quitPw });
         }
       } catch {
         quitError();

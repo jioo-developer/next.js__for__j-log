@@ -1,6 +1,6 @@
 "use client";
 import "@/app/_asset/Sign.scss";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/stories/atoms/Button";
 import { Input } from "@/stories/atoms/Input";

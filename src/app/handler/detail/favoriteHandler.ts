@@ -4,7 +4,8 @@ import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { FirebaseData } from "../../api_hooks/detail/getDetailHooks";
 import { db } from "@/app/Firebase";
 
-type mutatePropsType = {
+type favoriteType = {
+  email?: string;
   value: number;
   id: string;
 };
@@ -12,7 +13,7 @@ type mutatePropsType = {
 export const useFavoriteMutate = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ value, id }: mutatePropsType) => {
+    mutationFn: async ({ value, id }: favoriteType) => {
       const ref = doc(db, "post", id);
       const newFavorite = value + 1;
       await updateDoc(ref, {
