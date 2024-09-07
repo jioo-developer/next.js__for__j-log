@@ -9,7 +9,7 @@ import {
   ImageDeleteHandler,
   LoadImageHandler,
 } from "@/app/handler/detail/crud/PostCreateHandler";
-import { createPageId } from "@/app/handler/detail/pageInfoHandler";
+import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { User } from "firebase/auth";
@@ -29,9 +29,11 @@ const EditorPage = () => {
 
   const router = useRouter();
 
+  const createId = useCreateId();
+
   useEffect(() => {
     if (!editMode) {
-      pageInfoStore.setState({ pgId: createPageId() });
+      pageInfoStore.setState({ pgId: createId });
       //edit mode가 false이기 때문에 pageid를 새로 구성 = pageData가 없음
     } else {
       // edit mode가 true이기 때문에 이미 pageData가 있음
@@ -77,7 +79,7 @@ const EditorPage = () => {
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          if (title !== "" && text !== "") {
+          if (title !== "" && text !== "" && user) {
             createHandler();
           }
         }}
