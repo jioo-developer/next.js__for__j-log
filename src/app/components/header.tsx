@@ -7,12 +7,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { popuprHandler } from "../handler/error/ErrorHandler";
+import SearchIcon from "./SearchIcon";
 
 const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
 
 function Header() {
   const [tabState, setTab] = useState(false);
-  const { data, refetch } = useUserQueryHook();
+  const { data } = useUserQueryHook();
   const [displayName, setName] = useState(data ? data.displayName : "");
 
   const router = useRouter();
@@ -71,10 +72,15 @@ function Header() {
               className="arrow"
             />
           </label>
-          <ul className="sub_menu">
-            <li onClick={() => router.push("/pages/member/mypage")}>설정</li>
-            <li onClick={() => logout()}>로그아웃</li>
-          </ul>
+          <div className="ui_wrap">
+            <button onClick={() => router.push("/pages/search")}>
+              <SearchIcon />
+            </button>
+            <ul className="sub_menu">
+              <li onClick={() => router.push("/pages/member/mypage")}>설정</li>
+              <li onClick={() => logout()}>로그아웃</li>
+            </ul>
+          </div>
         </header>
       )}
     </>

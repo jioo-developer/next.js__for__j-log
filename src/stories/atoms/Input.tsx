@@ -3,12 +3,16 @@ import "@/app/_asset/theme.scss";
 import { css } from "@emotion/react";
 import { styleProps } from "@/app/type_global/commonType";
 import { useInput } from "@/app/handler/useInput";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 
 interface propsType extends styleProps {
   type: "id" | "password" | "textarea" | "email" | "text";
   setstate?: Dispatch<SetStateAction<string>>;
   value?: string | number;
+  enter?: {
+    isEnter: boolean;
+    func: () => void;
+  };
 }
 
 export const Input = ({
@@ -17,8 +21,17 @@ export const Input = ({
   type,
   setstate,
   value,
+  enter = { isEnter: false, func: () => {} },
 }: propsType) => {
   const { valueChangeHandler } = useInput("");
+  function keydownHandler(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      enter.func();
+    } else {
+      return "다른 keydown 입력";
+    }
+  }
   return (
     <input
       required
@@ -29,6 +42,11 @@ export const Input = ({
       onChange={(e) =>
         setstate ? setstate(e.target.value) : valueChangeHandler
       }
+      onKeyDown={(e) => {
+        if (enter.isEnter) {
+          keydownHandler(e);
+        }
+      }}
       css={style({ width, fontSize })}
       autoComplete="off"
     />

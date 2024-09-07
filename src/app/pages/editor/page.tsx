@@ -14,8 +14,9 @@ import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { User } from "firebase/auth";
 import { serverTimestamp } from "firebase/firestore";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 const EditorPage = () => {
@@ -30,6 +31,8 @@ const EditorPage = () => {
   const router = useRouter();
 
   const createId = useCreateId();
+
+  const checkboxRef = useRef(null);
 
   useEffect(() => {
     if (!editMode) {
@@ -57,7 +60,7 @@ const EditorPage = () => {
     };
     if (editMode) {
       const obj = { ...pageData };
-      Object.assign(content, obj);
+      const resultObj = Object.assign(content, obj);
     } else {
       const currentUser = user as User;
       const addContent = {
@@ -69,8 +72,9 @@ const EditorPage = () => {
         profile: currentUser.photoURL,
         timeStamp: serverTimestamp(),
         fileName: file.map((value: File) => value.name),
+        priority: true,
       };
-      Object.assign(content, addContent);
+      const resultObj = Object.assign(content, addContent);
     }
   }
 
@@ -132,7 +136,26 @@ const EditorPage = () => {
         <label htmlFor="image" className="Attachment image-att">
           이미지를 담아주세요
         </label>
-
+        <div className="use__item">
+          <input
+            type="checkbox"
+            className="eachCheckbox"
+            id="use__Check"
+            ref={checkboxRef}
+          />
+          <label
+            htmlFor="use__check"
+            className="check"
+            // style={
+            //   checkArr.includes(item.id)
+            //     ? { border: 0 }
+            //     : { border: "1px solid #eee" }
+            // }
+          >
+            <p>노출 우선권 사용하기</p>
+            <Image src="/img/checked.svg" alt="체크" width={25} height={25} />
+          </label>
+        </div>
         <div className="bottom_wrap">
           <div className="exit" onClick={() => router.back()}>
             ← &nbsp;나가기

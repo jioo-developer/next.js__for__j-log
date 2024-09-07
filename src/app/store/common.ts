@@ -11,3 +11,7 @@ export const pageInfoStore = create(() => ({
   pgId: "",
   editMode: false,
 }));
+
+export const searchStore = create(() => ({
+  searchText: "",
+}));
