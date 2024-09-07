@@ -5,9 +5,8 @@ import { FirebaseData } from "../detail/getDetailHooks";
 
 async function getPostData() {
   const collectionRef = collection(db, "post");
-  // const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
-  // const snapshot = await getDocs(queryData);
-  const snapshot = await getDocs(collectionRef);
+  const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  const snapshot = await getDocs(queryData);
   if (snapshot.docs.length > 0) {
     const postArray = snapshot.docs.map((doc) => ({
       ...doc.data(),
