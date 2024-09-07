@@ -1,6 +1,5 @@
 "use client";
 import "@/app/_asset/detail.scss";
-import { useFavoriteMutate } from "@/app/handler/detail/favoriteHandler";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHooks";
@@ -8,13 +7,13 @@ import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import Reply from "@/app/pages/detail/_reply/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
-import { User } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { cookieHandler } from "@/app/handler/commonHandler";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
 import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
+import { useFavoriteMutate } from "@/app/handler/detail/favoriteHandler";
+import { User } from "firebase/auth";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -46,13 +45,13 @@ const DetailPage = () => {
     });
   }, [msg]);
 
-  async function favoriteHandler() {
-    const email = (user as User).email as string;
-    const getcookie = `${email}-Cookie`;
+  function favoriteHandler() {
+    const getcookie = `${(user as User).email}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
-      const value = (pageData as FirebaseData).favorite;
-      favoriteMutate.mutate({ value, id: pageInfo });
-      cookieHandler(email);
+      favoriteMutate.mutate({
+        value: (pageData as FirebaseData).favorite,
+        id: pageInfo,
+      });
     }
   }
 
@@ -112,7 +111,7 @@ const DetailPage = () => {
                     </button>
                     <button
                       className="delete"
-                      onClick={() => pageDeleteHandler}
+                      onClick={() => pageDeleteHandler()}
                     >
                       삭제
                     </button>

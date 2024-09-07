@@ -20,21 +20,20 @@ import QuitPage from "../quit/page";
 import { popupMessageStore } from "@/app/store/common";
 
 function MyPage() {
-  const [nickname, setnickname] = useState("");
+  const { data } = useUserQueryHook();
+  const { nicknameData } = useNickQueryHook();
+
+  const [nickname, setnickname] = useState(
+    data ? (data.displayName as string) : ""
+  );
   const [nameToggle, setnameToggle] = useState(false);
   const [quit, setQuit] = useState(false);
 
   const router = useRouter();
+
   const msg = popupMessageStore().message;
 
-  const { data } = useUserQueryHook();
-  const { nicknameData } = useNickQueryHook();
-
   const nameChangeMutate = useNameChanger();
-
-  useEffect(() => {
-    data && setnickname(data.displayName as string);
-  }, [data]);
 
   useEffect(() => {
     popupMessageStore.subscribe((state, prevState) => {
@@ -47,11 +46,11 @@ function MyPage() {
   async function changeNameHandler() {
     if (nicknameData) {
       const isNamecheck = nicknameData.includes(nickname);
-      if (isNamecheck) {
-        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
-      } else {
+      if (!isNamecheck) {
         nameChangeMutate.mutate({ data, nickname });
         setnameToggle(!nameToggle);
+      } else {
+        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
       }
     }
   }
@@ -65,6 +64,7 @@ function MyPage() {
         const upload = await storageUpload(result, files);
         try {
           await updateProfile(user as User, { photoURL: upload[0] });
+          // 배열이 하나 이므로 [0] 으로 고정 대체
           router.push("/pages/main");
         } catch {
           popuprHandler({ message: "프로필 변경에 실패하였습니다." });
@@ -160,7 +160,7 @@ function MyPage() {
             </p>
           </div>
         </section>
-        {quit && <QuitPage userData={data} />}
+        {quit && <QuitPage user={data} />}
       </div>
     )
   );
