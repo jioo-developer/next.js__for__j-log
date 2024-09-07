@@ -5,10 +5,10 @@ import useDetailQueryHook, {
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { timeData } from "@/app/handler/commonHandler";
 import {
-  CreateUrl,
+  CreateImageUrl,
   ImageDeleteHandler,
   LoadImageHandler,
-} from "@/app/handler/detail/crud/PostCreateHandler";
+} from "@/app/handler/detail/crud/PostHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
@@ -56,11 +56,12 @@ const EditorPage = () => {
     const content = {
       title,
       text,
-      url: CreateUrl({ image: previewImg, file, isEdit: editMode }),
+      url: CreateImageUrl({ image: previewImg, file, isEdit: editMode }),
     };
     if (editMode) {
       const obj = { ...pageData };
       const resultObj = Object.assign(content, obj);
+      // postMutate.mutate(resultObj)
     } else {
       const currentUser = user as User;
       const addContent = {
@@ -75,6 +76,7 @@ const EditorPage = () => {
         priority: true,
       };
       const resultObj = Object.assign(content, addContent);
+      // postMutate.mutate(resultObj)
     }
   }
 

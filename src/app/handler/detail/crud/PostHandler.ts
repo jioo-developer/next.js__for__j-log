@@ -21,7 +21,7 @@ type urlProps = {
   isEdit?: boolean;
 };
 
-export async function CreateUrl({ image, file, isEdit }: urlProps) {
+export async function CreateImageUrl({ image, file, isEdit }: urlProps) {
   if (isEdit) {
     return await storageUpload(image, file);
   } else {
