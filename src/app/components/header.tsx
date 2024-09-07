@@ -6,7 +6,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { User } from "next-auth";
 import { popuprHandler } from "../handler/error/ErrorHandler";
 
 const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
@@ -14,7 +13,7 @@ const activePathName = ["/pages/member/mypage", "/pages/detail", "/pages/main"];
 function Header() {
   const [tabState, setTab] = useState(false);
   const { data, refetch } = useUserQueryHook();
-  const [displayName, setName] = useState("");
+  const [displayName, setName] = useState(data ? data.displayName : "");
 
   const router = useRouter();
   const pathname = usePathname();
@@ -37,10 +36,6 @@ function Header() {
   useEffect(() => {
     closeTab();
   }, [pathname]);
-
-  useEffect(() => {
-    setName(data?.displayName as string);
-  }, [data]);
 
   const isActive = activePathName.some((path) => pathname.startsWith(path));
 
