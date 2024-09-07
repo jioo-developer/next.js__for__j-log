@@ -26,8 +26,17 @@ const usePostQueryHook = () => {
       staleTime: 1 * 60 * 1000, // 1분
       notifyOnChangeProps: ["data"],
     });
-  const postData = data ? data : [];
 
+  let postData = data ? data : [];
+
+  if (postData.length > 0) {
+    const filterPriority = postData.filter((item) => item.priority);
+    const nonePriority = postData.filter((item) => !item.priority);
+    const result = [...filterPriority, ...nonePriority];
+    postData = result;
+  } else {
+    postData = [];
+  }
   return { isLoading, postData, error };
 };
 
