@@ -9,7 +9,7 @@ import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import {
   useDeleteHandler,
   useUpdateHandler,
-} from "@/app/handler/detail-reply/useSetReplyHandler";
+} from "@/app/handler/detail-reply/useMutationHandler";
 
 type propsType = {
   item: replyType;

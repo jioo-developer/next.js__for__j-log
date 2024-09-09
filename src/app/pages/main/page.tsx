@@ -4,9 +4,9 @@ import userQueryHook from "@/app/api_hooks/login/getUserHook";
 import { useRouter } from "next/navigation";
 import SkeletonItem from "@/app/components/SkeletonItem";
 import PostItem from "@/app/components/PostItem";
-import usePostQueryHook from "@/app/api_hooks/main/getPosthooks";
+import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { searchStore } from "@/app/store/common";
-import { FirebaseData } from "@/app/api_hooks/detail/getDetailHooks";
+import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
 
 const MainPage = () => {
   const [postState, setState] = useState<FirebaseData[] | null>(null);

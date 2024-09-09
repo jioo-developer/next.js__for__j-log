@@ -2,7 +2,7 @@
 import "@/app/_asset/detail.scss";
 import useDetailQueryHook, {
   FirebaseData,
-} from "@/app/api_hooks/detail/getDetailHooks";
+} from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import Reply from "@/app/pages/detail/_reply/page";
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
 import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
-import { useFavoriteMutate } from "@/app/handler/detail/favoriteHandler";
+import { useFavoriteMutate } from "@/app/handler/detail/useMutationHandler";
 import { User } from "firebase/auth";
 
 const DetailPage = () => {

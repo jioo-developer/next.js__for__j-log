@@ -7,7 +7,7 @@ import Image from "next/image";
 import Checker from "@/stories/atoms/Checker";
 import { useRouter } from "next/navigation";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import useNameQueryHook from "@/app/api_hooks/common/getNicknamehooks";
+import useNameQueryHook from "@/app/api_hooks/common/getnameHook";
 import useSignupHandler from "@/app/api_hooks/signup/signupHook";
 
 const authData = [
