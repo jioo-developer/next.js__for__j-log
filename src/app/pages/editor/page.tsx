@@ -1,19 +1,18 @@
 "use client";
 import useDetailQueryHook, {
   FirebaseData,
-} from "@/app/api_hooks/detail/getDetailHooks";
+} from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { timeData } from "@/app/handler/commonHandler";
 import {
-  CreateImageUrl,
+  CreateImgUrl,
   ImageDeleteHandler,
   LoadImageHandler,
-} from "@/app/handler/detail/crud/PostHandler";
+} from "@/app/handler/detail/crud/imageCrudHandler";
+import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
+import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
-import { User } from "firebase/auth";
-import { serverTimestamp } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
@@ -23,16 +22,16 @@ const EditorPage = () => {
   const { data: user } = useUserQueryHook();
   const { pgId: pageInfo, editMode } = pageInfoStore();
   const { pageData } = useDetailQueryHook(pageInfo);
+
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [previewImg, setPreview] = useState<string[]>([]);
   const [file, setFile] = useState<File[]>([]);
+  const [priorty, setPriorty] = useState(false);
 
   const router = useRouter();
-
   const createId = useCreateId();
-
-  const checkboxRef = useRef(null);
+  const postMutate = useCreateMutation();
 
   useEffect(() => {
     if (!editMode) {
@@ -40,43 +39,38 @@ const EditorPage = () => {
       //edit mode가 false이기 때문에 pageid를 새로 구성 = pageData가 없음
     } else {
       // edit mode가 true이기 때문에 이미 pageData가 있음
-      const data = pageData as FirebaseData;
+      const oldData = pageData as FirebaseData;
       // 그래서 거짓의 값이 없을 경우 타입 단언 적용
-      setTitle(data.title);
+      setTitle(oldData.title);
       // 이전에 있는 제목
-      setText(data.text);
+      setText(oldData.text);
       // 이전에 있는 내용
-      const imageUrl = (data as FirebaseData).url;
+      const imageUrl = oldData.url;
       setPreview(imageUrl);
       // 이전에 있는 이미지
     }
   }, [editMode, pageData]);
 
-  async function createHandler() {
+  async function CreateHandler() {
     const content = {
       title,
       text,
-      url: CreateImageUrl({ image: previewImg, file, isEdit: editMode }),
+      fileName: file.map((value: File) => value.name),
+      pageId: pageInfo,
+      url: await CreateImgUrl({
+        image: previewImg,
+        file,
+        isEdit: editMode,
+      }),
+      priority: priorty,
     };
     if (editMode) {
-      const obj = { ...pageData };
+      const obj = { ...(pageData as FirebaseData) };
       const resultObj = Object.assign(content, obj);
-      // postMutate.mutate(resultObj)
+      postMutate.mutate({ data: resultObj, pageId: pageInfo });
     } else {
-      const currentUser = user as User;
-      const addContent = {
-        user: currentUser.displayName,
-        writer: currentUser.uid,
-        date: `${timeData.year}년 ${timeData.month}월 ${timeData.day}일`,
-        favorite: 0,
-        pageId: pageInfo,
-        profile: currentUser.photoURL,
-        timeStamp: serverTimestamp(),
-        fileName: file.map((value: File) => value.name),
-        priority: true,
-      };
-      const resultObj = Object.assign(content, addContent);
-      // postMutate.mutate(resultObj)
+      const addContent = setDataHandler(content);
+      postMutate.mutate({ data: addContent, pageId: pageInfo });
     }
   }
 
@@ -86,7 +80,7 @@ const EditorPage = () => {
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           if (title !== "" && text !== "" && user) {
-            createHandler();
+            CreateHandler();
           }
         }}
       >
@@ -143,7 +137,7 @@ const EditorPage = () => {
             type="checkbox"
             className="eachCheckbox"
             id="use__Check"
-            ref={checkboxRef}
+            onChange={(e) => setPriorty(e.target.checked)}
           />
           <label
             htmlFor="use__check"

@@ -1,0 +1,37 @@
+import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
+import { db } from "@/app/Firebase";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { doc, setDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { popuprHandler } from "../../error/ErrorHandler";
+
+type propsType = {
+  data: FirebaseData;
+  pageId: string;
+};
+
+const useCreateMutation = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data, pageId }: propsType) => {
+      await setDoc(doc(db, "post", pageId), data);
+      return { data, pageId };
+    },
+    onSuccess: (result) => {
+      router.push(`/pages/detail/${result.pageId}`);
+      queryClient.setQueryData<FirebaseData>(["getPost"], () => {
+        return result.data;
+      });
+    },
+    onError: () => {
+      popuprHandler({ message: "게시글 작성 중 오류가 발생하였습니다" });
+    },
+  });
+};
+
+export default useCreateMutation;
