@@ -1,4 +1,4 @@
-import usePostQueryHook from "@/app/api_hooks/main/getPosthooks";
+import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { pageInfoStore } from "@/app/store/common";
 import { useParams } from "next/navigation";
 

@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { timeData } from "@/app/handler/commonHandler";
 import { db } from "@/app/Firebase";
-import { useReplyProps } from "@/app/handler/detail-reply/useSetReplyHandler";
+import { useReplyProps } from "@/app/handler/detail-reply/useMutationHandler";
 
 interface propsType extends useReplyProps {
   user: {
@@ -11,7 +11,7 @@ interface propsType extends useReplyProps {
   };
 }
 
-export const createReply = async ({ user, id, comment }: propsType) => {
+export const createReplyHandler = async ({ user, id, comment }: propsType) => {
   const commentData = {
     replyrer: user.name,
     comment: comment,
@@ -27,4 +27,4 @@ export const createReply = async ({ user, id, comment }: propsType) => {
   return commentData;
 };
 
-export default createReply;
+export default createReplyHandler;

@@ -3,7 +3,7 @@ import "@/app/_asset/profile.scss";
 import Image from "next/image";
 import React, { ChangeEvent, useEffect, useState } from "react";
 
-import useNickQueryHook from "@/app/api_hooks/common/getNicknamehooks";
+import useNickQueryHook from "@/app/api_hooks/common/getnameHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
@@ -12,7 +12,7 @@ import { updateProfile, User } from "firebase/auth";
 import { authService } from "@/app/Firebase";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { Input } from "@/stories/atoms/Input";
-import useNameChanger from "@/app/handler/mypage/nameChangeHandler";
+import useNameChanger from "@/app/handler/mypage/useMutationHandler";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { useRouter } from "next/navigation";

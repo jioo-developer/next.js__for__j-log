@@ -1,7 +1,7 @@
 import { db, storageService } from "@/app/Firebase";
 import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc } from "firebase/firestore";
-import { FirebaseData } from "@/app/api_hooks/detail/getDetailHooks";
+import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
 import { popupInit } from "../error/ErrorHandler";
 
 export async function pageDelete(data: FirebaseData) {
