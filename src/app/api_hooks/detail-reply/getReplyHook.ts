@@ -15,7 +15,6 @@ export type replyType = {
 const getReplyHandler = async (id: string) => {
   const collectionRef = collection(doc(collection(db, "post"), id), "reply");
   const snapshot = await getDocs(collectionRef);
-  console.log(snapshot);
   if (snapshot.docs.length > 0) {
     const docData = snapshot.docs.map((doc) => ({
       ...doc.data(),
