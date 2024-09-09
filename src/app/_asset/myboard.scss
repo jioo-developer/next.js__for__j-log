@@ -1,0 +1,52 @@
+.board_wrap {
+  padding-top: 100px;
+
+  .board__header {
+    display: flex;
+    .header_img {
+      width: 128px;
+      height: 128px;
+    }
+    .board__nickname {
+      font-size: 26px;
+      font-weight: 500;
+    }
+  }
+  .board__content {
+    display: flex;
+    width: 100%;
+    max-width: 1080px;
+    aside {
+      width: 300px;
+    }
+    .content__in {
+      max-width: 768px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      figure,
+      figcaption {
+        width: 100%;
+      }
+
+      figcaption {
+        display: flex;
+        flex-direction: column;
+        p,
+        .caption__bottom {
+          width: 100%;
+        }
+        .caption_bottom {
+          display: flex;
+          width: 100%;
+          gap: 16px;
+          p {
+            font-size: 14px;
+            color: #888;
+          }
+        }
+      }
+    }
+  }
+}
