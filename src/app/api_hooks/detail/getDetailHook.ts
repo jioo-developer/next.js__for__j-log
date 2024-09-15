@@ -22,7 +22,7 @@ export type FirebaseData = {
   writer: string;
   id: string;
   priority?: boolean;
-  replies?: number;
+  replyLength?: number;
 };
 
 async function getDetailHandler(pageId: string) {

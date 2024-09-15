@@ -2,18 +2,20 @@ import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { db } from "@/app/Firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { FirebaseData } from "../detail/getDetailHook";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 async function getPostData() {
   const collectionRef = collection(db, "post");
-  const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  const queryData = query(collectionRef, orderBy("timestamp", "asc"));
   const snapshot = await getDocs(queryData);
-  if (snapshot.docs.length > 0) {
+  if (!snapshot.empty) {
     const postArray = snapshot.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
     }));
     return postArray;
   } else {
+    popuprHandler({ message: "조회되는 게시글이 없습니다." });
     return [];
   }
 }
@@ -37,7 +39,7 @@ const usePostQueryHook = () => {
   } else {
     postData = [];
   }
-  return { isLoading, postData, error };
+  return { postData, isLoading, error };
 };
 
 export default usePostQueryHook;

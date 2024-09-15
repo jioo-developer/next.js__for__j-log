@@ -1,49 +1,52 @@
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { authService, db } from "@/app/Firebase";
-import { collection, query, orderBy, getDocs, doc } from "firebase/firestore";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { FirebaseData } from "../detail/getDetailHook";
+import { User } from "firebase/auth";
 
 async function getMyData() {
   const collectionRef = collection(db, "post");
-  const queryData = query(collectionRef, orderBy("timeStamp", "asc"));
+  const queryData = query(collectionRef, orderBy("timestamp", "asc"));
   const snapshot = await getDocs(queryData);
-  if (snapshot.docs.length > 0) {
-    const postArray = await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        // 각 문서의 'reply' 하위 컬렉션을 가져옴
-        const replyCollectionRef = collection(doc.ref, "reply");
-        const replySnapshot = await getDocs(replyCollectionRef);
+  if (!snapshot.empty) {
+    const user = authService.currentUser as User;
+    const filter = snapshot.docs.filter((doc) => {
+      return doc.data().id === user.uid;
+    });
 
-        // 'reply' 컬렉션에 문서가 있는 경우에만 해당 문서에 'reply' 배열을 추가
-        const replies = replySnapshot.docs.length;
-
-        return {
-          ...doc.data(),
-          id: doc.id,
-          replies: replies,
-        };
-      })
-    );
-    return postArray;
-  } else {
-    return [];
+    if (filter.length > 0) {
+      const result = await Promise.all(
+        filter.map(async (doc) => {
+          const isReply = collection(doc.ref, "reply");
+          const snapshot = await getDocs(isReply);
+          let replyLength = 0;
+          if (!snapshot.empty) {
+            replyLength = snapshot.docs.length;
+          }
+          return {
+            ...doc.data(),
+            id: doc.id,
+            replyLength: replyLength > 0 && replyLength,
+          };
+        })
+      );
+      return result;
+    }
   }
 }
 
 const useMyDataQueryHook = () => {
   const { data, isLoading, error }: QueryObserverResult<FirebaseData[], Error> =
     useQuery({
-      queryKey: ["getPost"],
+      queryKey: ["getMyData"],
       queryFn: getMyData,
       staleTime: 1 * 60 * 1000, // 1분
       notifyOnChangeProps: ["data"],
     });
 
   const myData = data ? data : [];
-  const user = authService.currentUser?.uid;
-  const result = myData.filter((item) => item.id === user);
 
-  return { isLoading, myData: result, error };
+  return { isLoading, myData, error };
 };
 
 export default useMyDataQueryHook;
