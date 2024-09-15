@@ -58,8 +58,39 @@ button.noShadow {
   display: flex;
   width: 100%;
   gap: 16px;
-  p {
-    font-size: 14px;
-    color: #888;
+  input {
+    display: block;
   }
+  label {
+    display: flex;
+    img {
+      order: 0;
+    }
+    p {
+      font-size: 14px;
+      color: #888;
+      order: 1;
+    }
+  }
+}
+
+.is__white_bg.input_wrap > input {
+  margin-top: 56px;
+  border: 1px solid #000;
+  border-radius: 0;
+  text-indent: 20px !important;
+}
+
+.is__white_bg.input_wrap {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.no__board {
+  display: flex;
+  width: 100%;
+  height: 70vh;
+  justify-content: center;
+  align-items: center;
 }

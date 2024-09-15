@@ -61,7 +61,7 @@ header {
   flex-direction: column;
   position: absolute;
   right: 0;
-  top: 65px;
+  top: 80px;
   background: #fff;
   box-shadow: 0 4px 16px 0 $hoverRgb;
   z-index: 10;
@@ -91,14 +91,36 @@ header {
   font-weight: bold;
 }
 
-label:has(input:checked) + .sub_menu {
+.ui_wrap {
+  display: flex;
+  gap: 40px;
+}
+
+/* input이 체크된 상태일 때 */
+label:has(input:checked) ~ .sub_menu {
   visibility: visible;
 }
 
-label:has(input:checked) + .sub_menu li {
+label:has(input:checked) ~ .sub_menu li {
   height: 30px;
+}
+
+/* input이 체크되지 않은 상태일 때 */
+label:has(input:not(:checked)) ~ .sub_menu {
+  visibility: hidden;
+}
+
+label:has(input:not(:checked)) ~ .sub_menu li {
+  height: 0;
 }
 
 input[type="checkbox"] {
   display: none;
+}
+
+.go__poster {
+  padding: 0 16px;
+  font-size: 20px;
+  border-radius: 18px;
+  border: 1px solid #000;
 }
