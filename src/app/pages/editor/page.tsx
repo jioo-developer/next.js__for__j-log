@@ -1,4 +1,5 @@
 "use client";
+import "@/app/_asset/upload.scss";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
@@ -91,6 +92,7 @@ const EditorPage = () => {
             onHeightChange={(height) => {}}
             className="text"
             autoComplete="off"
+            minRows={10}
             defaultValue={text}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
               setText(e.target.value);
@@ -149,7 +151,6 @@ const EditorPage = () => {
             // }
           >
             <p>노출 우선권 사용하기</p>
-            <Image src="/img/checked.svg" alt="체크" width={25} height={25} />
           </label>
         </div>
         <div className="bottom_wrap">
