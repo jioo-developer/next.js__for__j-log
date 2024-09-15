@@ -13,14 +13,17 @@ interface propsType extends styleProps {
     isEnter: boolean;
     func: () => void;
   };
+  placeholder?: string;
 }
 
 export const Input = ({
-  width,
+  width = 375,
+  height = "auto",
   fontSize = 14,
   type,
   setstate,
   value,
+  placeholder,
   enter = { isEnter: false, func: () => {} },
 }: propsType) => {
   const { valueChangeHandler } = useInput("");
@@ -37,7 +40,7 @@ export const Input = ({
       required
       type={type === "id" || type === "text" ? "text" : type}
       className="form-control"
-      placeholder={textPlaceHolader[type]}
+      placeholder={placeholder ? placeholder : textPlaceHolader[type]}
       value={value && value}
       onChange={(e) =>
         setstate ? setstate(e.target.value) : valueChangeHandler
@@ -47,7 +50,7 @@ export const Input = ({
           keydownHandler(e);
         }
       }}
-      css={style({ width, fontSize })}
+      css={style({ width, height, fontSize })}
       autoComplete="off"
     />
   );
@@ -61,8 +64,9 @@ const textPlaceHolader = {
   email: "이메일을 입력하세요.",
 };
 
-const style = ({ width, fontSize }: styleProps) => css`
+const style = ({ width, height, fontSize }: styleProps) => css`
   width: ${width === "full" ? "100%;" : width + "px;"}
+  height : ${height && height !== "auto" ? height + "px;" : "auto;"}
   font-size: ${fontSize}px;
   margin-bottom: 15px;
   &::placeholder {

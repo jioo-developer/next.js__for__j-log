@@ -1,9 +1,12 @@
-'use client';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useState } from 'react';
+"use client";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function ReactQueryProviders({children}: React.PropsWithChildren) {
+export default function ReactQueryProviders({
+  children,
+}: React.PropsWithChildren) {
   const [client] = useState(
     new QueryClient({
       defaultOptions: {
@@ -13,8 +16,17 @@ export default function ReactQueryProviders({children}: React.PropsWithChildren)
           retry: 1, // API 요청 실패시 재시도 하는 옵션 (설정값 만큼 재시도)
         },
       },
-    }),
+    })
   );
+
+  const router = {
+    pathname: usePathname(),
+    handler: useRouter(),
+  };
+
+  if (router.pathname === "/") {
+    router.handler.push("/pages/main");
+  }
 
   return (
     <QueryClientProvider client={client}>

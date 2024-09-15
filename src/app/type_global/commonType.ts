@@ -14,8 +14,8 @@ export interface childrenProps {
 }
 
 export interface styleProps {
-  width?: number | string;
-  height?: number | undefined;
+  width?: number | string | undefined;
+  height?: number | string | undefined;
   fontSize?: number;
 }
 
