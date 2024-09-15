@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import userQueryHook from "@/app/api_hooks/login/getUserHook";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SkeletonItem from "@/app/components/SkeletonItem";
 import PostItem from "@/app/components/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
@@ -9,9 +9,10 @@ import { searchStore } from "@/app/store/common";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
 
 const MainPage = () => {
-  const [postState, setState] = useState<FirebaseData[] | null>(null);
+  const [postState, setState] = useState<FirebaseData[]>([]);
 
   const router = useRouter();
+
   const { data, isLoading } = userQueryHook();
   const { postData } = usePostQueryHook();
 
@@ -35,8 +36,6 @@ const MainPage = () => {
         (item) => item.title === target || item.text === target
       );
       setState(filterArray);
-    } else {
-      setState(postData);
     }
   }, [searchInfo.isSearch]);
 
@@ -47,7 +46,7 @@ const MainPage = () => {
   };
 
   const showDataHandler = () => {
-    const array = postState as FirebaseData[];
+    const array = searchInfo.isSearch ? postState : postData;
     return array.map((item, index) => {
       return <PostItem item={item} index={index} key={index} />;
     });

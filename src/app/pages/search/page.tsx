@@ -1,3 +1,4 @@
+"use client";
 import { searchStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { useRouter } from "next/navigation";
@@ -14,11 +15,17 @@ const SearchPage = () => {
   }
 
   return (
-    <Input
-      type="text"
-      setstate={setSearch}
-      enter={{ isEnter: true, func: goSearch }}
-    />
+    <div className="is__white_bg input_wrap">
+      <Input
+        type="text"
+        setstate={setSearch}
+        enter={{ isEnter: true, func: goSearch }}
+        placeholder="검색어를 입력하세요"
+        width={768}
+        height={70}
+        fontSize={24}
+      />
+    </div>
   );
 };
 
