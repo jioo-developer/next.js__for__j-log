@@ -58,7 +58,7 @@ const SocialLoginPage = () => {
       }
     } catch {
       popuprHandler({
-        message: "로그인 정보가 조회 되지 않습니다",
+        message: "소셜 로그인 정보가 조회 되지 않습니다",
       });
     }
   }

@@ -7,12 +7,15 @@ import { Input } from "@/stories/atoms/Input";
 import SocialLogin from "./snsLogin/sosialLogin";
 import Image from "next/image";
 import useLoginHook from "@/app/api_hooks/login/setUserHook";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 const LoginPage = () => {
   const [id, setId] = useState("");
   const [pw, setpw] = useState("");
 
   const router = useRouter();
+
+  const { data: user } = useUserQueryHook();
 
   const loginMutation = useLoginHook();
   // 컴포넌트나 커스텀 훅의 내부에서만 호출
@@ -31,7 +34,7 @@ const LoginPage = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          LoginHandler();
+          if (!user) LoginHandler();
         }}
         className="sign-form"
       >
@@ -60,13 +63,17 @@ const LoginPage = () => {
         <Button
           className="pw_reset ass_btn noShadow"
           width={120}
-          onClick={() => router.push("/pages/resetPw")}
+          onClick={() => {
+            if (!user) router.push("/pages/resetPw");
+          }}
         >
           비밀번호 변경&amp;찾기
         </Button>
         <Button
           className="ass_auth ass_btn noShadow text-right"
-          onClick={() => router.push("/pages/signup")}
+          onClick={() => {
+            if (!user) router.push("/pages/signup");
+          }}
         >
           회원가입
         </Button>
