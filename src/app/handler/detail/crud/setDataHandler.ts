@@ -17,10 +17,10 @@ export const setDataHandler = (data: initialData) => {
     user: currentUser.displayName as string,
     profile: currentUser.photoURL as string,
     date: `${timeData.year}년 ${timeData.month}월 ${timeData.day}일`,
-    timeStamp: serverTimestamp() as Timestamp,
+    timestamp: serverTimestamp() as Timestamp,
     writer: currentUser.uid,
     favorite: 0,
-    id: currentUser.uid,
+    id: "",
   };
   const resultObj = Object.assign(data, addContent);
   return resultObj;

@@ -1,8 +1,8 @@
 "use client";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocationrHandler } from "../handler/commonHandler";
 
 export default function ReactQueryProviders({
   children,
@@ -19,10 +19,7 @@ export default function ReactQueryProviders({
     })
   );
 
-  const router = {
-    pathname: usePathname(),
-    handler: useRouter(),
-  };
+  const router = useLocationrHandler();
 
   if (router.pathname === "/") {
     router.handler.push("/pages/main");

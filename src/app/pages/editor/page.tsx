@@ -14,7 +14,6 @@ import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
@@ -56,7 +55,9 @@ const EditorPage = () => {
     const content = {
       title,
       text,
-      fileName: file.map((value: File) => value.name),
+      fileName: file
+        .map((value: File) => value.name)
+        .filter((item) => item !== ""),
       pageId: pageInfo,
       url: await CreateImgUrl({
         image: previewImg,
@@ -67,7 +68,7 @@ const EditorPage = () => {
     };
     if (editMode) {
       const obj = { ...(pageData as FirebaseData) };
-      const resultObj = Object.assign(content, obj);
+      const resultObj = Object.assign(obj, content);
       postMutate.mutate({ data: resultObj, pageId: pageInfo });
     } else {
       const addContent = setDataHandler(content);

@@ -21,17 +21,16 @@
   .board__content {
     display: flex;
     width: 100%;
-    aside {
-      display: flex;
-      justify-content: center;
-      width: 300px;
-      height: 100vh;
-      position: absolute;
-      left: 130px;
+
+    .all_view {
+      color: rgb(32, 201, 151);
+      span {
+        color: #888;
+      }
     }
     .content__in {
       max-width: 768px;
-      padding-top: 100px;
+      padding-top: 20px;
       margin: 0 auto;
       width: 100%;
       display: flex;

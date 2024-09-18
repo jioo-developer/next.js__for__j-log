@@ -13,8 +13,6 @@ export async function pageDelete(data: FirebaseData) {
 
   if (files.length > 0) {
     await DeleteHandler(files, writer);
-  } else {
-    throw new Error("에러");
   }
 
   const ref = doc(db, "post", id);

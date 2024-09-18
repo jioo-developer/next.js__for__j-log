@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { doc, updateDoc } from "firebase/firestore";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { FirebaseData } from "../../api_hooks/detail/getDetailHook";
-import { db } from "@/app/Firebase";
+import { authService, db } from "@/app/Firebase";
+import { cookieHandler } from "../commonHandler";
 
 type favoriteType = {
   email?: string;
@@ -22,6 +23,8 @@ export const useFavoriteMutate = () => {
       return newFavorite;
     },
     onSuccess: (result, { id }) => {
+      const user = authService.currentUser?.email;
+      cookieHandler(user ? user : "guest");
       queryClient.refetchQueries({
         queryKey: ["getPage", id],
       });

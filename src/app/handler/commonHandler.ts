@@ -1,3 +1,5 @@
+import { usePathname, useRouter } from "next/navigation";
+
 const time = new Date();
 export const timeData = {
   year: time.getFullYear(),
@@ -19,3 +21,10 @@ export function cookieHandler(name: string) {
   result.setHours(result.getHours() + 9);
   document.cookie = `${name}-Cookie=${encodeURIComponent("done")}; expires=${result.toUTCString()};`;
 }
+
+export const useLocationrHandler = () => {
+  return {
+    pathname: usePathname(),
+    handler: useRouter(),
+  };
+};

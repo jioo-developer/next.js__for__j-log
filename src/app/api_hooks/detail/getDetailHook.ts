@@ -13,7 +13,7 @@ export type FirebaseData = {
   pageId: string;
   profile: string;
   date: string;
-  timeStamp: Timestamp;
+  timestamp: Timestamp;
   title: string;
   fileName: string[];
   url: string[];
