@@ -10,6 +10,7 @@ export const popupMessageStore = create(() => ({
 export const pageInfoStore = create(() => ({
   pgId: "",
   editMode: false,
+  fromAction: "",
 }));
 
 export const searchStore = create(() => ({
