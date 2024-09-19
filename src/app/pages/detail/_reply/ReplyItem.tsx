@@ -10,6 +10,7 @@ import {
   useDeleteHandler,
   useUpdateHandler,
 } from "@/app/handler/detail-reply/useMutationHandler";
+import { pageInfoStore } from "@/app/store/common";
 
 type propsType = {
   item: replyType;
@@ -39,6 +40,8 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
 
   const deleteMutation = useDeleteHandler();
 
+  const from = pageInfoStore().fromAction;
+
   function AskDeleteHandler(index: number, isClick?: boolean) {
     if (!isClick) {
       popuprHandler({
@@ -46,9 +49,10 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
         type: "confirm",
       });
       setTarget(index);
+      pageInfoStore.setState({ fromAction: "reply" });
     }
 
-    if (isClick) {
+    if (isClick && from === "reply") {
       const replyId = (replyData as replyType[])[index].id;
       deleteMutation.mutate({ id: pageId, replyId, comment });
     }

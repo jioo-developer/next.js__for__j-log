@@ -13,7 +13,6 @@ import { useEffect } from "react";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
 import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
 import { useFavoriteMutate } from "@/app/handler/detail/useMutationHandler";
-import { User } from "firebase/auth";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -46,7 +45,8 @@ const DetailPage = () => {
   }, [msg]);
 
   function favoriteHandler() {
-    const getcookie = `${(user as User).email}-Cookie`;
+    const target = user ? user.email : "guest";
+    const getcookie = `${target}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
       favoriteMutate.mutate({
         value: (pageData as FirebaseData).favorite,
@@ -61,15 +61,20 @@ const DetailPage = () => {
     }
   }, [ispopupClick]);
 
+  const from = pageInfoStore().fromAction;
+
   async function pageDeleteHandler(isClick?: boolean) {
     if (!isClick) {
       popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
+      pageInfoStore.setState({ fromAction: "detail" });
     } else {
-      try {
-        pageDelete(pageData as FirebaseData);
-        router.push("/pages/main");
-      } catch {
-        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
+      if (from === "detail") {
+        try {
+          pageDelete(pageData as FirebaseData);
+          router.push("/pages/main");
+        } catch {
+          popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
+        }
       }
     }
   }
@@ -97,26 +102,20 @@ const DetailPage = () => {
                 <p className="writer">{pageData.user}</p>
                 <p className="date">{pageData.date}</p>
               </div>
-              {user.uid === pageData.writer ||
-                (user.email === "rlawl3383@gmail.com" && (
-                  <div className="right_wrap">
-                    <button
-                      className="edit"
-                      onClick={() => {
-                        pageInfoStore.setState({ editMode: true });
-                        router.push("/pages/editor");
-                      }}
-                    >
-                      수정
-                    </button>
-                    <button
-                      className="delete"
-                      onClick={() => pageDeleteHandler()}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                ))}
+              <div className="right_wrap">
+                <button
+                  className="edit"
+                  onClick={() => {
+                    pageInfoStore.setState({ editMode: true });
+                    router.push("/pages/editor");
+                  }}
+                >
+                  수정
+                </button>
+                <button className="delete" onClick={() => pageDeleteHandler()}>
+                  삭제
+                </button>
+              </div>
             </div>
           </section>
           <section className="content_wrap">
