@@ -1,7 +1,7 @@
 "use client";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocationrHandler } from "../handler/commonHandler";
 
 export default function ReactQueryProviders({
@@ -21,9 +21,11 @@ export default function ReactQueryProviders({
 
   const router = useLocationrHandler();
 
-  if (router.pathname === "/") {
-    router.handler.push("/pages/main");
-  }
+  useEffect(() => {
+    if (router.pathname === "/") {
+      router.handler.push("/pages/main");
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={client}>
