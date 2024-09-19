@@ -32,38 +32,38 @@ const MyBoardPage = () => {
             />
             <p className="board__nickname">{user.displayName}</p>
           </section>
-          <section className="board__content" onClick={routeHandler}>
-            <aside>
+          <section className="board__content">
+            <div className="content__in">
               <p className="all_view">
                 전체보기
-                <span>{`(${myData.length})`}</span>
+                <span>&nbsp;{`(${myData.length})`}</span>
               </p>
-            </aside>
-            <div className="content__in">
-              <article>
-                <figure>
-                  <Image
-                    src={
-                      myData[0].url[0] ? myData[0].url[0] : "/img/no-image.jpg"
-                    }
-                    width={768}
-                    height={400}
-                    alt="프로필 이미지"
-                  />
-                </figure>
-                <figcaption>
-                  <p className="content__title">{myData[0].title}</p>
-                  <p className="content__text">{myData[0].text}</p>
-                  <div className="caption__bottom">
-                    <p>{myData[0].date}</p>
-                    <p>{`${myData[0].replyLength}개의 댓글`}</p>
-                    <p>
-                      ♥&nbsp;
-                      {myData[0].favorite}
-                    </p>
-                  </div>
-                </figcaption>
-              </article>
+              {myData.map((item, index) => {
+                return (
+                  <article onClick={routeHandler} key={index}>
+                    <figure>
+                      <Image
+                        src={item.url[0] ? item.url[0] : "/img/no-image.jpg"}
+                        width={768}
+                        height={400}
+                        alt="프로필 이미지"
+                      />
+                    </figure>
+                    <figcaption>
+                      <p className="content__title">{item.title}</p>
+                      <p className="content__text">{item.text}</p>
+                      <div className="caption__bottom">
+                        <p>{item.date}</p>
+                        <p>{`${item.replyLength}개의 댓글`}</p>
+                        <p>
+                          ♥&nbsp;
+                          {item.favorite}
+                        </p>
+                      </div>
+                    </figcaption>
+                  </article>
+                );
+              })}
             </div>
           </section>
         </div>
