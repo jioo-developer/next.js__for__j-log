@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import useNameQueryHook from "@/app/api_hooks/common/getnameHook";
 import useSignupHandler from "@/app/api_hooks/signup/signupHook";
+import { validateEmail } from "@/app/handler/commonHandler";
 
 const authData = [
   { id: "auth", text: "회원가입및 운영약관 동의", important: true },
@@ -27,6 +28,17 @@ const SignupPage = () => {
   const { nicknameData, error, isLoading } = useNameQueryHook();
 
   const crateAccount = useSignupHandler();
+
+  function validateHandler() {
+    const isEmailCheck = validateEmail(email);
+    if (!isEmailCheck) {
+      popuprHandler({ message: "올바른 이메일 형식이 아닙니다." });
+    } else if (password.length < 8) {
+      popuprHandler({ message: "비밀번호가 짧습니다." });
+    } else {
+      accountHandler();
+    }
+  }
 
   function accountHandler() {
     if (!error && nicknameData) {
@@ -61,14 +73,14 @@ const SignupPage = () => {
         className="auth-form"
         onSubmit={(e) => {
           e.preventDefault();
-          accountHandler();
+          validateHandler();
         }}
       >
         <p className="id_title">
           이메일&nbsp;<span>*</span>
         </p>
         <Input
-          type="id"
+          type={"email"}
           width={375}
           height={45}
           fontSize={16}
@@ -102,6 +114,7 @@ const SignupPage = () => {
           width={"full"}
           theme="primary"
           className={disable ? "un_btn" : "btn"}
+          disable={disable}
         >
           회원가입
         </Button>
