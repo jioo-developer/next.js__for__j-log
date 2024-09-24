@@ -83,6 +83,7 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
             {checkArr.length === items.length && (
               <Image src="/img/checked.svg" alt="체크" width={25} height={25} />
             )}
+            전체 약관 동의
           </label>
           <p className="check_text">전체 약관 동의</p>
         </div>
@@ -116,6 +117,7 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
                     height={25}
                   />
                 )}
+                {item.text}
               </label>
               <p className="check_text">
                 <span style={!item.important ? { opacity: 0 } : {}}>
