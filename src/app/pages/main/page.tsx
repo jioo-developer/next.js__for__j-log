@@ -7,6 +7,7 @@ import PostItem from "@/app/components/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { searchStore } from "@/app/store/common";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 const MainPage = () => {
   const [postState, setState] = useState<FirebaseData[]>([]);
@@ -16,13 +17,18 @@ const MainPage = () => {
   const { data, isLoading } = userQueryHook();
   const { postData } = usePostQueryHook();
 
-  setTimeout(() => {
-    if (!isLoading) {
-      if (!data) {
-        router.push("/pages/login");
+  useEffect(() => {
+    setTimeout(() => {
+      if (!isLoading) {
+        popupInit();
+        if (!data) {
+          router.push("/pages/login");
+        }
+      } else {
+        popuprHandler({ message: "회원정보를 불러오고 있습니다" });
       }
-    }
-  }, 100);
+    }, 100);
+  }, [isLoading]);
 
   const searchInfo = {
     params: searchStore().searchText,
