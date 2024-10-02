@@ -38,15 +38,14 @@ const isCheckHandler = (labelText: string) => {
 
 describe("Checker Component test", () => {
   beforeEach(() => {
+    // given
     const setStateMock = jest.fn();
     render(<Checker allcheck={true} items={items} setState={setStateMock} />);
     // 테스트 할 컴포넌트를 랜더링
   });
   test("전체동의 체크박스 기능 테스트", () => {
-    screen.debug();
     // when start 입력이나 동작에 관한 액션
     const expectTry = isCheckHandler("전체 약관 동의");
-    // when End
 
     // then start 모든 체크박스가 체크 되었는지 검증
     expect(expectTry).toBe(true);
@@ -57,8 +56,6 @@ describe("Checker Component test", () => {
 
     expect(expectReTry).toBe(false);
     // 전체 약관 동의 체크박스를 클릭했을 때
-
-    // then End
   });
   test("약관 동의 개별 테스트", () => {
     // when 입력이나 동작에 관한 액션
@@ -74,7 +71,7 @@ describe("Checker Component test", () => {
     expect(SecondChecker).toBe(true);
 
     // when 입력이나 동작에 관한 액션
-    const thirdChecker = isCheckHandler("회원가입 및 운영약관 동의");
+    const thirdChecker = isCheckHandler("위치정보 이용약관 동의");
 
     // then 체크 상태 검증
     expect(thirdChecker).toBe(true);
