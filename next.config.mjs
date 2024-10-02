@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   sassOptions: {
-    includePaths: ["styles"],
+    reactStrictMode: false,
+    includePaths: ["app/_asset"], // styles 폴더를 SCSS 파일의 경로로 설정
+    prependData: `@import "@/app/_asset/_mixin.scss";`, // _mixin.scss 파일의 경로를 정확히 설정
   },
   images: {
     domains: [
