@@ -6,6 +6,7 @@ import { useInput } from "@/app/handler/useInput";
 import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 
 interface propsType extends styleProps {
+  id?: string;
   type: "id" | "password" | "textarea" | "email" | "text";
   setstate?: Dispatch<SetStateAction<string>>;
   value?: string | number;
@@ -24,6 +25,7 @@ export const Input = ({
   setstate,
   value,
   placeholder,
+  id,
   enter = { isEnter: false, func: () => {} },
 }: propsType) => {
   const { valueChangeHandler } = useInput("");
@@ -37,6 +39,7 @@ export const Input = ({
   }
   return (
     <input
+      id={id && id}
       required
       type={type === "id" || type === "text" ? "text" : type}
       className="form-control"

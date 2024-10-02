@@ -23,7 +23,7 @@ const useNameQueryHook = () => {
       notifyOnChangeProps: ["data"],
     });
 
-  const nicknameData = data;
+  const nicknameData = data ? data : [];
 
   return { nicknameData, error, isLoading };
 };

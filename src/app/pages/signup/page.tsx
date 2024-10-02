@@ -12,7 +12,7 @@ import useSignupHandler from "@/app/api_hooks/signup/signupHook";
 import { validateEmail } from "@/app/handler/commonHandler";
 
 const authData = [
-  { id: "auth", text: "회원가입및 운영약관 동의", important: true },
+  { id: "auth", text: "회원가입 및 운영약관 동의", important: true },
   { id: "data", text: "개인정보 수집 및 동의", important: true },
   { id: "location", text: "위치정보 이용약관 동의", important: false },
 ];
@@ -76,39 +76,51 @@ const SignupPage = () => {
           validateHandler();
         }}
       >
-        <p className="id_title">
-          이메일&nbsp;<span>*</span>
-        </p>
-        <Input
-          type={"email"}
-          width={375}
-          height={45}
-          fontSize={16}
-          setstate={setEmail}
-        />
+        <div>
+          <Input
+            id="email-input"
+            type={"email"}
+            width={375}
+            height={45}
+            fontSize={16}
+            setstate={setEmail}
+          />
+          <label htmlFor="email-input" className="id_title">
+            이메일
+          </label>
+        </div>
+
         <p className="warning">
           ※ 실제 사용하시는 이메일을 사용하셔야 비밀번호를 찾으실 수 있습니다.
         </p>
-        <p className="id_title">
-          비밀번호&nbsp;<span>*</span>
-        </p>
-        <Input
-          type="password"
-          width={375}
-          height={45}
-          fontSize={16}
-          setstate={setPassword}
-        />
-        <p className="id_title">
-          닉네임 &nbsp;<span>*</span>
-        </p>
-        <Input
-          type="text"
-          width={375}
-          height={45}
-          fontSize={16}
-          setstate={setNickname}
-        />
+        <div>
+          <Input
+            type="password"
+            id="pw-input"
+            width={375}
+            height={45}
+            fontSize={16}
+            setstate={setPassword}
+          />
+          <label htmlFor="pw-input" className="id_title">
+            비밀번호
+          </label>
+        </div>
+
+        <div>
+          <Input
+            type="text"
+            width={375}
+            height={45}
+            fontSize={16}
+            setstate={setNickname}
+            id="nick_input"
+          />
+          <label htmlFor="nick_input" className="id_title">
+            닉네임
+          </label>
+        </div>
+
         <Checker allcheck items={authData} setState={setDisable} />
         <Button
           width={"full"}
