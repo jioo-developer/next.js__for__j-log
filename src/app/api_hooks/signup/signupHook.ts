@@ -34,6 +34,7 @@ const useSignupHandler = () => {
       await setDoc(doc(db, "nickname", user.uid), {
         id: user.uid,
         nickname: nickname,
+        service: "password",
       });
 
       // 사용자 프로필 업데이트
