@@ -17,7 +17,8 @@ type propsType = {
 const useSignupHandler = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  return useMutation({
+
+  const mutation = useMutation({
     mutationFn: async ({ email, password, nickname }: propsType) => {
       // 회원생성로직
       const createUser = await createUserWithEmailAndPassword(
@@ -29,18 +30,16 @@ const useSignupHandler = () => {
 
       const user = createUser.user;
 
-      if (user) {
-        // Firestore에 닉네임 저장
-        await setDoc(doc(db, "nickname", user.uid), {
-          id: user.uid,
-          nickname: nickname,
-        });
+      // Firestore에 닉네임 저장
+      await setDoc(doc(db, "nickname", user.uid), {
+        id: user.uid,
+        nickname: nickname,
+      });
 
-        // 사용자 프로필 업데이트
-        await updateProfile(user, {
-          displayName: nickname,
-        });
-      }
+      // 사용자 프로필 업데이트
+      await updateProfile(user, {
+        displayName: nickname,
+      });
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
@@ -58,6 +57,8 @@ const useSignupHandler = () => {
       }
     },
   });
+
+  return mutation;
 };
 
 export default useSignupHandler;

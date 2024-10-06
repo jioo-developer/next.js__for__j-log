@@ -1,6 +1,6 @@
 "use client";
 import "@/app/_asset/auth.scss";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/stories/atoms/Input";
 import { Button } from "@/stories/atoms/Button";
 import Image from "next/image";
@@ -36,21 +36,17 @@ const SignupPage = () => {
     } else if (password.length < 8) {
       popuprHandler({ message: "비밀번호가 짧습니다." });
     } else {
-      accountHandler();
-    }
-  }
-
-  function accountHandler() {
-    if (!error && nicknameData) {
-      const isNamecheck = nicknameData.includes(nickname);
-      if (isNamecheck) {
-        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
-      } else {
-        crateAccount.mutate({
-          email: email,
-          password: password,
-          nickname: nickname,
-        });
+      if (error === null && nicknameData.length > 0) {
+        const isNamecheck = nicknameData.includes(nickname);
+        if (isNamecheck) {
+          popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+        } else {
+          crateAccount.mutate({
+            email: email,
+            password: password,
+            nickname: nickname,
+          });
+        }
       }
     }
   }
