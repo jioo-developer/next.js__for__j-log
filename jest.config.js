@@ -7,6 +7,8 @@ module.exports = {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.jest.json" }], // ts-jest 설정을 여기에 적용
   },
 
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+
   transformIgnorePatterns: [
     "/node_modules/",
     "^.+\\.module\\.(css|sass|scss)$",
