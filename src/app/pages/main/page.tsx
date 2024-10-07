@@ -18,17 +18,12 @@ const MainPage = () => {
   const { postData } = usePostQueryHook();
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!isLoading) {
-        popupInit();
-        if (!data) {
-          router.push("/pages/login");
-        }
-      } else {
-        popuprHandler({ message: "회원정보를 불러오고 있습니다" });
-      }
-    }, 100);
-  }, [isLoading]);
+    popuprHandler({ message: "회원정보를 불러오고 있습니다" });
+    popupInit();
+    if (!data) {
+      router.push("/pages/login");
+    }
+  }, [data]);
 
   const searchInfo = {
     params: searchStore().searchText,
