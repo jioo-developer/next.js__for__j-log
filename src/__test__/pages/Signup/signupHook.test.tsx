@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -85,8 +86,7 @@ describe("회원가입 페이지 로직 테스트", () => {
       })
     );
 
-    const mockRouter = require("next/navigation").useRouter();
-    expect(mockRouter.push).toHaveBeenCalledWith("/pages/main");
+    expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
   });
 
   test("게정 생성이 실패 했을 때를 테스트 합니다.", async () => {
