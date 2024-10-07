@@ -4,72 +4,54 @@ import { authService } from "@/app/Firebase";
 import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { popupMessageStore } from "@/app/store/common";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { Popup } from "@/stories/atoms/Popup";
+import { Input } from "@/stories/atoms/Input";
+import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
+import { Button } from "@/stories/atoms/Button";
+import { useEffect, useState } from "react";
+import { validateEmail } from "@/app/handler/commonHandler";
 
 const ResetPwPage = () => {
   const [findPw, setFindPw] = useState("");
 
-  const { data } = useUserQueryHook();
+  const { data, isLoading } = useUserQueryHook();
 
   const router = useRouter();
 
-  function routerHandler() {
-    router.push("/pages/login");
-  }
-
   useEffect(() => {
-    if (!data) {
-      popuprHandler({
-        message: "비밀번호를 잊어버리셨나요?",
-        type: "prompt",
-        state: setFindPw,
-      });
+    if (data && !isLoading) {
+      router.push("/pages/login");
     }
-  }, [data]);
-
-  // 팝업 취소 시 login 페이지로 라우팅
-  const msg = popupMessageStore().message;
-
-  useEffect(() => {
-    popupMessageStore.subscribe((state, prevState) => {
-      const target = "비밀번호를 잊어버리셨나요?";
-      if (prevState.message === target && state.message === "") {
-        routerHandler();
-      }
-    });
-  }, [msg]);
-
-  // 팝업 취소 시 login 페이지로 라우팅
-
-  // 팝업 확인 누를 시 비밀번호 찾기 로직 실행
-
-  const isPopupClick = popupMessageStore().isClick;
-
-  useEffect(() => {
-    if (isPopupClick) {
-      resetHandler();
-    }
-  }, [isPopupClick]);
-
-  // 팝업 확인 누를 시 비밀번호 찾기 로직 실행
+  }, [data, isLoading]);
 
   const resetHandler = async () => {
     try {
       await sendPasswordResetEmail(authService, findPw);
-      popuprHandler({ message: "입력하신 메일로 비밀번호 안내드렸습니다" });
-      routerHandler();
-    } catch (error) {
-      const errorMessage = LoginErrorHandler((error as Error).message);
-      if (errorMessage) {
-        popuprHandler({ message: errorMessage });
+      const isEmail = validateEmail(findPw);
+      if (isEmail) {
+        popuprHandler({ message: "입력하신 메일로 비밀번호 안내드렸습니다" });
+        router.push("/pages/login");
       } else {
-        popuprHandler({ message: "회원가입 도중 에러가 발생하였습니다" });
+        throw new Error("올바른 이메일 형식이 아닙니다.");
       }
+    } catch (error) {
+      popuprHandler({ message: "올바른 이메일 형식이 아닙니다." });
     }
   };
+
+  return (
+    <Popup type="custom" width="28rem;" handText="비밀번호를 잊어버리셨나요?">
+      <Input type="email" width="full" setstate={setFindPw} />
+      <ButtonGroup>
+        <Button onClick={() => router.push("/pages/login")}>취소</Button>
+        <Button theme="success" onClick={() => resetHandler()}>
+          확인
+        </Button>
+      </ButtonGroup>
+    </Popup>
+  );
 };
 
 export default ResetPwPage;
