@@ -116,6 +116,10 @@ describe("회원가입 페이지 로직 테스트", () => {
     });
 
     await waitFor(() => {
+      expect(result.current.isSuccess).toBe(false);
+    });
+
+    await waitFor(() => {
       expect(LoginErrorHandler).toHaveBeenCalledWith(errorMessage);
       expect(popuprHandler).toHaveBeenCalledWith({
         message: errorMessage,
