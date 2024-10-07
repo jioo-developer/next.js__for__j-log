@@ -15,6 +15,7 @@ type propsType = {
   textAlign?: "left" | "center" | "right";
   subText?: string;
   children?: ReactNode;
+  handText?: string;
 };
 
 export const Popup = ({
@@ -25,6 +26,7 @@ export const Popup = ({
   textAlign = "left",
   subText,
   children,
+  handText = "",
 }: propsType) => {
   const msgContent = popupMessageStore();
 
@@ -40,7 +42,7 @@ export const Popup = ({
               font-weight: bold;
             `}
           >
-            {msgContent.message}
+            {handText === "" ? msgContent.message : handText}
           </p>
           {subText && (
             <p
