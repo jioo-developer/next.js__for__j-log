@@ -4,21 +4,20 @@ import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { objType } from "@/app/pages/login/snsLogin/sosialLogin";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 export async function onGoogle() {
   const provider = new GoogleAuthProvider();
-  const result = (await signInWithPopup(authService, provider)).user;
-  // 구글 로그인 결과
-  if (result) {
-    const { userId, userName, service } = {
-      userId: result.uid,
-      userName: result.displayName as string,
-      service: result.providerData[0].providerId,
+  try {
+    const result = await signInWithPopup(authService, provider);
+    // 구글 로그인 결과
+    return {
+      userId: result.user.uid,
+      userName: result.user.displayName as string,
+      service: result.user.providerData[0].providerId,
     };
-    return { userId, userName, service };
-  } else {
-    throw new Error("구글 로그인에 실패하였습니다");
+  } catch {
+    throw new Error("소셜 로그인 정보가 조회 되지 않습니다");
   }
 }
 
@@ -27,7 +26,7 @@ export async function isSecondaryPw(id: string) {
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     // 이미 문서가 있는 지 체크
-    if (docSnap.data().service && docSnap.data().password) {
+    if (docSnap.data().service !== "password" && docSnap.data().password) {
       return true;
       // 문서 안에 service 타입과 패스워드가 있는지 체크
     } else {
@@ -45,6 +44,15 @@ export const useSecondaryHandler = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (params: objType) => {
+
+      const isFalsy = Object.values(params).some((item) => {
+        return !item;
+      });
+
+      if (isFalsy) {
+        throw new Error("2차비밀번호 설정 중 에러가 발생하였습니다");
+      }
+      
       await setDoc(doc(db, "nickname", params.id), {
         id: params.id,
         password: params.pw,
@@ -54,18 +62,15 @@ export const useSecondaryHandler = () => {
         // 만약 nickname이 null 일 때 uid를 대신 넣어주기
       });
     },
-    onSettled: () => {
-      popupInit();
-    },
     onSuccess: async () => {
       await queryClient.refetchQueries({
         queryKey: ["getuser"],
       });
       router.push("/pages/main");
     },
-    onError: () => {
+    onError: (error) => {
       popuprHandler({
-        message: "2차비밀번호 설정 중 에러가 발생하였습니다",
+        message: error.message,
       });
     },
   });

@@ -32,6 +32,7 @@ const SocialLoginPage = () => {
 
   useEffect(() => {
     if (ispopupClick) {
+      popupInit();
       const newObj = { ...userObj };
       newObj.pw = parseInt(pw);
       setSecondPw.mutate(newObj);
@@ -56,9 +57,9 @@ const SocialLoginPage = () => {
       } else {
         router.push("/pages/main");
       }
-    } catch {
+    } catch (error) {
       popuprHandler({
-        message: "소셜 로그인 정보가 조회 되지 않습니다",
+        message: (error as Error).message,
       });
     }
   }
