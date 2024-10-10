@@ -9,6 +9,7 @@ const nextConfig = {
     domains: [
       process.env.NEXT_PUBLIC_FIREBASE_STORAGE_GOGGLE_API,
       process.env.NEXT_PUBLIC_FIREBASE_STORAGE_GOGGLE_USER,
+      "lh3.googleusercontent.com",
     ],
   },
 };

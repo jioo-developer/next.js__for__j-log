@@ -1,12 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import userQueryHook from "@/app/api_hooks/login/getUserHook";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import SkeletonItem from "@/app/components/SkeletonItem";
 import PostItem from "@/app/components/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { searchStore } from "@/app/store/common";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
+import { isSecondaryPw } from "@/app/api_hooks/login/snsLogin/googleLogin";
 import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 const MainPage = () => {
@@ -18,12 +19,21 @@ const MainPage = () => {
   const { postData } = usePostQueryHook();
 
   useEffect(() => {
-    popuprHandler({ message: "회원정보를 불러오고 있습니다" });
-    popupInit();
-    if (!data) {
-      router.push("/pages/login");
+    if (isLoading) {
+      popuprHandler({ message: "회원정보를 불러 오는 중입니다." });
+    } else {
+      popupInit();
+      if (!data) {
+        router.push("/pages/login");
+      } else {
+        isSecondaryPw(data.uid).then((result) => {
+          if (!result) {
+            router.push("/pages/login");
+          }
+        });
+      }
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   const searchInfo = {
     params: searchStore().searchText,
