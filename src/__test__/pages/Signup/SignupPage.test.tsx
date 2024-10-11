@@ -4,6 +4,8 @@ import useSignupHandler from "@/app/api_hooks/signup/signupHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import SignupPage from "@/app/pages/signup/page";
 import { commonElement, isSubmitActive } from "./utils";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /* mocking 할 함수 목록 
  1. nicknameQueryHook
@@ -12,6 +14,15 @@ import { commonElement, isSubmitActive } from "./utils";
  4. signupHandler
  5. 6번의 return mutate
 */
+
+jest.mock("@/app/api_hooks/login/getUserHook", () => ({
+  __esModule: true, // ES 모듈로 인식되도록 설정
+  default: jest.fn().mockReturnValue({
+    data: null, // 모의 데이터 반환
+    error: null,
+    isLoading: false,
+  }),
+}));
 
 jest.mock("@/app/api_hooks/common/getnameHook", () => ({
   __esModule: true, // ES 모듈로 인식되도록 설정
@@ -49,7 +60,15 @@ jest.mock("@/app/api_hooks/signup/signupHook", () => jest.fn());
 describe("회원가입 페이지 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    render(<SignupPage />);
+    const queryClient = new QueryClient();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SignupPage />
+      </QueryClientProvider>
+    );
+    const { data } = useUserQueryHook();
+    expect(data).toBe(null);
   });
 
   test("초기 랜더링 시 회원가입 버튼 및 체크 박스가 비 활성화 되어 있는 지 확인합니다.", () => {

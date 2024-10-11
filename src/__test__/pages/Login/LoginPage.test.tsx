@@ -1,3 +1,4 @@
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import useLoginHook from "@/app/api_hooks/login/setUserHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import LoginPage from "@/app/pages/login/page";
@@ -66,6 +67,9 @@ describe("로그인 페이지 테스트", () => {
         <LoginPage />
       </QueryClientProvider>
     );
+
+    const { data } = useUserQueryHook();
+    expect(data).toBe(null);
   });
 
   test("입력 상태가 올바르게 업데이트 되는 지 확인합니다.", () => {
