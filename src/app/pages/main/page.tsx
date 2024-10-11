@@ -25,12 +25,11 @@ const MainPage = () => {
       popupInit();
       if (!data) {
         router.push("/pages/login");
-      } else {
-        isSecondaryPw(data.uid).then((result) => {
-          if (!result) {
-            router.push("/pages/login");
-          }
-        });
+      } else if (data) {
+        const result = isSecondaryPw(data.uid);
+        if (!result) {
+          router.push("/pages/login");
+        }
       }
     }
   }, [data, isLoading]);
