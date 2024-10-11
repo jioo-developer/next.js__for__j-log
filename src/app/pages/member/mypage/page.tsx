@@ -47,7 +47,11 @@ function MyPage() {
     if (nicknameData) {
       const isNamecheck = nicknameData.includes(nickname);
       if (!isNamecheck) {
-        nameChangeMutate.mutate({ data, nickname });
+        const obj = {
+          data: data as User,
+          nickname,
+        };
+        nameChangeMutate.mutate(obj);
         setnameToggle(!nameToggle);
       } else {
         popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
