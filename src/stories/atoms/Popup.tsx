@@ -32,7 +32,7 @@ export const Popup = ({
 
   return (
     <>
-      <div css={[fullscreen, darkLayer]}></div>
+      <div className="popup" css={[fullscreen, darkLayer]}></div>
       <div css={[fullscreen, whiteBoxWrapper, top && { position: "relative" }]}>
         <div css={[whiteBox(width, height), flexDirection]}>
           <p
