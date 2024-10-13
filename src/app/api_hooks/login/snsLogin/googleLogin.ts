@@ -24,16 +24,18 @@ export async function onGoogle() {
 export async function isSecondaryPw(id: string) {
   const docRef = await doc(db, "nickname", id);
   const docSnap = await getDoc(docRef);
+
   if (docSnap.exists()) {
-    // 이미 문서가 있는 지 체크
+    if (docSnap.data().service === "password") {
+      return true;
+    }
+
     if (docSnap.data().service !== "password" && docSnap.data().password) {
       return true;
-      // 문서 안에 service 타입과 패스워드가 있는지 체크
     } else {
       return false;
       // 문서 안에 service 타입과 패스워드가 있는지 체크
     }
-    // 이미 문서가 있는 지 체크
   } else {
     return false;
   }
@@ -44,15 +46,14 @@ export const useSecondaryHandler = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (params: objType) => {
-
-      const isFalsy = Object.values(params).some((item) => {
+      const isFalsyValue = Object.values(params).some((item) => {
         return !item;
       });
 
-      if (isFalsy) {
-        throw new Error("2차비밀번호 설정 중 에러가 발생하였습니다");
+      if (isFalsyValue) {
+        throw new Error("입력된 값에 오류가 있습니다. 다시 시도 해주세요");
       }
-      
+
       await setDoc(doc(db, "nickname", params.id), {
         id: params.id,
         password: params.pw,

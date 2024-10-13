@@ -1,7 +1,7 @@
 import "@/app/_asset/home.scss";
 const postItem = () => {
   return (
-    <div className="post skeleton">
+    <div className="post skeleton" data-testid="skeleton">
       <figure className="thumbnail">
         <div
           style={{
