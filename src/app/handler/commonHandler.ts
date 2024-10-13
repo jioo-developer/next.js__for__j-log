@@ -1,5 +1,3 @@
-import { usePathname, useRouter } from "next/navigation";
-
 // 시간 함수
 const time = new Date();
 export const timeData = {
@@ -23,14 +21,6 @@ export function cookieHandler(name: string) {
   result.setHours(result.getHours() + 9);
   document.cookie = `${name}-Cookie=${encodeURIComponent("done")}; expires=${result.toUTCString()};`;
 }
-
-// 라우터 커스텀 hook
-export const useLocationrHandler = () => {
-  return {
-    pathname: usePathname(),
-    handler: useRouter(),
-  };
-};
 
 // 공백을 허용하지 않는 이메일 검증 정규식
 export const validateEmail = (email: string) => {

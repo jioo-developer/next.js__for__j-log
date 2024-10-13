@@ -2,13 +2,6 @@ import { User } from "firebase/auth";
 import { authService, db, storageService } from "@/app/Firebase";
 import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
-import { popuprHandler } from "../error/ErrorHandler";
-
-export function quitError() {
-  popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
-  return null;
-  // undefined나 null 타입을 방지하기 위해 error를 띄움 (삭제금지)
-}
 
 export async function deleteUserDB() {
   const user = authService.currentUser as User;
