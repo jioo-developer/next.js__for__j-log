@@ -6,28 +6,25 @@ import SocialDeleteHandler from "@/app/handler/quit/socialquit";
 import { popupMessageStore } from "@/app/store/common";
 import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { deleteUserDB, quitError } from "@/app/handler/quit/deleteDB";
+import { deleteUserDB } from "@/app/handler/quit/deleteDB";
+import { Popup } from "@/stories/atoms/Popup";
+import { Input } from "@/stories/atoms/Input";
+import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
+import { Button } from "@/stories/atoms/Button";
 
-const QuitPage = ({ user }: { user: User }) => {
+type propsType = {
+  user: User;
+  setQuit: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const QuitPage = ({ user, setQuit }: propsType) => {
   const [quitPw, setPw] = useState("");
   const isPopupClick = popupMessageStore().isClick;
   const [loginType, setType] = useState<string | null>(null);
 
   useEffect(() => {
-    popuprHandler({
-      message: "정말로 계정을 삭제 하시겠습니까?",
-      type: "confirm",
-    });
-  }, []);
-
-  useEffect(() => {
     if (isPopupClick) {
-      // 클릭 인식
-      if (!loginType) {
-        deleteHandler();
-      } else {
-        deleteHandler(true);
-      }
+      deleteHandler(true);
     }
   }, [isPopupClick]);
 
@@ -54,12 +51,25 @@ const QuitPage = ({ user }: { user: User }) => {
           originDeleteHandler({ data: user, password: quitPw });
         }
       } catch {
-        quitError();
+        popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
       }
     }
   }
 
-  return <div></div>;
+  return (
+    <Popup
+      type="custom"
+      width="28rem;"
+      handText="정말로 계정을 삭제 하시겠습니까?"
+    >
+      <ButtonGroup>
+        <Button onClick={() => setQuit(false)}>취소</Button>
+        <Button theme="success" onClick={() => deleteHandler()}>
+          확인
+        </Button>
+      </ButtonGroup>
+    </Popup>
+  );
 };
 
 export default QuitPage;
