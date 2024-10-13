@@ -35,6 +35,26 @@ jest.mock("@/app/api_hooks/login/LoginErrorHandler", () => ({
   LoginErrorHandler: jest.fn(),
 }));
 
+// 공용 작업
+const commonHandler = () => {
+  const queryClient = new QueryClient();
+  const { result } = renderHook(() => useSignupHandler(), {
+    wrapper: ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  });
+
+  act(() => {
+    result.current.mutate({
+      email: "test@example.com",
+      password: "validPassword123",
+      nickname: "existingNickname",
+    });
+  });
+  return result;
+};
+//공용작업
+
 describe("회원가입 페이지 로직 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -45,48 +65,50 @@ describe("회원가입 페이지 로직 테스트", () => {
       user: { uid: "123", displayName: "existingNickname" },
     });
 
-    const queryClient = new QueryClient();
-    const { result } = renderHook(() => useSignupHandler(), {
-      wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      ),
-    });
+    // 임시 계정 모킹
 
-    act(() => {
-      result.current.mutate({
-        email: "test@example.com",
-        password: "validPassword123",
-        nickname: "existingNickname",
-      });
-    });
+    const result = commonHandler();
+    //mutate 실행 함수
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
+    // mutate 성공 했는 지 체크
+
+    // expect.any(Object) : authService를 {} 로 모킹해서 object라고 넣음
 
     expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
-      expect.any(Object), // authService 객체
+      expect.any(Object),
       "test@example.com",
       "validPassword123"
     );
 
+    // 계정 생성 후 기본 셋팅 검증
     expect(setDoc).toHaveBeenCalledWith(expect.any(Object), {
       id: "123",
       nickname: "existingNickname",
       service: "password",
     });
+
+    // 계정 정보를 DB에 저장하는지 검증 (추후 회원탈퇴에 필요)
+
     expect(updateProfile).toHaveBeenCalledWith(
       expect.objectContaining({
-        uid: "123", // 혹은 user 객체의 필드를 정확히 입력
+        uid: "123",
       }),
+      // USER 정보
       expect.objectContaining({
         displayName: "existingNickname",
       })
+      // firebase 로그인이 아이디 & 비밀번호만으로 계정이 생성 되서 닉네임 추가를 수동으로 해줘야함
     );
+    // 계정 생성 후 기본 셋팅 검증
 
+    // 다 하고 라우팅 검증 과 환영 팝업 검증
     expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "회원가입을 환영합니다!",
+    });
   });
 
   test("게정 생성이 실패 했을 때를 테스트 합니다.", async () => {
@@ -98,27 +120,13 @@ describe("회원가입 페이지 로직 테스트", () => {
 
     (LoginErrorHandler as jest.Mock).mockReturnValue(null);
 
-    const queryClient = new QueryClient();
-    const { result } = renderHook(() => useSignupHandler(), {
-      wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      ),
-    });
-
-    act(() => {
-      result.current.mutate({
-        email: "test@example.com",
-        password: "validPassword123",
-        nickname: "existingNickname",
-      });
-    });
+    const result = commonHandler();
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(false);
     });
 
+    // 계정 생성 실패서 에러 팝업 출력 검증
     await waitFor(() => {
       expect(LoginErrorHandler).toHaveBeenCalledWith(errorMessage);
       expect(popuprHandler).toHaveBeenCalledWith({

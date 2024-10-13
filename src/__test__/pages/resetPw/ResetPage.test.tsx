@@ -1,18 +1,16 @@
 import { sendPasswordResetEmail } from "firebase/auth";
-import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { authService } from "@/app/Firebase";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import ResetPwPage from "@/app/pages/resetPw/page";
-import { popupMessageStore } from "@/app/store/common";
 import { validateEmail } from "@/app/handler/commonHandler";
 import { useRouter } from "next/navigation";
 
 jest.mock("@/app/api_hooks/login/getUserHook", () => ({
   __esModule: true, // ES 모듈로 인식되도록 설정
   default: jest.fn().mockReturnValue({
-    data: undefined, // 모의 데이터 반환
+    data: null, // 모의 데이터 반환
     error: Error,
     isLoading: false,
   }),
@@ -52,6 +50,9 @@ describe("비밀번호 찾기 로직 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     render(<ResetPwPage />);
+
+    const { data } = useUserQueryHook();
+    expect(data).toBe(null);
   });
 
   test("취소 버튼을 누를 시 로그인 페이지로 되돌아가는 지 확입합니다.", () => {
