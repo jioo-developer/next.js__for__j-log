@@ -8,6 +8,7 @@ import { popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 export type objType = {
   id: string;
@@ -29,6 +30,8 @@ const SocialLoginPage = () => {
   const ispopupClick = popupMessageStore().isClick;
 
   const setSecondPw = useSecondaryHandler();
+
+  const { refetch } = useUserQueryHook();
 
   useEffect(() => {
     if (ispopupClick) {
@@ -55,6 +58,7 @@ const SocialLoginPage = () => {
           service: googleUser.service,
         });
       } else {
+        refetch();
         router.push("/pages/main");
       }
     } catch (error) {
