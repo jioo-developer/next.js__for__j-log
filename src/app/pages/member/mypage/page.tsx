@@ -1,7 +1,7 @@
 "use client";
 import "@/app/_asset/profile.scss";
 import Image from "next/image";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 
 import useNickQueryHook from "@/app/api_hooks/common/getnameHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
@@ -17,7 +17,6 @@ import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import { useRouter } from "next/navigation";
 import QuitPage from "../quit/page";
-import { popupMessageStore } from "@/app/store/common";
 
 function MyPage() {
   const { data } = useUserQueryHook();
@@ -31,27 +30,13 @@ function MyPage() {
 
   const router = useRouter();
 
-  const msg = popupMessageStore().message;
-
   const nameChangeMutate = useNameChanger();
 
-  useEffect(() => {
-    popupMessageStore.subscribe((state, prevState) => {
-      if (prevState.message !== "" && state.message === "") {
-        setQuit(false);
-      }
-    });
-  }, [msg]);
-
   async function changeNameHandler() {
-    if (nicknameData) {
+    if (nicknameData && data) {
       const isNamecheck = nicknameData.includes(nickname);
       if (!isNamecheck) {
-        const obj = {
-          data: data as User,
-          nickname,
-        };
-        nameChangeMutate.mutate(obj);
+        nameChangeMutate.mutate({ data, nickname });
         setnameToggle(!nameToggle);
       } else {
         popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
@@ -164,7 +149,7 @@ function MyPage() {
             </p>
           </div>
         </section>
-        {quit && <QuitPage user={data} />}
+        {quit && <QuitPage user={data} setQuit={setQuit} />}
       </div>
     )
   );
