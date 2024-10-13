@@ -57,6 +57,8 @@ const getElementsHandler = () => {
   return { id, password, loginBtn, resetBtn, signupBtn };
 };
 
+const queryClient = new QueryClient();
+
 describe("로그인 페이지 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -86,6 +88,7 @@ describe("로그인 페이지 테스트", () => {
     (useLoginHook as jest.Mock).mockReturnValue({
       mutate: jest.fn(),
     });
+    // mutate를 여기서만 mocking
 
     const { id, password, loginBtn } = getElementsHandler();
     fireEvent.change(id, { target: { value: "user@test.com" } });
@@ -101,20 +104,10 @@ describe("로그인 페이지 테스트", () => {
     });
   });
 
-  test("로그인에 성공 하면 동작하는 로직을 테스트 합니다.", async () => {
+  const commonHandler = () => {
     const LoginHook = jest.requireActual(
       "@/app/api_hooks/login/setUserHook"
     ).default;
-
-    (signInWithEmailAndPassword as jest.Mock).mockResolvedValue({
-      user: { uid: "123" },
-    });
-
-    const queryClient = new QueryClient();
-
-    const refetchQueriesSpy = jest
-      .spyOn(queryClient, "refetchQueries")
-      .mockResolvedValue();
 
     const { result } = renderHook(() => LoginHook(), {
       wrapper: ({ children }) => (
@@ -130,6 +123,19 @@ describe("로그인 페이지 테스트", () => {
         pw: "password123",
       });
     });
+    return result;
+  };
+
+  test("로그인에 성공 하면 동작하는 로직을 테스트 합니다.", async () => {
+    (signInWithEmailAndPassword as jest.Mock).mockResolvedValue({
+      user: { uid: "123" },
+    });
+
+    const refetchQueriesSpy = jest
+      .spyOn(queryClient, "refetchQueries")
+      .mockResolvedValue();
+
+    const result = commonHandler();
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -145,30 +151,11 @@ describe("로그인 페이지 테스트", () => {
   });
 
   test("로그인에 실패 하면 동작하는 로직을 테스트 합니다.", async () => {
-    const LoginHook = jest.requireActual(
-      "@/app/api_hooks/login/setUserHook"
-    ).default;
-
     (signInWithEmailAndPassword as jest.Mock).mockRejectedValue(
       new Error("auth/wrong-password")
     );
 
-    const queryClient = new QueryClient();
-
-    const { result } = renderHook(() => LoginHook(), {
-      wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      ),
-    });
-
-    act(() => {
-      result.current.mutate({
-        id: "wronguser@example.com",
-        pw: "wrongpassword",
-      });
-    });
+    const result = commonHandler();
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
