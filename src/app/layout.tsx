@@ -7,6 +7,7 @@ import { childrenProps } from "@/app/type_global/commonType";
 import ReactQueryProvider from "./provider/ReactQueryProvider";
 import Header from "./components/Header";
 import { ReturnPopup } from "@/app/handler/error/ErrorHandler";
+import MiddleWareProvider from "./provider/middlewareProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,13 +19,15 @@ export default function RootLayout({ children }: childrenProps) {
     <html lang="ko">
       <body>
         <ReactQueryProvider>
-          <div className="wrap">
-            <div className="in_wrap">
-              <Header />
-              {children}
-              <ReturnPopup />
+          <MiddleWareProvider>
+            <div className="wrap">
+              <div className="in_wrap">
+                <Header />
+                {children}
+                <ReturnPopup />
+              </div>
             </div>
-          </div>
+          </MiddleWareProvider>
         </ReactQueryProvider>
       </body>
     </html>
