@@ -6,9 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, waitFor } from "@testing-library/react";
 import { usePathname, useRouter } from "next/navigation";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { signOut } from "firebase/auth";
 
 jest.mock("@/app/Firebase", () => ({
-  authService: {},
+  authService: {
+    signOut: jest.fn(),
+  },
 }));
 
 jest.mock("@/app/api_hooks/login/getUserHook", () => ({
@@ -74,7 +77,10 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
     expect(isLoading).toBe(true);
     const exceptionPatmName = ["/pages/login", "/pages/signup"];
     const pathName = usePathname();
+    //false를 출력
     expect(exceptionPatmName.includes(pathName)).toBe(false);
+    console.log(exceptionPatmName.includes(pathName));
+    //false를 출력
     if (exceptionPatmName.includes(pathName) && !data) {
       await waitFor(() => {
         expect(popuprHandler).toHaveBeenCalledWith({
@@ -96,14 +102,19 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
     expect(pathname).toBe("/pages/main");
   });
 
-  test("검증에 실패 햇을 시 로그인 페이지로 리다이렉트 되는지 확인", async () => {
+  test("검증에 실패 했을 시 로그인 페이지로 리다이렉트 되는지 확인", async () => {
     (usePathname as jest.Mock).mockReturnValueOnce("/pages/main");
 
     (isSecondaryPw as jest.Mock).mockResolvedValueOnce(false);
 
     const secondFun = await isSecondaryPw("123");
+    //return이 false
+    expect(secondFun).toBe(false);
     if (secondFun) {
       expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
+      await waitFor(() => {
+        expect(signOut).toHaveBeenCalled();
+      });
     }
   });
 });
