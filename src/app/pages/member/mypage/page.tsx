@@ -90,7 +90,7 @@ function MyPage() {
                 이미지 업로드
               </label>
             </div>
-            <div className="name_area">
+            <div className="name_area" data-testid="name_area">
               {nameToggle ? (
                 <Input
                   type="text"

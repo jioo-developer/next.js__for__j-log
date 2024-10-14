@@ -1,8 +1,7 @@
-import useSignupHandler from "@/app/api_hooks/signup/signupHook";
-import { validateEmail } from "@/app/handler/commonHandler";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 
 export const commonElement = () => {
+  // signup 전용
   const emailInput = screen.getByLabelText("이메일") as HTMLInputElement;
   const pwInput = screen.getByLabelText("비밀번호") as HTMLInputElement;
   const nicknameInput = screen.getByLabelText("닉네임") as HTMLInputElement;

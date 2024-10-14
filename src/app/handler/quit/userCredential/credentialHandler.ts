@@ -2,7 +2,7 @@ import { db } from "@/app/Firebase";
 import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { popupMessageStore } from "@/app/store/common";
-import { quitError } from "../deleteDB";
+import { popuprHandler } from "../../error/ErrorHandler";
 
 async function isLoginType(user: User) {
   const docRef = doc(db, "nickname", user.uid);
@@ -14,7 +14,8 @@ async function isLoginType(user: User) {
       return "origin";
     }
   } else {
-    return quitError();
+    popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
+    return null;
   }
 }
 
@@ -24,6 +25,7 @@ export async function isCredential(user: User) {
     popupMessageStore.setState({ isClick: false });
     return accountType;
   } catch {
-    return quitError();
+    popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
+    return null;
   }
 }
