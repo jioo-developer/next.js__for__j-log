@@ -1,5 +1,7 @@
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import useLoginHook from "@/app/api_hooks/login/setUserHook";
+import { authService } from "@/app/Firebase";
+import { useLogOut } from "@/app/handler/commonHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import LoginPage from "@/app/pages/login/page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,7 +17,9 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 jest.mock("@/app/Firebase", () => ({
-  authService: {},
+  authService: {
+    signOut: jest.fn(), // signOut 함수를 모킹
+  },
 }));
 
 jest.mock("firebase/auth", () => ({
@@ -34,6 +38,7 @@ jest.mock("@/app/api_hooks/login/getUserHook", () => ({
     data: null, // 모의 데이터 반환
     error: null,
     isLoading: false,
+    refetch: jest.fn(),
   }),
 }));
 
@@ -164,5 +169,32 @@ describe("로그인 페이지 테스트", () => {
     expect(popuprHandler).toHaveBeenCalledWith({
       message: "아이디 또는 비밀번호가 맞지 않습니다.",
     });
+  });
+});
+
+describe("로그아웃 로직 테스트", () => {
+  beforeEach(() => {
+    jest.clearAllMocks(); // 각 테스트 전에 모든 모킹을 초기화
+  });
+
+  test("로그아웃 기능이 성공적으로 호출되는지 테스트", async () => {
+    const queryClient = new QueryClient();
+
+    // useLogOut 훅을 테스트 환경에서 실행
+    const { result } = renderHook(() => useLogOut());
+
+    // logOut 함수 실행
+    await act(async () => {
+      await result.current();
+    });
+
+    // authService.signOut가 호출되었는지 확인
+    expect(authService.signOut).toHaveBeenCalled();
+
+    // refetch 함수가 호출되었는지 확인
+    expect(useUserQueryHook().refetch).toHaveBeenCalled();
+
+    // router.push가 로그인 페이지로 이동했는지 확인
+    expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
   });
 });
