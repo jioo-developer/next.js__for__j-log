@@ -13,17 +13,9 @@ const Reply = () => {
 
   const { replyData, isLoading } = useReplyQueryHook(id);
 
-  const { msg, comment, setComment } = useReplyContext();
+  const { comment, setComment } = useReplyContext();
 
   const isReply = !isLoading && replyData && replyData.length > 0;
-
-  // useEffect(() => {
-  //   popupMessageStore.subscribe((state, prevState) => {
-  //     if (prevState.message.includes("삭제") && state.message === "") {
-  //       // 뭐더라
-  //     }
-  //   });
-  // }, [msg]);
 
   const createMutation = useCreateHandler();
 

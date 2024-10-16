@@ -15,12 +15,9 @@ const MyBoardPage = () => {
     router.push(`/pages/detail/${myData[0].pageId}`);
   }
 
-  if (isLoading) {
-    return <div></div>;
-  }
   return (
     <>
-      {user && myData.length > 0 ? (
+      {!isLoading && user && myData.length > 0 ? (
         <div className="wrap board_wrap">
           <section className="board__header">
             <Image

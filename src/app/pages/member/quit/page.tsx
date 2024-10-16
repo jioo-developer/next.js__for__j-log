@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { isCredential } from "@/app/handler/quit/userCredential/credentialHandler";
 import originDeleteHandler from "@/app/handler/quit/originquit";
@@ -20,7 +21,6 @@ type propsType = {
 const QuitPage = ({ user, setQuit }: propsType) => {
   const [quitPw, setPw] = useState("");
   const isPopupClick = popupMessageStore().isClick;
-  const [loginType, setType] = useState<string | null>(null);
 
   useEffect(() => {
     if (isPopupClick) {
@@ -28,31 +28,32 @@ const QuitPage = ({ user, setQuit }: propsType) => {
     }
   }, [isPopupClick]);
 
-  async function deleteHandler(isSosial?: boolean) {
-    if (!loginType) {
-      const Credential = await isCredential(user);
-      // 계정 타입을 체크
+  async function LogintypeCheck() {
+    const Credential = await isCredential(user);
+    // 계정 타입을 체크
 
-      if (Credential === "sosial") {
-        setType(Credential);
-        //state에 저장
-        popuprHandler({
-          message: "회원탈퇴에 사용 될 2차비밀번호를 입력해주세요",
-          type: "prompt",
-          state: setPw,
-        });
-      }
+    if (Credential === "sosial") {
+      //state에 저장
+      popuprHandler({
+        message: "회원탈퇴에 사용 될 2차비밀번호를 입력해주세요",
+        type: "prompt",
+        state: setPw,
+      });
     } else {
-      try {
-        deleteUserDB();
-        if (isSosial) {
-          SocialDeleteHandler();
-        } else {
-          originDeleteHandler({ data: user, password: quitPw });
-        }
-      } catch {
-        popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
+      deleteHandler();
+    }
+  }
+
+  async function deleteHandler(isSosial?: boolean) {
+    try {
+      deleteUserDB();
+      if (isSosial) {
+        SocialDeleteHandler();
+      } else {
+        originDeleteHandler({ data: user, password: quitPw });
       }
+    } catch {
+      popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
     }
   }
 
@@ -64,7 +65,7 @@ const QuitPage = ({ user, setQuit }: propsType) => {
     >
       <ButtonGroup>
         <Button onClick={() => setQuit(false)}>취소</Button>
-        <Button theme="success" onClick={() => deleteHandler()}>
+        <Button theme="success" onClick={() => LogintypeCheck()}>
           확인
         </Button>
       </ButtonGroup>
