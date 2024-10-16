@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { popuprHandler } from "../handler/error/ErrorHandler";
 import SearchIcon from "./SearchIcon";
 import { searchStore } from "../store/common";
+import { useLogOut } from "../handler/commonHandler";
 
 const activePathName = [
   "/pages/member/mypage",
@@ -38,13 +39,7 @@ function Header() {
     }
   }, [pathname]);
 
-  function logout() {
-    authService.signOut().then(() => {
-      refetch();
-      queryClient.clear();
-      router.push("/pages/login");
-    });
-  }
+  const LogOutHandler = useLogOut();
 
   const isActive = activePathName.some((path) => pathname.startsWith(path));
 
@@ -97,7 +92,7 @@ function Header() {
                 내 게시글
               </li>
               <li onClick={() => router.push("/pages/member/mypage")}>설정</li>
-              <li onClick={() => logout()}>로그아웃</li>
+              <li onClick={() => LogOutHandler()}>로그아웃</li>
             </ul>
           </div>
         </header>

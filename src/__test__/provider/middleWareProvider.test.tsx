@@ -79,7 +79,6 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
     const pathName = usePathname();
     //false를 출력
     expect(exceptionPatmName.includes(pathName)).toBe(false);
-    console.log(exceptionPatmName.includes(pathName));
     //false를 출력
     if (exceptionPatmName.includes(pathName) && !data) {
       await waitFor(() => {

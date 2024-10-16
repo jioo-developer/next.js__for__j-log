@@ -16,11 +16,6 @@ const MiddleWareProvider = ({ children }: childrenProps) => {
     handler: useRouter(),
   };
 
-  useEffect(() => {
-    if (router.pathname === "/pages/login" || router.pathname === "/pages/main")
-      popupInit();
-  }, [router.pathname]);
-
   const exceptionPatmName = ["/", "/pages/login", "/pages/signup"];
 
   useEffect(() => {
@@ -29,6 +24,7 @@ const MiddleWareProvider = ({ children }: childrenProps) => {
         popuprHandler({ message: "회원정보를 불러 오는 중입니다." });
       }
     } else {
+      popupInit();
       if (!data) {
         router.handler.push("/pages/login");
       } else {

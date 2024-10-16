@@ -1,3 +1,8 @@
+import { useRouter } from "next/navigation";
+import { authService } from "../Firebase";
+import { QueryClient } from "@tanstack/react-query";
+import useUserQueryHook from "../api_hooks/login/getUserHook";
+
 // 시간 함수
 const time = new Date();
 export const timeData = {
@@ -29,3 +34,19 @@ export const validateEmail = (email: string) => {
   // 이메일에 공백이 있는지 확인하고 공백이 없고, 정규식이 일치하면 true 반환
   return !/\s/.test(email) && regex.test(email);
 };
+
+export function useLogOut() {
+  const router = useRouter();
+  const queryClient = new QueryClient();
+  const { refetch } = useUserQueryHook();
+
+  // 로그아웃 기능을 제공하는 함수
+  const logOut = async () => {
+    await authService.signOut();
+    refetch();
+    queryClient.clear();
+    router.push("/pages/login");
+  };
+
+  return logOut; // logOut 함수를 반환
+}
