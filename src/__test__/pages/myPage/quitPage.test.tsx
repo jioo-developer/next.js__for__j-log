@@ -58,8 +58,6 @@ describe("회원탈퇴 로직 테스트", () => {
     email: "test@example.com",
   } as unknown as User;
 
-  const quitPw = "password123";
-
   beforeEach(async () => {
     jest.clearAllMocks();
     const queryClient = new QueryClient();
