@@ -18,7 +18,7 @@ const activePathName = [
 ];
 
 function Header() {
-  const { data, isLoading } = useUserQueryHook();
+  const { data, refetch, isLoading } = useUserQueryHook();
   const [displayName, setName] = useState("");
 
   const router = useRouter();
@@ -39,13 +39,11 @@ function Header() {
   }, [pathname]);
 
   function logout() {
-    try {
-      authService.signOut();
+    authService.signOut().then(() => {
+      refetch();
       queryClient.clear();
       router.push("/pages/login");
-    } catch {
-      popuprHandler({ message: "로그아웃에 실패하였습니다" });
-    }
+    });
   }
 
   const isActive = activePathName.some((path) => pathname.startsWith(path));
