@@ -79,6 +79,7 @@ const EditorPage = () => {
   return (
     <div className="upload">
       <form
+        role="form"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           if (title !== "" && text !== "" && user) {
@@ -142,22 +143,14 @@ const EditorPage = () => {
             id="use__Check"
             onChange={(e) => setPriorty(e.target.checked)}
           />
-          <label
-            htmlFor="use__check"
-            className="check"
-            // style={
-            //   checkArr.includes(item.id)
-            //     ? { border: 0 }
-            //     : { border: "1px solid #eee" }
-            // }
-          >
+          <label htmlFor="use__check" className="check">
             <p>노출 우선권 사용하기</p>
           </label>
         </div>
         <div className="bottom_wrap">
-          <div className="exit" onClick={() => router.back()}>
+          <button className="exit" onClick={() => router.back()}>
             ← &nbsp;나가기
-          </div>
+          </button>
           <div className="cancel_wrap">
             <button type="submit" className="post">
               글작성

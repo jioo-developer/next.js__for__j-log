@@ -4,7 +4,7 @@ import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import Reply from "@/app/pages/detail/_reply/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
@@ -45,8 +45,7 @@ const DetailPage = () => {
   }, [msg]);
 
   function favoriteHandler() {
-    const target = user ? user.email : "guest";
-    const getcookie = `${target}-Cookie`;
+    const getcookie = `${user}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
       favoriteMutate.mutate({
         value: (pageData as FirebaseData).favorite,
@@ -57,35 +56,33 @@ const DetailPage = () => {
 
   useEffect(() => {
     if (ispopupClick) {
-      pageDeleteHandler(true);
+      onDelete();
+      popupInit();
     }
   }, [ispopupClick]);
 
   const from = pageInfoStore().fromAction;
 
-  async function pageDeleteHandler(isClick?: boolean) {
-    if (!isClick) {
-      popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
-      pageInfoStore.setState({ fromAction: "detail" });
-    } else {
-      if (from === "detail") {
-        try {
-          pageDelete(pageData as FirebaseData);
-          router.push("/pages/main");
-        } catch {
-          popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
-        }
+  async function pageDeleteHandler() {
+    popuprHandler({ message: "정말 삭제 하시겠습니까?", type: "confirm" });
+    pageInfoStore.setState({ fromAction: "detail" });
+  }
+
+  async function onDelete() {
+    if (from === "detail") {
+      try {
+        await pageDelete(pageData as FirebaseData);
+        router.push("/pages/main");
+      } catch {
+        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
       }
     }
   }
 
-  if (isLoading) {
-    return <div></div>;
-  }
-
   return (
     pageData &&
-    user && (
+    user &&
+    !isLoading && (
       <div className="detail_wrap">
         <div className="in_wrap">
           <section className="sub_header">
