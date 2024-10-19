@@ -73,7 +73,7 @@ export const useDeleteHandler = () => {
       });
     },
     onError: () => {
-      popuprHandler({ message: "댓글 수정 중 문제가 생겼습니다" });
+      popuprHandler({ message: "댓글 삭제 중 문제가 생겼습니다" });
     },
   });
 };

@@ -6,13 +6,11 @@ import {
   within,
 } from "@testing-library/react";
 import EditorPage from "@/app/pages/editor/page";
-import { pageInfoStore } from "@/app/store/common";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { create } from "zustand";
 import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 // 필요한 훅과 모듈을 모킹
 

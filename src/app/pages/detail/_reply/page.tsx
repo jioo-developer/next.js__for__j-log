@@ -7,9 +7,12 @@ import { useReplyContext } from "./context";
 import { authService } from "@/app/Firebase";
 import { User } from "firebase/auth";
 import { useCreateHandler } from "@/app/handler/detail-reply/useMutationHandler";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 const Reply = () => {
   const id = pageInfoStore().pgId;
+
+  const { data } = useUserQueryHook();
 
   const { replyData, isLoading } = useReplyQueryHook(id);
 
@@ -20,7 +23,7 @@ const Reply = () => {
   const createMutation = useCreateHandler();
 
   const CreateRely = () => {
-    const user = authService.currentUser as User;
+    const user = data as User;
     const userObj = {
       name: user.displayName as string,
       profile: user.photoURL as string,
@@ -33,6 +36,7 @@ const Reply = () => {
   return (
     <>
       {isReply &&
+        data &&
         replyData.map((item, index) => {
           return (
             <ReplyItem
