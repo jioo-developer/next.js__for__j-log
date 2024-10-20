@@ -9,7 +9,6 @@ import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { deleteUserDB } from "@/app/handler/quit/deleteDB";
 import { Popup } from "@/stories/atoms/Popup";
-import { Input } from "@/stories/atoms/Input";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 
