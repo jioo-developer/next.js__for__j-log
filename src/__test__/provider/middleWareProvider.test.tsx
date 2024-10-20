@@ -1,5 +1,8 @@
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { isSecondaryPw } from "@/app/api_hooks/login/snsLogin/googleLogin";
+import {
+  isSecondaryPw,
+  onGoogle,
+} from "@/app/api_hooks/login/snsLogin/googleLogin";
 import MainPage from "@/app/pages/main/page";
 import MiddleWareProvider from "@/app/provider/middlewareProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,6 +10,7 @@ import { act, render, waitFor } from "@testing-library/react";
 import { usePathname, useRouter } from "next/navigation";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { signOut } from "firebase/auth";
+import { useIsPathHandler } from "@/app/handler/commonHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
@@ -33,8 +37,6 @@ jest.mock("@/app/api_hooks/main/getPostHook", () => ({
   }),
 }));
 
-jest.mock("@/app/api_hooks/login/snsLogin/googleLogin");
-
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn().mockReturnValue({
     push: jest.fn(),
@@ -47,14 +49,21 @@ jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popupInit: jest.fn(),
 }));
 
+jest.mock("@/app/handler/commonHandler", () => ({
+  useIsPathHandler: jest.fn(),
+}));
+
 jest.mock("@/app/api_hooks/login/snsLogin/googleLogin", () => ({
+  onGoogle: jest.fn(),
   isSecondaryPw: jest.fn(),
+  useSecondaryHandler: jest.fn(),
 }));
 
 describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
+  const queryClient = new QueryClient();
+
   beforeEach(() => {
     jest.clearAllMocks();
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -65,22 +74,30 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
     );
   });
 
-  test("회원정보를 붏러오는 팝업 호출 테스트", async () => {
+  test("유저 정보가 없을 시 pages/login으로 이동 테스트", () => {
     (usePathname as jest.Mock).mockReturnValueOnce("/pages/main");
+    (useUserQueryHook as jest.Mock).mockReturnValueOnce({
+      data: null,
+      error: null,
+      isLoading: false,
+    });
+    const { data } = useUserQueryHook();
+    expect(data).toBeNull();
+
+    expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
+  });
+
+  test("회원정보를 붏러오는 팝업 호출 테스트", async () => {
     (useUserQueryHook as jest.Mock).mockReturnValueOnce({
       data: null,
       error: null,
       isLoading: true,
     });
-    const { data, isLoading } = useUserQueryHook();
-    expect(data).toBeNull();
-    expect(isLoading).toBe(true);
-    const exceptionPatmName = ["/pages/login", "/pages/signup"];
-    const pathName = usePathname();
-    //false를 출력
-    expect(exceptionPatmName.includes(pathName)).toBe(false);
-    //false를 출력
-    if (exceptionPatmName.includes(pathName) && !data) {
+    (useIsPathHandler as jest.Mock).mockReturnValue(() => false);
+
+    const isPathCheck = useIsPathHandler();
+    const { data } = useUserQueryHook();
+    if (!isPathCheck && !data) {
       await waitFor(() => {
         expect(popuprHandler).toHaveBeenCalledWith({
           message: "회원정보를 불러오는 중입니다.",

@@ -7,6 +7,7 @@ import { childrenProps } from "../type_global/commonType";
 import { User } from "firebase/auth";
 import { authService } from "../Firebase";
 import { usePathname, useRouter } from "next/navigation";
+import { useIsPathHandler } from "../handler/commonHandler";
 
 const MiddleWareProvider = ({ children }: childrenProps) => {
   const { data, refetch, isLoading } = useUserQueryHook();
@@ -16,11 +17,11 @@ const MiddleWareProvider = ({ children }: childrenProps) => {
     handler: useRouter(),
   };
 
-  const exceptionPatmName = ["/", "/pages/login", "/pages/signup"];
+  const isPathCheck = useIsPathHandler();
 
   useEffect(() => {
     if (isLoading) {
-      if (!exceptionPatmName.includes(router.pathname) && !data) {
+      if (!isPathCheck() && !data) {
         popuprHandler({ message: "회원정보를 불러 오는 중입니다." });
       }
     } else {

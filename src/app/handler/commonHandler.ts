@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { authService } from "../Firebase";
 import { QueryClient } from "@tanstack/react-query";
 import useUserQueryHook from "../api_hooks/login/getUserHook";
@@ -49,4 +49,13 @@ export function useLogOut() {
   };
 
   return logOut; // logOut 함수를 반환
+}
+
+export function useIsPathHandler() {
+  const pathname = usePathname();
+  const check = () => {
+    const isShowPathname = ["/", "/pages/login", "/pages/signup"];
+    return isShowPathname.includes(pathname);
+  };
+  return check;
 }
