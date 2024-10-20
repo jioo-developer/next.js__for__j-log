@@ -41,21 +41,18 @@ export function useLogOut() {
   const { refetch } = useUserQueryHook();
 
   // 로그아웃 기능을 제공하는 함수
-  const logOut = async () => {
+  return async function () {
     await authService.signOut();
     refetch();
     queryClient.clear();
     router.push("/pages/login");
   };
-
-  return logOut; // logOut 함수를 반환
 }
 
 export function useIsPathHandler() {
   const pathname = usePathname();
-  const check = () => {
+  return function () {
     const isShowPathname = ["/", "/pages/login", "/pages/signup"];
     return isShowPathname.includes(pathname);
   };
-  return check;
 }
