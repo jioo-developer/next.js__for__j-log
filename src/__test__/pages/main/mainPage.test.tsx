@@ -3,8 +3,9 @@ import MainPage from "@/app/pages/main/page";
 import SkeletonItem from "@/app/components/SkeletonItem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { create } from "zustand";
 import { usePathname } from "next/navigation";
+import { searchStore } from "@/app/store/common";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -36,12 +37,12 @@ jest.mock("@/app/api_hooks/main/getPostHook", () => ({
   }),
 }));
 
-describe("메인페이지 테스트", () => {
+describe("메인페이지 테스트 - skeleton 함수까지", () => {
+  const queryClient = new QueryClient();
+
   beforeEach(() => {
     jest.clearAllMocks();
-  });
 
-  test("로딩 중에 스켈레톤 렌더링되는지 확인", () => {
     (usePathname as jest.Mock).mockReturnValueOnce("/pages/main");
     (useUserQueryHook as jest.Mock).mockReturnValueOnce({
       data: null,
@@ -49,37 +50,86 @@ describe("메인페이지 테스트", () => {
       isLoading: true,
     });
     const { data, isLoading } = useUserQueryHook();
-    const queryClient = new QueryClient();
     render(
       <QueryClientProvider client={queryClient}>
         <>{isLoading ? <SkeletonItem /> : <MainPage />}</>
       </QueryClientProvider>
     );
+  });
+
+  test("pages/main 으로 라우팅 되는 지 테스트", () => {
     const pathname = usePathname();
     expect(pathname).not.toBe("/");
+  });
+
+  test("회원 정보 불러오는 팝업 호출 테스트", async () => {
+    (useUserQueryHook as jest.Mock).mockReturnValueOnce({
+      data: null,
+      error: null,
+      isLoading: true,
+    });
+    const { data, isLoading } = useUserQueryHook();
+
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenLastCalledWith(
+        "회원정보를 불러 오는 중입니다."
+      );
+    });
+  });
+
+  test("로딩 중에 스켈레톤 렌더링 되는 지 확인", () => {
     const skeletonItems = screen.getByTestId("skeleton");
     expect(skeletonItems).not.toBeNull();
   });
+});
 
-  test("검색어가 있을 때 필터링된 데이터가 렌더링 되는지 확인", async () => {
-    const queryClient = new QueryClient();
+describe("메인 페이지 테스트 - skeleton 함수 이후", () => {
+  const queryClient = new QueryClient();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MainPage />
-      </QueryClientProvider>
-    );
-
-    const testStore = create(() => ({
-      searchText: "",
-    }));
-
-    act(() => {
-      testStore.setState({ searchText: "Test Title" });
+  test("searchInfo.text 가 있을 때 테스트", async () => {
+    await act(async () => {
+      searchStore.setState({ searchText: "Test Text" }); // 상태를 ""로 변경
     });
 
+    // 상태가 ""로 변경되었을 때 router.push가 호출되는지 확인
     await waitFor(() => {
-      expect(screen.getByText("Test Title")).toBeInTheDocument();
+      const currentState = searchStore.getState(); // 현재 zustand 상태 가져오기
+      expect(currentState.searchText).toBe("Test Text");
     });
+
+    await act(() => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MainPage />
+        </QueryClientProvider>
+      );
+    });
+
+    expect(screen.getByText("Test Text")).toBeInTheDocument();
+  });
+
+  test("searchInfo.text 가 없을 때 테스트", async () => {
+    await act(async () => {
+      searchStore.setState({ searchText: "" }); // 상태를 ""로 변경
+    });
+
+    // 상태가 ""로 변경되었을 때 router.push가 호출되는지 확인
+    await waitFor(() => {
+      const currentState = searchStore.getState(); // 현재 zustand 상태 가져오기
+      expect(currentState.searchText).toBe("");
+    });
+    await act(() => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MainPage />
+        </QueryClientProvider>
+      );
+    });
+
+    expect(screen.getByText("Test Text")).toBeInTheDocument();
+    expect(screen.getByText("Other Text")).toBeInTheDocument();
   });
 });
