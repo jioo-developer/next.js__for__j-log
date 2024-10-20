@@ -15,13 +15,6 @@ import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { updateProfile, User } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/Firebase";
-import { useRouter } from "next/navigation";
-
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn().mockReturnValue({
-    push: jest.fn(),
-  }),
-}));
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
@@ -41,6 +34,12 @@ jest.mock("firebase/firestore", () => ({
 
 jest.mock("firebase/auth", () => ({
   updateProfile: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn().mockReturnValue({
+    push: jest.fn(),
+  }),
 }));
 
 jest.mock("@/app/handler/error/ErrorHandler", () => ({
@@ -107,6 +106,7 @@ describe("닉네임 변경 로직 테스트", () => {
       fireEvent.click(editEndBtn);
     });
   });
+
   test("닉네임 변경 함수 mutate hook 호출 테스트", async () => {
     const { nicknameData } = useNameQueryHook();
     const isNamecheck = nicknameData.includes("NewNickName");
@@ -195,7 +195,7 @@ describe("프로필 이미지 변경 로직 테스트", () => {
     );
     await act(async () => {
       try {
-        await updateProfile({ uid: "123" } as User, { photoURL: upload[0] });
+        await updateProfile({ uid: "123" } as User, { photoURL: null });
       } catch {
         popuprHandler({ message: "프로필 변경에 실패하였습니다." });
       }
