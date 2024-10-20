@@ -14,7 +14,6 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { User } from "firebase/auth";
-import { create } from "zustand";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -57,10 +56,10 @@ describe("회원탈퇴 로직 테스트", () => {
     uid: "123",
     email: "test@example.com",
   } as unknown as User;
+  const queryClient = new QueryClient();
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    const queryClient = new QueryClient();
 
     await act(async () => {
       render(
@@ -84,7 +83,7 @@ describe("회원탈퇴 로직 테스트", () => {
     });
   });
 
-  test("isCredential이 'origin'일 때  테스트", async () => {
+  test("isCredential이 'origin'일 때  originDeleteHandler 호출 테스트", async () => {
     (isCredential as jest.Mock).mockResolvedValue("origin");
     const activeBtn = screen.getByText("확인");
     await act(async () => {
@@ -119,20 +118,6 @@ describe("회원탈퇴 로직 테스트", () => {
     expect(SocialDeleteHandler).toHaveBeenCalled();
   });
 
-  test("isSosial이 false일 때 originDeleteHandler 호출 테스트", async () => {
-    (isCredential as jest.Mock).mockResolvedValue("origin");
-
-    const activeBtn = screen.getByText("확인");
-    await act(async () => {
-      fireEvent.click(activeBtn);
-    });
-
-    expect(originDeleteHandler).toHaveBeenCalledWith({
-      data: mockUser,
-      password: "",
-    });
-  });
-
   test("회원탈퇴 중 에러가 발생하면 popuprHandler 호출 테스트", async () => {
     (deleteUserDB as jest.Mock).mockImplementation(() => {
       throw new Error("Error during delete");
@@ -143,8 +128,18 @@ describe("회원탈퇴 로직 테스트", () => {
       fireEvent.click(activeBtn);
     });
 
-    expect(popuprHandler).toHaveBeenCalledWith({
-      message: "회원탈퇴 도중 에러가 발생하였습니다",
+    await act(async () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <QuitPage user={mockUser} setQuit={setQuitMock} />
+        </QueryClientProvider>
+      );
+    });
+
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "회원탈퇴 도중 에러가 발생하였습니다",
+      });
     });
   });
 });
