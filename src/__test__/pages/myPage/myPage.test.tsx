@@ -284,6 +284,7 @@ describe("프로필 이미지 변경 로직 테스트", () => {
     });
   });
   test("프로필 이미지 변경 실패 테스트", async () => {
+    const errorMessage = "프로필 변경에 실패하였습니다.";
     (updateProfile as jest.Mock).mockRejectedValue(
       new Error("Profile update failed")
     );
@@ -291,14 +292,14 @@ describe("프로필 이미지 변경 로직 테스트", () => {
       try {
         await updateProfile({ uid: "123" } as User, { photoURL: null });
       } catch {
-        popuprHandler({ message: "프로필 변경에 실패하였습니다." });
+        popuprHandler({ message: errorMessage });
       }
     });
 
     await waitFor(() => {
       // popuprHandler가 호출되었는지 확인
       expect(popuprHandler).toHaveBeenCalledWith({
-        message: "프로필 변경에 실패하였습니다.",
+        message: errorMessage,
       });
     });
   });
