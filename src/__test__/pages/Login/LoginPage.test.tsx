@@ -15,6 +15,7 @@ import {
 } from "@testing-library/react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { commonHandler, getElementsHandler } from "./utils";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
@@ -47,20 +48,6 @@ jest.mock("@/app/api_hooks/login/setUserHook", () => jest.fn());
 jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popuprHandler: jest.fn(),
 }));
-
-const getElementsHandler = () => {
-  const id = screen.getByPlaceholderText(
-    "아이디를 입력하세요."
-  ) as HTMLInputElement;
-  const password = screen.getByPlaceholderText(
-    "비밀번호를 8자리 이상 입력하세요."
-  ) as HTMLInputElement;
-  const loginBtn = screen.getByText("로그인");
-  const resetBtn = screen.getByText("비밀번호 변경&찾기");
-  const signupBtn = screen.getByText("회원가입");
-
-  return { id, password, loginBtn, resetBtn, signupBtn };
-};
 
 const queryClient = new QueryClient();
 
@@ -109,28 +96,6 @@ describe("로그인 페이지 테스트", () => {
     });
   });
 
-  const commonHandler = () => {
-    const LoginHook = jest.requireActual(
-      "@/app/api_hooks/login/setUserHook"
-    ).default;
-
-    const { result } = renderHook(() => LoginHook(), {
-      wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      ),
-    });
-
-    act(() => {
-      result.current.mutate({
-        id: "test@example.com",
-        pw: "password123",
-      });
-    });
-    return result;
-  };
-
   test("로그인에 성공 하면 동작하는 로직을 테스트 합니다.", async () => {
     (signInWithEmailAndPassword as jest.Mock).mockResolvedValue({
       user: { uid: "123" },
@@ -140,7 +105,7 @@ describe("로그인 페이지 테스트", () => {
       .spyOn(queryClient, "refetchQueries")
       .mockResolvedValue();
 
-    const result = commonHandler();
+    const result = commonHandler(queryClient);
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -160,7 +125,7 @@ describe("로그인 페이지 테스트", () => {
       new Error("auth/wrong-password")
     );
 
-    const result = commonHandler();
+    const result = commonHandler(queryClient);
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -178,8 +143,6 @@ describe("로그아웃 로직 테스트", () => {
   });
 
   test("로그아웃 기능이 성공적으로 호출되는지 테스트", async () => {
-    const queryClient = new QueryClient();
-
     // useLogOut 훅을 테스트 환경에서 실행
     const { result } = renderHook(() => useLogOut());
 

@@ -4,7 +4,7 @@ import {
   onGoogle,
   useSecondaryHandler,
 } from "@/app/api_hooks/login/snsLogin/googleLogin";
-import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import SocialLoginPage from "@/app/pages/login/snsLogin/sosialLogin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -15,7 +15,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { create } from "zustand";
 
@@ -27,6 +27,18 @@ jest.mock("firebase/auth", () => ({
   signInWithPopup: jest.fn(),
   GoogleAuthProvider: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
+}));
+
+jest.mock("@/app/api_hooks/login/snsLogin/googleLogin", () => ({
+  isSecondaryPw: jest.fn(),
+  onGoogle: jest.fn(),
+  useSecondaryHandler: jest.fn(),
+}));
+
+jest.mock("firebase/firestore", () => ({
+  getDoc: jest.fn(),
+  setDoc: jest.fn().mockResolvedValue(true),
+  doc: jest.fn().mockReturnValue({}),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -50,18 +62,6 @@ jest.mock("@/app/api_hooks/login/setUserHook", () => jest.fn());
 jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popuprHandler: jest.fn(),
   popupInit: jest.fn(),
-}));
-
-jest.mock("@/app/api_hooks/login/snsLogin/googleLogin", () => ({
-  isSecondaryPw: jest.fn(),
-  onGoogle: jest.fn(),
-  useSecondaryHandler: jest.fn(),
-}));
-
-jest.mock("firebase/firestore", () => ({
-  getDoc: jest.fn(),
-  setDoc: jest.fn().mockResolvedValue(true),
-  doc: jest.fn().mockReturnValue({}),
 }));
 
 describe("구글 로그인 시 계정 조회 테스트", () => {
@@ -158,6 +158,7 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
     await act(() => {
       fireEvent.click(googleButton);
     });
+
     expect(refetch).toHaveBeenCalled();
     expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
   });
