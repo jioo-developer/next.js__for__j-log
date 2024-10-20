@@ -7,13 +7,23 @@ import { commonElement, isSubmitActive } from "./utils";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-/* mocking 할 함수 목록 
- 1. nicknameQueryHook
- 2. useRouter
- 3. 공용 팝업 함수  
- 4. signupHandler
- 5. 6번의 return mutate
-*/
+// 공용 목 함수
+
+jest.mock("@/app/Firebase", () => ({
+  authService: {},
+}));
+
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn().mockReturnValue({
+    push: jest.fn(),
+  }),
+}));
+
+jest.mock("@/app/handler/error/ErrorHandler", () => ({
+  popuprHandler: jest.fn(),
+}));
+
+// 공용 목 함수
 
 jest.mock("@/app/api_hooks/login/getUserHook", () => ({
   __esModule: true, // ES 모듈로 인식되도록 설정
@@ -32,24 +42,6 @@ jest.mock("@/app/api_hooks/common/getnameHook", () => ({
     isLoading: false,
   }),
 }));
-
-// 공용 목 함수
-
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn().mockReturnValue({
-    push: jest.fn(),
-  }),
-}));
-
-jest.mock("@/app/handler/error/ErrorHandler", () => ({
-  popuprHandler: jest.fn(),
-}));
-
-jest.mock("@/app/Firebase", () => ({
-  authService: {},
-}));
-
-// 공용 목 함수
 
 jest.mock("@/app/api_hooks/signup/signupHook", () => jest.fn());
 
@@ -71,7 +63,7 @@ describe("회원가입 페이지 테스트", () => {
     expect(data).toBe(null);
   });
 
-  test("초기 랜더링 시 회원가입 버튼 및 체크 박스가 비 활성화 되어 있는 지 확인합니다.", () => {
+  test("초기 랜더링 시 회원가입 버튼 및 체크 박스가 비 활성화 되어 있는 지 테스트", () => {
     const signupButton = screen.getByRole("button", { name: "회원가입" });
 
     const { checkbox, privateCheckbox } = commonElement();
@@ -87,7 +79,7 @@ describe("회원가입 페이지 테스트", () => {
     expect(signupButton).toBeDisabled();
   });
 
-  test("입력 상태가 올바르게 업데이트되는지 확인합니다.", () => {
+  test("입력 상태가 올바르게 업데이트 되는 지 테스트", () => {
     const { emailInput, pwInput, nicknameInput } = commonElement();
 
     fireEvent.change(emailInput, { target: { value: "user@test.com" } });
@@ -99,7 +91,11 @@ describe("회원가입 페이지 테스트", () => {
     expect(nicknameInput.value).toBe("nickname");
   });
 
-  test("올바르지 않은 이메일 형식일 때 에러 메시지 표시", async () => {
+  test("필수 체크박스 활성화 되어 있는 지 테스트", () => {
+    expect(isSubmitActive()).toBe(true);
+  });
+
+  test("올바르지 않은 이메일 형식일 때 에러 메시지 노출 테스트", async () => {
     const { emailInput, signupForm } = commonElement();
 
     fireEvent.change(emailInput, {
@@ -119,7 +115,7 @@ describe("회원가입 페이지 테스트", () => {
     });
   });
 
-  test("비밀번호가 짧을 때 에러 메시지 표시 합니다.", async () => {
+  test("비밀번호가 짧을 때 에러 메시지 노출 테스트.", async () => {
     const { emailInput, pwInput, signupForm } = commonElement();
 
     fireEvent.change(emailInput, {
@@ -143,7 +139,7 @@ describe("회원가입 페이지 테스트", () => {
     });
   });
 
-  test("이미 사용 중인 닉네임 일 때 에러 메시지 표시 합니다.", async () => {
+  test("이미 사용 중인 닉네임 일 때 에러 메시지 표시 테스트", async () => {
     const { emailInput, pwInput, nicknameInput, signupForm } = commonElement();
 
     fireEvent.change(emailInput, {

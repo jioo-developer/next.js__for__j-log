@@ -7,15 +7,6 @@ import ResetPwPage from "@/app/pages/resetPw/page";
 import { validateEmail } from "@/app/handler/commonHandler";
 import { useRouter } from "next/navigation";
 
-jest.mock("@/app/api_hooks/login/getUserHook", () => ({
-  __esModule: true, // ES 모듈로 인식되도록 설정
-  default: jest.fn().mockReturnValue({
-    data: null, // 모의 데이터 반환
-    error: Error,
-    isLoading: false,
-  }),
-}));
-
 jest.mock("@/app/Firebase", () => ({
   authService: {},
 }));
@@ -27,6 +18,15 @@ jest.mock("firebase/auth", () => ({
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn().mockReturnValue({
     push: jest.fn(),
+  }),
+}));
+
+jest.mock("@/app/api_hooks/login/getUserHook", () => ({
+  __esModule: true, // ES 모듈로 인식되도록 설정
+  default: jest.fn().mockReturnValue({
+    data: null, // 모의 데이터 반환
+    error: Error,
+    isLoading: false,
   }),
 }));
 

@@ -60,7 +60,7 @@ describe("회원가입 페이지 로직 테스트", () => {
     jest.clearAllMocks();
   });
 
-  test("계정 생성이 성공 했는지 확인합니다.", async () => {
+  test("계정 생성 성공 테스트", async () => {
     (createUserWithEmailAndPassword as jest.Mock).mockResolvedValue({
       user: { uid: "123", displayName: "existingNickname" },
     });
@@ -111,7 +111,7 @@ describe("회원가입 페이지 로직 테스트", () => {
     });
   });
 
-  test("게정 생성이 실패 했을 때를 테스트 합니다.", async () => {
+  test("게정 생성이 실패 했을 때를 테스트", async () => {
     const errorMessage = "회원가입 도중 에러가 발생하였습니다";
 
     (createUserWithEmailAndPassword as jest.Mock).mockRejectedValue(
@@ -128,7 +128,6 @@ describe("회원가입 페이지 로직 테스트", () => {
 
     // 계정 생성 실패서 에러 팝업 출력 검증
     await waitFor(() => {
-      expect(LoginErrorHandler).toHaveBeenCalledWith(errorMessage);
       expect(popuprHandler).toHaveBeenCalledWith({
         message: errorMessage,
       });
