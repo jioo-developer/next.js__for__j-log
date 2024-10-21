@@ -1,4 +1,10 @@
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  renderHook,
+  act,
+} from "@testing-library/react";
 import EditorPage from "@/app/pages/editor/page";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
@@ -9,16 +15,20 @@ import { getElement, lenderingCheck } from "./utils";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
-import {
-  CreateImgUrl,
-  ImageDeleteHandler,
-  LoadImageHandler,
-} from "@/app/handler/detail/crud/imageCrudHandler";
+import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
+import { useRouter } from "next/navigation";
+import { setDoc } from "firebase/firestore";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 // 필요한 훅과 모듈을 모킹
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
+}));
+
+jest.mock("firebase/firestore", () => ({
+  setDoc: jest.fn(),
+  doc: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -224,6 +234,110 @@ describe("Post & Edit 페이지 CreateHandler 테스트", () => {
     expect(postMutate.mutate).toHaveBeenCalledWith({
       data: addContent,
       pageId: storeState.pgId,
+    });
+  });
+});
+
+describe("페이지 생성 로직 테스트", () => {
+  const queryClient = new QueryClient();
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (setDoc as jest.Mock).mockResolvedValue(true);
+    // 페이지 정보 스토어 초기화
+    (useCreateId as jest.Mock).mockReturnValue("new-page-id");
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <EditorPage />
+      </QueryClientProvider>
+    );
+  });
+  test("페이지 생성 성공 테스트", async () => {
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/detail/crud/useMutationHandler"
+    ).default;
+
+    const pageId = "new-page-id";
+
+    const content = {
+      title: "Mock Title",
+      text: "This is some mock text.",
+      file: [
+        new File(["file content 1"], "file1.png", { type: "image/png" }),
+        new File(["file content 2"], "file2.jpg", { type: "image/jpeg" }),
+      ],
+      previewImg: [
+        "http://example.com/preview1.png",
+        "http://example.com/preview2.png",
+      ],
+      pageInfo: "mockPageId",
+      editMode: false,
+      priority: true,
+      url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
+    };
+
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    await act(async () => {
+      result.current.mutate({
+        content,
+        pageId,
+      });
+    });
+
+    // isLoading이 완료될 때까지 대기 후 isSuccess 확인
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    await waitFor(() => {
+      expect(useRouter().push).toHaveBeenCalledWith(`/pages/detail/${pageId}`);
+    });
+  });
+  test("페이지 생성 실패 테스트", async () => {
+    (setDoc as jest.Mock).mockRejectedValue(() => {
+      return Promise.reject(new Error("게시글 작성 중 오류 발생"));
+    });
+
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/detail/crud/useMutationHandler"
+    ).default;
+
+    const pageId = "new-page-id";
+
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    const obj = {
+      data: null,
+      pageId,
+    };
+
+    await act(async () => {
+      result.current.mutate(obj);
+    });
+
+    // isLoading이 완료될 때까지 대기 후 isError 확인
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true); // 실패한 경우 isError가 true가 되어야 함
+    });
+
+    await waitFor(() => {
+      // 오류 메시지가 올바르게 처리되었는지 확인 (popuprHandler 호출 여부 등)
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "게시글 작성 중 오류가 발생하였습니다",
+      });
     });
   });
 });
