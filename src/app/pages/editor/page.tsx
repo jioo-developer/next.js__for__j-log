@@ -116,6 +116,7 @@ const EditorPage = () => {
                   <button
                     type="button"
                     className="preview_delete"
+                    data-testid="delete-button"
                     onClick={() => {
                       const array = { image: previewImg, file: file };
                       ImageDeleteHandler({ array, fileIndex: index });

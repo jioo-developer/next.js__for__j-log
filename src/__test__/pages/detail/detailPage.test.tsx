@@ -75,11 +75,6 @@ describe("게시글 페이지 데이터 없을 때 테스트", () => {
   });
 
   test("게시글 데이터 조회가 안 될 경우 팝업 노출 테스트", async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <DetailPage />
-      </QueryClientProvider>
-    );
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "페이지 정보가 조회 되지 않습니다.",
@@ -87,11 +82,6 @@ describe("게시글 페이지 데이터 없을 때 테스트", () => {
     });
   });
   test("팝업 노출 후 확인 버튼 클릭 시 메인 페이지로 이동 테스트", async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <DetailPage />
-      </QueryClientProvider>
-    );
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "페이지 정보가 조회 되지 않습니다.",
@@ -314,9 +304,8 @@ describe("좋아요 로직 테스트", () => {
     });
 
     // 좋아요 버튼 찾기 (적절한 텍스트를 기준으로 버튼 검색)
-    const favoriteBtn = (await screen.getByText(
-      "게시글에 대한 댓글을 달아주세요."
-    ).nextElementSibling) as HTMLButtonElement;
+    const favoriteBtn = screen.getByText("게시글에 대한 댓글을 달아주세요.")
+      .nextElementSibling as HTMLButtonElement;
 
     // 좋아요 버튼이 존재하는지 확인
     expect(favoriteBtn).toBeInTheDocument();
