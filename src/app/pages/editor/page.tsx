@@ -51,6 +51,19 @@ const EditorPage = () => {
     }
   }, [editMode, pageData]);
 
+  async function imageUrl() {
+    const resultUrl = await CreateImgUrl({
+      image: previewImg,
+      file,
+      isEdit: editMode,
+    });
+    if (resultUrl) {
+      return resultUrl;
+    } else {
+      return [];
+    }
+  }
+
   async function CreateHandler() {
     const content = {
       title,
@@ -59,11 +72,7 @@ const EditorPage = () => {
         .map((value: File) => value.name)
         .filter((item) => item !== ""),
       pageId: pageInfo,
-      url: await CreateImgUrl({
-        image: previewImg,
-        file,
-        isEdit: editMode,
-      }),
+      url: await imageUrl(),
       priority: priorty,
     };
     if (editMode) {

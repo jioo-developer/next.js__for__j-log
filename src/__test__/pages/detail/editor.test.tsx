@@ -1,16 +1,15 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import EditorPage from "@/app/pages/editor/page";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { create } from "zustand";
 import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
+import { getElement, lenderingCheck } from "./utils";
+import useDetailQueryHook, {
+  FirebaseData,
+} from "@/app/api_hooks/detail/getDetailHook";
+import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
 
 // 필요한 훅과 모듈을 모킹
 
@@ -48,7 +47,9 @@ jest.mock("@/app/api_hooks/detail/getDetailHook", () => ({
   }),
 }));
 
-jest.mock("@/app/handler/detail/pageInfoHandler");
+jest.mock("@/app/handler/detail/pageInfoHandler", () => ({
+  useCreateId: jest.fn(),
+}));
 jest.mock("@/app/handler/detail/crud/setDataHandler");
 
 jest.mock("@/app/handler/detail/crud/imageCrudHandler", () => ({
@@ -63,27 +64,12 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
   mutate: jest.fn(),
 });
 
-const getElement = () => {
-  const form = screen.getByRole("form") as HTMLFormElement;
-  const input = within(form).getByPlaceholderText(
-    "내용을 입력하세요."
-  ) as HTMLInputElement;
-  const textarea = within(form).getAllByRole(
-    "textbox"
-  )[1] as HTMLTextAreaElement;
-  const fileInputLabel = within(form).getByLabelText(
-    "이미지를 담아주세요"
-  ) as HTMLLabelElement;
-  const exitBtn = within(form).getAllByRole("button")[0] as HTMLButtonElement;
-  const submitBtn = screen.getByText("글작성");
-  return { form, input, textarea, fileInputLabel, exitBtn, submitBtn };
-};
-
 describe("Post & Edit 페이지 테스트", () => {
   const usePageInfoStore = create(() => ({
     pgId: "",
     editMode: false,
   }));
+
   beforeEach(() => {
     jest.clearAllMocks();
     // 페이지 정보 스토어 초기화
@@ -96,7 +82,9 @@ describe("Post & Edit 페이지 테스트", () => {
         <EditorPage />
       </QueryClientProvider>
     );
+    lenderingCheck();
   });
+
   beforeEach(() => {
     const { form, input, textarea } = getElement();
 
@@ -112,31 +100,14 @@ describe("Post & Edit 페이지 테스트", () => {
     fireEvent.submit(form);
   });
 
-  test("에디터 폼이 렌더링 되는지 확인", () => {
-    // 제목, 텍스트, 파일 업로드, 글작성 버튼이 있는지 확인
-    const { form, input, textarea, fileInputLabel, exitBtn, submitBtn } =
-      getElement();
-    expect(form).toBeInTheDocument();
-    expect(input).toBeInTheDocument();
-    expect(textarea).toBeInTheDocument();
-    expect(fileInputLabel).toBeInTheDocument();
-    expect(exitBtn).toBeInTheDocument();
-    expect(submitBtn).toBeInTheDocument();
-  });
-
-  test("createHandler 함수 실행 테스트", async () => {
-    // createHandler가 실행 됐을 때 setDataHandler를 호출 하는지
-
-    await waitFor(() => {
-      expect(setDataHandler).toHaveBeenCalled();
-    });
-  });
-
   test("CreateHandler가 실행 되었을 때 editMode가 true 일 때 테스트", () => {
     usePageInfoStore.setState({ editMode: true, pgId: "new-page-id" });
     const storeState = usePageInfoStore.getState();
     expect(storeState.editMode).toBe(true);
-    const resultObj = {
+
+    const { pageData } = useDetailQueryHook(useCreateId());
+
+    const content = {
       title: "Mock Title",
       text: "This is some mock text.",
       file: [
@@ -152,6 +123,18 @@ describe("Post & Edit 페이지 테스트", () => {
       priority: true,
       url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
     };
+
+    const obj = { ...(pageData as FirebaseData) };
+    const assignSpy = jest.spyOn(Object, "assign");
+
+    const resultObj = Object.assign(obj, content);
+
+    expect(assignSpy).toHaveBeenCalled();
+
+    expect(assignSpy).toHaveBeenCalledWith(obj, content);
+
+    assignSpy.mockRestore();
+
     const postMutate = useCreateMutation();
 
     postMutate.mutate({
@@ -169,26 +152,20 @@ describe("Post & Edit 페이지 테스트", () => {
     const storeState = usePageInfoStore.getState();
     expect(storeState.editMode).toBe(false);
 
-    await waitFor(() => {
-      expect(setDataHandler).toHaveBeenCalled();
-    });
+    (CreateImgUrl as jest.Mock).mockReturnValue([]);
 
     const addContent = {
-      title: "Mock Title",
-      text: "This is some mock text.",
-      file: [
-        new File(["file content 1"], "file1.png", { type: "image/png" }),
-        new File(["file content 2"], "file2.jpg", { type: "image/jpeg" }),
-      ],
-      previewImg: [
-        "http://example.com/preview1.png",
-        "http://example.com/preview2.png",
-      ],
-      pageInfo: "mockPageId",
-      editMode: false,
-      priority: true,
-      url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
+      fileName: [],
+      pageId: "new-page-id",
+      priority: false,
+      text: "Test content",
+      title: "Test Title",
+      url: [],
     };
+    await waitFor(() => {
+      expect(setDataHandler).toHaveBeenCalledWith(addContent);
+    });
+
     const postMutate = useCreateMutation();
 
     postMutate.mutate({
