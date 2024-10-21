@@ -1,4 +1,4 @@
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import EditorPage from "@/app/pages/editor/page";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
@@ -9,7 +9,11 @@ import { getElement, lenderingCheck } from "./utils";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
-import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
+import {
+  CreateImgUrl,
+  ImageDeleteHandler,
+  LoadImageHandler,
+} from "@/app/handler/detail/crud/imageCrudHandler";
 
 // 필요한 훅과 모듈을 모킹
 
@@ -64,7 +68,54 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
   mutate: jest.fn(),
 });
 
-describe("Post & Edit 페이지 테스트", () => {
+describe("Post & Edit 페이지 랜더링 테스트", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    const queryClient = new QueryClient();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <EditorPage />
+      </QueryClientProvider>
+    );
+  });
+  test("Element 랜더링 체크", () => {
+    lenderingCheck();
+  });
+  test("createHandler 호출 성공 테스트", async () => {
+    const { form, input, textarea } = getElement();
+
+    fireEvent.change(input, {
+      target: { value: "Test Title" },
+    });
+    fireEvent.change(textarea, {
+      target: { value: "Test content" },
+    });
+
+    fireEvent.submit(form);
+    await waitFor(() => {
+      expect(setDataHandler).toHaveBeenCalled();
+    });
+  });
+  test("createHandler 호출 실패 테스트", async () => {
+    const { form, input, textarea } = getElement();
+
+    fireEvent.change(input, {
+      target: { value: "" },
+    });
+    fireEvent.change(textarea, {
+      target: { value: "Test content" },
+    });
+
+    fireEvent.submit(form);
+    await waitFor(() => {
+      expect(setDataHandler).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe("Post & Edit 페이지 CreateHandler 테스트", () => {
   const usePageInfoStore = create(() => ({
     pgId: "",
     editMode: false,
@@ -82,7 +133,6 @@ describe("Post & Edit 페이지 테스트", () => {
         <EditorPage />
       </QueryClientProvider>
     );
-    lenderingCheck();
   });
 
   beforeEach(() => {
@@ -95,8 +145,6 @@ describe("Post & Edit 페이지 테스트", () => {
       target: { value: "Test content" },
     });
 
-    expect(input.value).not.toBe("");
-    expect(textarea.value).not.toBe("");
     fireEvent.submit(form);
   });
 
