@@ -1,8 +1,10 @@
-import useDetailQueryHook from "@/app/api_hooks/detail/getDetailHook";
+import useDetailQueryHook, {
+  FirebaseData,
+} from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
+import pageDelete from "@/app/handler/detail/pageDeleteHanlder";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
-import { useFavoriteMutate } from "@/app/handler/detail/useMutationHandler";
+import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import DetailPage from "@/app/pages/detail/[id]/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
@@ -13,11 +15,27 @@ import {
   waitFor,
   screen,
   fireEvent,
+  renderHook,
 } from "@testing-library/react";
+import { deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 jest.mock("@/app/Firebase", () => ({
-  authService: {},
+  authService: {
+    currentUser: {
+      email: "test@example.com", // 현재 사용자의 이메일을 설정
+    },
+  },
+}));
+
+jest.mock("@/app/Firebase", () => ({
+  db: jest.fn().mockReturnValue({}),
+}));
+
+jest.mock("firebase/firestore", () => ({
+  deleteDoc: jest.fn(),
+  doc: jest.fn(),
+  updateDoc: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -218,11 +236,26 @@ describe("페이지 삭제 로직 테스트", () => {
     });
   });
   test("페이지 삭제 로직 성공", async () => {
-    (pageDelete as jest.Mock).mockResolvedValueOnce({
-      title: "123",
-      text: "123",
-      url: [],
-    }); // pageDelete가 성공할 경우
+    (doc as jest.Mock).mockResolvedValue(true);
+    (deleteDoc as jest.Mock).mockResolvedValue(true);
+
+    const pageDeleteHandler = jest.requireActual(
+      "@/app/handler/detail/pageDeleteHanlder"
+    ).default;
+    const mockList: FirebaseData = {
+      fileName: [], // fileName을 string[]로 전달
+      writer: "test-writer",
+      pageId: "new-page-id",
+      user: "test-user",
+      profile: "test-profile-url",
+      date: "2023-01-01",
+      timestamp: 1672531200 as unknown as Timestamp, // Firestore Timestamp 사용
+      title: "Test Title", // 추가 필드
+      url: ["https://example.com"], // 추가 필드
+      favorite: 0, // 추가 필드
+      text: "Test content of the page", // 추가 필드
+      id: "unique-document-id", // 추가 필드
+    };
 
     await act(async () => {
       popupMessageStore.setState({ isClick: true });
@@ -235,6 +268,17 @@ describe("페이지 삭제 로직 테스트", () => {
     await waitFor(() => {
       expect(pageDelete).toHaveBeenCalledWith(expect.any(Object)); // FirebaseData로 pageDelete 호출
       expect(useRouter().push).toHaveBeenCalledWith("/pages/main"); // 페이지가 메인으로 이동
+    });
+
+    // pageDelete 함수 호출
+    await pageDeleteHandler(mockList);
+
+    // doc 함수가 올바르게 호출되었는지 확인
+    await waitFor(() => {
+      expect(doc).toHaveBeenCalledWith(expect.anything(), "post", pageId);
+
+      // deleteDoc 함수가 doc 함수에서 반환된 ref로 호출되었는지 확인
+      expect(deleteDoc).toHaveBeenCalledWith(expect.anything());
     });
   });
 
@@ -296,7 +340,7 @@ describe("좋아요 로직 테스트", () => {
       popupMessageStore.setState({ message: "", isClick: false });
     });
   });
-  test("좋아요 함수 성공 테스트", async () => {
+  test("좋아요 mutate 함수 성공 테스트", async () => {
     // document.cookie 모킹
     Object.defineProperty(document, "cookie", {
       writable: true,
@@ -331,7 +375,39 @@ describe("좋아요 로직 테스트", () => {
 
     // favoriteMutate가 호출되었는지 확인
   });
-  test("좋아요 함수 실패 테스트", async () => {
+  test("좋아요 함수 로직 성공 반영 테스트", async () => {
+    (updateDoc as jest.Mock).mockResolvedValueOnce(true);
+    (doc as jest.Mock).mockResolvedValue(true);
+
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/detail/useMutationHandler"
+    ).default;
+
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // act로 mutate 실행
+    await act(async () => {
+      await result.current.mutate({
+        value: 10,
+        id: pageId,
+      }); // 좋아요 수 업데이트 시도
+    });
+
+    console.log(result.current);
+
+    // Firestore의 doc과 updateDoc이 호출되었는지 확인
+    expect(doc).toHaveBeenCalledWith(expect.anything(), "post", pageId);
+    expect(updateDoc).toHaveBeenCalledWith(expect.anything(), {
+      favorite: 10 + 1,
+    });
+  });
+  test("좋아요 mutate 함수 실패 테스트", async () => {
     (useFavoriteMutate as jest.Mock).mockReturnValue({
       mutate: jest.fn(() => {
         new Error("Mutate function failed");
