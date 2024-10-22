@@ -66,7 +66,7 @@ describe("로그인 페이지 테스트", () => {
     expect(data).toBe(null);
   });
 
-  test("입력 상태가 올바르게 업데이트 되는 지 확인합니다.", () => {
+  test("입력 상태가 올바르게 업데이트 되는 지 테스트", () => {
     const { id, password } = getElementsHandler();
 
     fireEvent.change(id, { target: { value: "user@test.com" } });
@@ -76,7 +76,7 @@ describe("로그인 페이지 테스트", () => {
     expect(password.value).toBe("password123");
   });
 
-  test("로그인 함수 호출에 성공하는 지 테스트 합니다.", async () => {
+  test("로그인 함수 호출에 성공하는 지 테스트", async () => {
     (useLoginHook as jest.Mock).mockReturnValue({
       mutate: jest.fn(),
     });
@@ -96,7 +96,7 @@ describe("로그인 페이지 테스트", () => {
     });
   });
 
-  test("로그인에 성공 하면 동작하는 로직을 테스트 합니다.", async () => {
+  test("로그인에 성공 하면 동작하는 로직 테스트", async () => {
     (signInWithEmailAndPassword as jest.Mock).mockResolvedValue({
       user: { uid: "123" },
     });
@@ -120,7 +120,7 @@ describe("로그인 페이지 테스트", () => {
     refetchQueriesSpy.mockRestore();
   });
 
-  test("로그인에 실패 하면 동작하는 로직을 테스트 합니다.", async () => {
+  test("로그인에 실패 하면 동작하는 로직을 테스트", async () => {
     (signInWithEmailAndPassword as jest.Mock).mockRejectedValue(
       new Error("auth/wrong-password")
     );

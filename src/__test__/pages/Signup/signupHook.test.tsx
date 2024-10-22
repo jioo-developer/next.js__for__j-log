@@ -6,6 +6,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { commonHandler } from "./utils";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -35,27 +36,8 @@ jest.mock("@/app/api_hooks/login/LoginErrorHandler", () => ({
   LoginErrorHandler: jest.fn(),
 }));
 
-// 공용 작업
-const commonHandler = () => {
-  const queryClient = new QueryClient();
-  const { result } = renderHook(() => useSignupHandler(), {
-    wrapper: ({ children }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    ),
-  });
-
-  act(() => {
-    result.current.mutate({
-      email: "test@example.com",
-      password: "validPassword123",
-      nickname: "existingNickname",
-    });
-  });
-  return result;
-};
-//공용작업
-
 describe("회원가입 페이지 로직 테스트", () => {
+  const queryClient = new QueryClient();
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -67,7 +49,7 @@ describe("회원가입 페이지 로직 테스트", () => {
 
     // 임시 계정 모킹
 
-    const result = commonHandler();
+    const result = commonHandler(queryClient);
     //mutate 실행 함수
 
     await waitFor(() => {
@@ -111,7 +93,7 @@ describe("회원가입 페이지 로직 테스트", () => {
     });
   });
 
-  test("게정 생성이 실패 했을 때를 테스트", async () => {
+  test("게정 생성 실패 테스트", async () => {
     const errorMessage = "회원가입 도중 에러가 발생하였습니다";
 
     (createUserWithEmailAndPassword as jest.Mock).mockRejectedValue(
@@ -120,7 +102,7 @@ describe("회원가입 페이지 로직 테스트", () => {
 
     (LoginErrorHandler as jest.Mock).mockReturnValue(null);
 
-    const result = commonHandler();
+    const result = commonHandler(queryClient);
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(false);

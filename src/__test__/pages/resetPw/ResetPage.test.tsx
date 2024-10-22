@@ -55,13 +55,13 @@ describe("비밀번호 찾기 로직 테스트", () => {
     expect(data).toBe(null);
   });
 
-  test("취소 버튼을 누를 시 로그인 페이지로 되돌아가는 지 확입합니다.", () => {
+  test("취소 버튼을 누를 시 로그인 페이지로 되돌아가는 지 테스트", () => {
     const confirmButton = screen.getByText("취소");
     fireEvent.click(confirmButton);
     expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
   });
 
-  test("비밀번호 찾기를 위한 이메일 전송에 성공 했는지 테스트 합니다.", async () => {
+  test("비밀번호 찾기를 위한 이메일 전송에 성공 했는지 테스트", async () => {
     const popupTitle = screen.getByText(
       "비밀번호를 잊어버리셨나요?"
     ) as HTMLElement;
@@ -94,7 +94,7 @@ describe("비밀번호 찾기 로직 테스트", () => {
     expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
   });
 
-  test("비밀번호 찾기를 위한 이메일 전송에 실패 했는지 테스트 합니다.", async () => {
+  test("비밀번호 찾기를 위한 이메일 전송에 실패 했는지 테스트", async () => {
     const error = "올바른 이메일 형식이 아닙니다.";
 
     const popupTitle = screen.getByText(

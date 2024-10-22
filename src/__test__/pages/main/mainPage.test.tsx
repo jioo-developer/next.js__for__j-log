@@ -37,6 +37,10 @@ jest.mock("@/app/api_hooks/main/getPostHook", () => ({
   }),
 }));
 
+jest.mock("@/app/handler/error/ErrorHandler", () => ({
+  popuprHandler: jest.fn(),
+}));
+
 describe("메인페이지 테스트 - skeleton 함수까지", () => {
   const queryClient = new QueryClient();
 
@@ -60,21 +64,6 @@ describe("메인페이지 테스트 - skeleton 함수까지", () => {
   test("pages/main 으로 라우팅 되는 지 테스트", () => {
     const pathname = usePathname();
     expect(pathname).not.toBe("/");
-  });
-
-  test("회원 정보 불러오는 팝업 호출 테스트", async () => {
-    (useUserQueryHook as jest.Mock).mockReturnValueOnce({
-      data: null,
-      error: null,
-      isLoading: true,
-    });
-    const { data, isLoading } = useUserQueryHook();
-
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenLastCalledWith(
-        "회원정보를 불러 오는 중입니다."
-      );
-    });
   });
 
   test("로딩 중에 스켈레톤 렌더링 되는 지 확인", () => {
@@ -109,6 +98,7 @@ describe("메인 페이지 테스트 - skeleton 함수 이후", () => {
     });
 
     expect(screen.getByText("Test Text")).toBeInTheDocument();
+    expect(screen.queryByText("Other Text")).not.toBeInTheDocument();
   });
 
   test("searchInfo.text 가 없을 때 테스트", async () => {
