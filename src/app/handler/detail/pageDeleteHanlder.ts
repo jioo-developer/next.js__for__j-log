@@ -3,7 +3,7 @@ import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc } from "firebase/firestore";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
 
-export async function pageDelete(data: FirebaseData) {
+async function pageDelete(data: FirebaseData) {
   const files = data.fileName;
   const writer = data.writer;
   const id = data.pageId;
@@ -24,3 +24,5 @@ async function DeleteHandler(files: string[], writer: string) {
     })
   );
 }
+
+export default pageDelete;

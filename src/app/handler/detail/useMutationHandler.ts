@@ -11,7 +11,7 @@ type favoriteType = {
   id: string;
 };
 
-export const useFavoriteMutate = () => {
+const useFavoriteMutate = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ value, id }: favoriteType) => {
@@ -41,3 +41,5 @@ export const useFavoriteMutate = () => {
     },
   });
 };
+
+export default useFavoriteMutate;

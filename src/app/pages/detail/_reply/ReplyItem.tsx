@@ -2,14 +2,14 @@ import { Button } from "@/stories/atoms/Button";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import Image from "next/image";
 import { Input } from "@/stories/atoms/Input";
-import { replyType } from "@/app/api_hooks/detail-reply/getReplyHook";
+import { replyType } from "@/app/api_hooks/Reply/getReplyHook";
 import { useReplyContext } from "./context";
 import { useEffect } from "react";
 import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import {
   useDeleteHandler,
   useUpdateHandler,
-} from "@/app/handler/detail-reply/useMutationHandler";
+} from "@/app/handler/Reply/useMutationHandler";
 import { pageInfoStore } from "@/app/store/common";
 
 type propsType = {
@@ -70,7 +70,12 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
   return (
     <div className="reply_wrap" key={`reply-${index}`}>
       <div className="user_info">
-        <Image src={item.profile} alt="" width={40} height={40} />
+        <Image
+          src={item.profile ? item.profile : "/img/no-image.jpg"}
+          alt=""
+          width={40}
+          height={40}
+        />
         <div className="user_text">
           <p className="reply_name">{item.replyrer}</p>
           <p className="reply_date">{item.date}</p>

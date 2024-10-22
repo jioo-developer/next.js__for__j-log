@@ -49,8 +49,7 @@ export function useLogOut() {
   };
 }
 
-export function useIsPathHandler() {
-  const pathname = usePathname();
+export function isPathHandler(pathname: string) {
   return function () {
     const isShowPathname = ["/", "/pages/login", "/pages/signup"];
     return isShowPathname.includes(pathname);

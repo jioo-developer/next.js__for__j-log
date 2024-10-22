@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { timeData } from "@/app/handler/commonHandler";
 import { db } from "@/app/Firebase";
-import { useReplyProps } from "@/app/handler/detail-reply/useMutationHandler";
+import { useReplyProps } from "@/app/handler/Reply/useMutationHandler";
 
 interface propsType extends useReplyProps {
   user: {

@@ -1,6 +1,6 @@
 import { db } from "@/app/Firebase";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
-import { useReplyProps } from "@/app/handler/detail-reply/useMutationHandler";
+import { useReplyProps } from "@/app/handler/Reply/useMutationHandler";
 
 const ReplyUpdate = async ({ id, replyId, comment }: useReplyProps) => {
   const collectionRef = collection(doc(collection(db, "post"), id), "reply");

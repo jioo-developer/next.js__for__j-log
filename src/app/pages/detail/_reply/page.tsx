@@ -1,12 +1,11 @@
 "use client";
-import { useReplyQueryHook } from "@/app/api_hooks/detail-reply/getReplyHook";
+import { useReplyQueryHook } from "@/app/api_hooks/Reply/getReplyHook";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { pageInfoStore } from "@/app/store/common";
 import ReplyItem from "@/app/pages/detail/_reply/ReplyItem";
 import { useReplyContext } from "./context";
-import { authService } from "@/app/Firebase";
 import { User } from "firebase/auth";
-import { useCreateHandler } from "@/app/handler/detail-reply/useMutationHandler";
+import { useCreateHandler } from "@/app/handler/Reply/useMutationHandler";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 const Reply = () => {

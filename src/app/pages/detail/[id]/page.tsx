@@ -11,8 +11,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
-import { pageDelete } from "@/app/handler/detail/pageDeleteHanlder";
-import { useFavoriteMutate } from "@/app/handler/detail/useMutationHandler";
+import pageDelete from "@/app/handler/detail/pageDeleteHanlder";
+import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
 
 const DetailPage = () => {
   const router = useRouter();

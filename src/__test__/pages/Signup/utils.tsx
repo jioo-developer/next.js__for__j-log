@@ -1,4 +1,6 @@
-import { fireEvent, screen } from "@testing-library/react";
+import useSignupHandler from "@/app/api_hooks/signup/signupHook";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, renderHook, screen } from "@testing-library/react";
 
 export const commonElement = () => {
   // signup 전용
@@ -46,3 +48,22 @@ export const isSubmitActive = () => {
 
   return true;
 };
+
+export // 공용 작업
+const commonHandler = (queryClient: QueryClient) => {
+  const { result } = renderHook(() => useSignupHandler(), {
+    wrapper: ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  });
+
+  act(() => {
+    result.current.mutate({
+      email: "test@example.com",
+      password: "validPassword123",
+      nickname: "existingNickname",
+    });
+  });
+  return result;
+};
+//공용작업

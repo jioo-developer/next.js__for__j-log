@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import replyUpdateHandler from "@/app/handler/detail-reply/replyUpdateHandler";
-import createReplyHandler from "@/app/handler/detail-reply/createReplyHandler";
-import replyDeleteHandler from "@/app/handler/detail-reply/replyDeleteHandler";
+import replyUpdateHandler from "@/app/handler/Reply/replyUpdateHandler";
+import createReplyHandler from "@/app/handler/Reply/createReplyHandler";
+import replyDeleteHandler from "@/app/handler/Reply/replyDeleteHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { replyType } from "@/app/api_hooks/detail-reply/getReplyHook";
+import { replyType } from "@/app/api_hooks/Reply/getReplyHook";
 
 export interface useReplyProps {
   id: string;
