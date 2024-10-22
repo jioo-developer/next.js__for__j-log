@@ -78,7 +78,7 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
   mutate: jest.fn(),
 });
 
-describe("Post & Edit 페이지 랜더링 테스트", () => {
+describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -93,7 +93,7 @@ describe("Post & Edit 페이지 랜더링 테스트", () => {
   test("Element 랜더링 체크", () => {
     lenderingCheck();
   });
-  test("createHandler 호출 성공 테스트", async () => {
+  test("onSubmit 조건 만족 시 함수 호출 테스트", async () => {
     const { form, input, textarea } = getElement();
 
     fireEvent.change(input, {
@@ -108,7 +108,7 @@ describe("Post & Edit 페이지 랜더링 테스트", () => {
       expect(setDataHandler).toHaveBeenCalled();
     });
   });
-  test("createHandler 호출 실패 테스트", async () => {
+  test("onSubmit 조건 비 만족 시 함수 미호출 테스트", async () => {
     const { form, input, textarea } = getElement();
 
     fireEvent.change(input, {
@@ -125,7 +125,7 @@ describe("Post & Edit 페이지 랜더링 테스트", () => {
   });
 });
 
-describe("Post & Edit 페이지 CreateHandler 테스트", () => {
+describe("페이지 생성 & 수정 함수 호출 테스트", () => {
   const usePageInfoStore = create(() => ({
     pgId: "",
     editMode: false,
@@ -158,7 +158,39 @@ describe("Post & Edit 페이지 CreateHandler 테스트", () => {
     fireEvent.submit(form);
   });
 
-  test("CreateHandler가 실행 되었을 때 editMode가 true 일 때 테스트", () => {
+  test("페이지 생성 함수 호출 테스트", async () => {
+    usePageInfoStore.setState({ editMode: false, pgId: "new-page-id" });
+    const storeState = usePageInfoStore.getState();
+    expect(storeState.editMode).toBe(false);
+
+    (CreateImgUrl as jest.Mock).mockReturnValue([]);
+
+    const addContent = {
+      fileName: [],
+      pageId: "new-page-id",
+      priority: false,
+      text: "Test content",
+      title: "Test Title",
+      url: [],
+    };
+    await waitFor(() => {
+      expect(setDataHandler).toHaveBeenCalledWith(addContent);
+    });
+
+    const postMutate = useCreateMutation();
+
+    postMutate.mutate({
+      data: addContent as any, // data에 resultObj 전달
+      pageId: storeState.pgId,
+    });
+
+    expect(postMutate.mutate).toHaveBeenCalledWith({
+      data: addContent,
+      pageId: storeState.pgId,
+    });
+  });
+
+  test("페이지 수정 함수 호출 테스트", () => {
     usePageInfoStore.setState({ editMode: true, pgId: "new-page-id" });
     const storeState = usePageInfoStore.getState();
     expect(storeState.editMode).toBe(true);
@@ -205,40 +237,9 @@ describe("Post & Edit 페이지 CreateHandler 테스트", () => {
       pageId: storeState.pgId,
     });
   });
-  test("CreateHandler가 실행 되었을 때 editMode가 false 일 때 테스트", async () => {
-    usePageInfoStore.setState({ editMode: false, pgId: "new-page-id" });
-    const storeState = usePageInfoStore.getState();
-    expect(storeState.editMode).toBe(false);
-
-    (CreateImgUrl as jest.Mock).mockReturnValue([]);
-
-    const addContent = {
-      fileName: [],
-      pageId: "new-page-id",
-      priority: false,
-      text: "Test content",
-      title: "Test Title",
-      url: [],
-    };
-    await waitFor(() => {
-      expect(setDataHandler).toHaveBeenCalledWith(addContent);
-    });
-
-    const postMutate = useCreateMutation();
-
-    postMutate.mutate({
-      data: addContent as any, // data에 resultObj 전달
-      pageId: storeState.pgId,
-    });
-
-    expect(postMutate.mutate).toHaveBeenCalledWith({
-      data: addContent,
-      pageId: storeState.pgId,
-    });
-  });
 });
 
-describe("페이지 생성 로직 테스트", () => {
+describe("페이지 생성 & 수정 로직 테스트", () => {
   const queryClient = new QueryClient();
   beforeEach(() => {
     jest.clearAllMocks();
@@ -252,7 +253,7 @@ describe("페이지 생성 로직 테스트", () => {
       </QueryClientProvider>
     );
   });
-  test("페이지 생성 성공 테스트", async () => {
+  test("CreateHandler 함수 성공 테스트", async () => {
     const mutationHandler = jest.requireActual(
       "@/app/handler/detail/crud/useMutationHandler"
     ).default;
@@ -300,7 +301,7 @@ describe("페이지 생성 로직 테스트", () => {
       expect(useRouter().push).toHaveBeenCalledWith(`/pages/detail/${pageId}`);
     });
   });
-  test("페이지 생성 실패 테스트", async () => {
+  test("CreateHandler 함수 실패 테스트", async () => {
     (setDoc as jest.Mock).mockRejectedValue(() => {
       return Promise.reject(new Error("게시글 작성 중 오류 발생"));
     });
