@@ -17,6 +17,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/Firebase";
 import storageUpload from "@/app/handler/file/storageUploadHandler";
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
+import { useRouter } from "next/navigation";
 jest.mock("@/app/Firebase", () => ({
   authService: {
     currentUser: {
@@ -77,10 +78,11 @@ jest.mock("@/app/handler/mypage/useMutationHandler", () => jest.fn());
 
 jest.mock("@/app/handler/file/storageUploadHandler", () => jest.fn());
 
+const queryClient = new QueryClient();
+
 describe("닉네임 변경 로직 테스트", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -198,11 +200,24 @@ describe("닉네임 변경 로직 테스트", () => {
     const { nicknameData } = useNameQueryHook();
     const isNamecheck = nicknameData.includes("Nickname1");
     expect(isNamecheck).toBe(true);
-    if (!isNamecheck) {
+
+    if (isNamecheck) {
+      popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+    }
+
+    await act(() => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MyPage />
+        </QueryClientProvider>
+      );
+    });
+
+    await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "이미 사용중인 닉네임 입니다",
       });
-    }
+    });
   });
 });
 describe("파일 업로드 성공 및 실패 테스트", () => {
@@ -274,6 +289,7 @@ describe("프로필 이미지 변경 로직 테스트", () => {
     // updateProfile을 성공적으로 호출하고, 라우터가 호출되는지 확인
     await act(async () => {
       await updateProfile({ uid: "123" } as User, { photoURL: upload[0] });
+      useRouter().push("/pages/main");
     });
 
     await waitFor(() => {
@@ -281,6 +297,10 @@ describe("프로필 이미지 변경 로직 테스트", () => {
         { uid: "123" },
         { photoURL: "uploadedUrl" }
       );
+    });
+
+    await waitFor(() => {
+      expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
     });
   });
   test("프로필 이미지 변경 실패 테스트", async () => {
