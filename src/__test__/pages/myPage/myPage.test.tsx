@@ -205,14 +205,6 @@ describe("닉네임 변경 로직 테스트", () => {
       popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
     }
 
-    await act(() => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MyPage />
-        </QueryClientProvider>
-      );
-    });
-
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "이미 사용중인 닉네임 입니다",

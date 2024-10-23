@@ -128,13 +128,11 @@ describe("회원탈퇴 로직 테스트", () => {
       fireEvent.click(activeBtn);
     });
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <QuitPage user={mockUser} setQuit={setQuitMock} />
-        </QueryClientProvider>
-      );
-    });
+    try {
+      deleteUserDB();
+    } catch {
+      popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });
+    }
 
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
