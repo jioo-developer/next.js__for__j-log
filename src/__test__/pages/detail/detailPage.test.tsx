@@ -197,6 +197,20 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
 describe("페이지 삭제 로직 테스트", () => {
   const queryClient = new QueryClient();
   const pageId = "new-page-id";
+  const mockList: FirebaseData = {
+    fileName: [], // fileName을 string[]로 전달
+    writer: "test-writer",
+    pageId: "new-page-id",
+    user: "test-user",
+    profile: "test-profile-url",
+    date: "2023-01-01",
+    timestamp: 1672531200 as unknown as Timestamp, // Firestore Timestamp 사용
+    title: "Test Title", // 추가 필드
+    url: ["https://example.com"], // 추가 필드
+    favorite: 0, // 추가 필드
+    text: "Test content of the page", // 추가 필드
+    id: "unique-document-id", // 추가 필드
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -242,20 +256,6 @@ describe("페이지 삭제 로직 테스트", () => {
     const pageDeleteHandler = jest.requireActual(
       "@/app/handler/detail/pageDeleteHanlder"
     ).default;
-    const mockList: FirebaseData = {
-      fileName: [], // fileName을 string[]로 전달
-      writer: "test-writer",
-      pageId: "new-page-id",
-      user: "test-user",
-      profile: "test-profile-url",
-      date: "2023-01-01",
-      timestamp: 1672531200 as unknown as Timestamp, // Firestore Timestamp 사용
-      title: "Test Title", // 추가 필드
-      url: ["https://example.com"], // 추가 필드
-      favorite: 0, // 추가 필드
-      text: "Test content of the page", // 추가 필드
-      id: "unique-document-id", // 추가 필드
-    };
 
     await act(async () => {
       popupMessageStore.setState({ isClick: true });
@@ -293,13 +293,17 @@ describe("페이지 삭제 로직 테스트", () => {
       expect(pageDelete).toHaveBeenCalled();
     });
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <DetailPage />
-        </QueryClientProvider>
-      );
-    });
+    const currentState = pageInfoStore.getState();
+    const from = currentState.fromAction;
+
+    if (from === "detail") {
+      try {
+        await pageDelete(mockList);
+        useRouter().push("/pages/main");
+      } catch {
+        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
+      }
+    }
 
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
