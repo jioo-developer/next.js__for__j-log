@@ -125,7 +125,7 @@ describe("Header 컴포넌트 라우팅 테스트", () => {
     const button = screen.getByText("설정");
     fireEvent.click(button);
     await waitFor(() => {
-      expect(useRouter().push).toHaveBeenCalledWith("/pages/member/myPage");
+      expect(useRouter().push).toHaveBeenCalledWith("/pages/member/mypage");
     });
   });
 
