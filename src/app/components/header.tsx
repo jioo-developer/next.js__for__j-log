@@ -1,12 +1,9 @@
 "use client";
 import "@/app/_asset/header.scss";
-import { authService } from "../Firebase";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { popuprHandler } from "../handler/error/ErrorHandler";
+import { useEffect, useRef, useState } from "react";
 import SearchIcon from "./SearchIcon";
 import { searchStore } from "../store/common";
 import { useLogOut } from "../handler/commonHandler";
@@ -25,7 +22,6 @@ function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const ref = useRef<HTMLInputElement | null>(null);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -41,7 +37,9 @@ function Header() {
 
   const LogOutHandler = useLogOut();
 
-  const isActive = activePathName.some((path) => pathname.startsWith(path));
+  const isActive = activePathName.some((path) =>
+    new RegExp(`^${path}`).test(pathname)
+  );
 
   return (
     <>
