@@ -1,16 +1,42 @@
-import { render, renderHook, act, waitFor } from "@testing-library/react";
+import {
+  render,
+  renderHook,
+  act,
+  waitFor,
+  screen,
+  fireEvent,
+} from "@testing-library/react";
 import {
   useCreateHandler,
   useUpdateHandler,
   useDeleteHandler,
-} from "@/app/handler/detail-reply/useMutationHandler";
+} from "@/app/handler/Reply/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Reply from "@/app/pages/detail/_reply/page";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { pageInfoStore } from "@/app/store/common";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
+}));
+
+jest.mock("firebase/firestore", () => ({
+  doc: jest.fn(),
+  addDoc: jest.fn(),
+  updateDoc: jest.fn(),
+  deleteDoc: jest.fn(),
+  collection: jest.fn(),
+  serverTimestamp: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -19,35 +45,63 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-jest.mock("@/app/handler/error/ErrorHandler", () => ({
-  popuprHandler: jest.fn(),
-}));
-
 jest.mock("@/app/api_hooks/login/getUserHook", () => ({
   __esModule: true, // ES 모듈로 인식되도록 설정
   default: jest.fn().mockReturnValue({
-    data: { uid: "user-id", displayName: "Test User" },
+    data: {
+      uid: "test-uid",
+      displayName: "Test User",
+      profile: "img/default.svg",
+    },
     error: null,
     isLoading: false,
   }),
 }));
 
-jest.mock("@/app/handler/detail-reply/useMutationHandler", () => ({
-  useCreateHandler: jest.fn(),
-  useUpdateHandler: jest.fn(),
-  useDeleteHandler: jest.fn(),
+jest.mock("@/app/api_hooks/detail/getDetailHook", () => ({
+  __esModule: true, // ES 모듈로 인식되도록 설정
+  default: jest.fn().mockReturnValue({
+    pageData: { title: "test title", text: "test text", url: [] },
+    error: null,
+    isLoading: false,
+  }),
+}));
+
+jest.mock("@/app/api_hooks/Reply/getReplyHook", () => ({
+  __esModule: true, // ES 모듈로 인식되도록 설정
+  useReplyQueryHook: jest.fn().mockReturnValue({
+    replyData: ["test"],
+    error: null,
+    isLoading: false,
+  }),
+}));
+
+jest.mock("@/app/handler/Reply/useMutationHandler", () => ({
+  useCreateHandler: jest.fn().mockReturnValue({
+    mutate: jest.fn(),
+  }),
+  useUpdateHandler: jest.fn().mockReturnValue({
+    mutate: jest.fn(),
+  }),
+  useDeleteHandler: jest.fn().mockReturnValue({
+    mutate: jest.fn(),
+  }),
+}));
+
+jest.mock("@/app/handler/error/ErrorHandler", () => ({
+  popuprHandler: jest.fn(),
 }));
 
 jest.mock("@/app/handler/detail/pageInfoHandler");
 
-describe("Reply 페이지 테스트", () => {
+const queryClient = new QueryClient();
+
+describe("Reply 페이지 함수 호출 테스트 - mutate 이전", () => {
   beforeEach(() => {
     // 각 테스트 전에 mock 함수 초기화
     jest.clearAllMocks();
 
     (useCreateId as jest.Mock).mockReturnValue("new-page-id");
-
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -56,66 +110,66 @@ describe("Reply 페이지 테스트", () => {
     );
   });
 
-  test("댓글 생성 성공 테스트", async () => {
-    (useCreateHandler as jest.Mock).mockReturnValue({
-      mutate: jest.fn(),
+  test("댓글 생성 muatate 호출 테스트", async () => {
+    await act(async () => {
+      pageInfoStore.setState({ pgId: useCreateId() });
     });
 
-    const { result } = renderHook(() => useCreateHandler());
-    const comment = "Test comment";
+    const { data } = useUserQueryHook();
 
-    // 댓글 작성 호출
-    act(() => {
-      result.current.mutate({
-        user: { name: "Test User", profile: "test-photo-url", uid: "test-uid" },
-        id: "test-page-id",
-        comment,
+    const btn = screen.getByText("댓글 작성");
+    fireEvent.submit(btn);
+
+    const createMutation = useCreateHandler();
+
+    await waitFor(() => {
+      expect(createMutation.mutate).toHaveBeenCalledWith({
+        user: {
+          name: data?.displayName,
+          profile: "img/default.svg",
+          uid: data?.uid,
+        },
+        id: useCreateId(),
+        comment: "",
       });
-    });
-
-    // 댓글이 제대로 작성되었는지 확인
-    expect(useCreateHandler().mutate).toHaveBeenCalledWith({
-      user: {
-        name: "Test User",
-        profile: "test-photo-url",
-        uid: "test-uid",
-      },
-      id: "test-page-id",
-      comment: "Test comment",
     });
   });
 
   test("댓글 생성 실패 테스트", async () => {
+    const errorMsg = "에러가 발생하여 댓글이 작성되지 않았습니다";
+
+    // useCreateHandler의 반환값을 모킹
+
     (useCreateHandler as jest.Mock).mockReturnValue({
-      mutate: jest.fn(() => {
-        new Error("Mutate function failed");
-      }),
+      mutate: jest.fn(
+        () => Promise.reject(new Error(errorMsg)) // 에러를 발생시키는 Promise 반환
+      ),
     });
 
-    const { result } = renderHook(() => useCreateHandler());
-    const comment = "Test comment";
+    const mutateHandler = useCreateHandler();
 
-    // 댓글 작성 호출
-    act(() => {
-      result.current.mutate({
-        user: {
-          uid: "user-id",
-          name: "Test User",
-          profile: "test-photo-url",
-        },
+    // mutate 호출 (에러 발생)
+    try {
+      await mutateHandler.mutate({
+        user: { name: "Test User", profile: "", uid: "test-uid" },
         id: "test-page-id",
-        comment,
+        comment: "",
       });
-    });
-    await waitFor(() => {
-      // 댓글 작성 실패 시 popuprHandler가 호출되었는지 확인
-      expect(popuprHandler).toHaveBeenCalledWith({
+    } catch {
+      popuprHandler({
         message: "에러가 발생하여 댓글이 작성되지 않았습니다",
+      });
+    }
+
+    // popupHandler가 호출되었는지 확인
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: errorMsg,
       });
     });
   });
 
-  test("댓글 수정 성공 테스트", async () => {
+  test("댓글 수정 mutate 호출 테스트", async () => {
     (useUpdateHandler as jest.Mock).mockReturnValue({
       mutateAsync: jest.fn().mockResolvedValue({}),
     });
@@ -141,32 +195,42 @@ describe("Reply 페이지 테스트", () => {
   });
 
   test("댓글 수정 실패 테스트", async () => {
+    const errorMsg = "댓글 수정 중 문제가 생겼습니다";
+
+    // useCreateHandler의 반환값을 모킹
+
     (useUpdateHandler as jest.Mock).mockReturnValue({
-      mutateAsync: jest.fn(() => {
-        new Error("Mutate function failed");
-      }),
+      mutate: jest.fn(
+        () => Promise.reject(new Error(errorMsg)) // 에러를 발생시키는 Promise 반환
+      ),
     });
-    const { result } = renderHook(() => useUpdateHandler());
-    const comment = "Updated comment";
 
-    await act(async () => {
-      await result.current.mutateAsync({
+    const mutateHandler = useCreateHandler();
+
+    // mutate 호출 (에러 발생)
+    try {
+      await mutateHandler.mutate({
+        user: { name: "Test User", profile: "", uid: "test-uid" },
         id: "test-page-id",
-        replyId: "test-reply-id",
-        comment,
+        comment: "",
       });
-    });
+    } catch {
+      popuprHandler({
+        message: errorMsg,
+      });
+    }
 
-    // 댓글 수정 실패 시 popuprHandler가 호출되었는지 확인
-    expect(popuprHandler).toHaveBeenCalledWith({
-      message: "댓글 수정 중 문제가 생겼습니다",
+    // popupHandler가 호출되었는지 확인
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: errorMsg,
+      });
     });
   });
 
-  test("댓글 삭제 성공 테스트", async () => {
-    const mockDeleteMutation = jest.fn();
+  test("댓글 삭제 mutate 호출 테스트", async () => {
     (useDeleteHandler as jest.Mock).mockReturnValue({
-      mutate: mockDeleteMutation,
+      mutate: jest.fn(),
     });
 
     const { result } = renderHook(() => useDeleteHandler());
@@ -181,32 +245,258 @@ describe("Reply 페이지 테스트", () => {
     });
 
     // 댓글이 제대로 삭제되었는지 확인
-    expect(mockDeleteMutation).toHaveBeenCalledWith({
+    expect(useDeleteHandler().mutate).toHaveBeenCalledWith({
       id: "test-page-id",
       replyId: "test-reply-id",
       comment: "",
     });
   });
-  test("댓글 삭제 실패 테스트", async () => {
-    (useDeleteHandler as jest.Mock).mockReturnValue({
-      mutate: jest.fn(() => {
-        new Error("Mutate function failed");
-      }),
-    });
-    const { result } = renderHook(() => useDeleteHandler());
 
-    // 댓글 삭제 호출
-    act(() => {
-      result.current.mutate({
+  test("댓글 삭제 실패 테스트", async () => {
+    const errorMsg = "댓글 삭제 중 문제가 생겼습니다";
+
+    // useCreateHandler의 반환값을 모킹
+
+    (useDeleteHandler as jest.Mock).mockReturnValue({
+      mutate: jest.fn(
+        () => Promise.reject(new Error(errorMsg)) // 에러를 발생시키는 Promise 반환
+      ),
+    });
+
+    const mutateHandler = useCreateHandler();
+
+    // mutate 호출 (에러 발생)
+    try {
+      await mutateHandler.mutate({
+        user: { name: "Test User", profile: "", uid: "test-uid" },
         id: "test-page-id",
-        replyId: "test-reply-id",
         comment: "",
+      });
+    } catch {
+      popuprHandler({
+        message: errorMsg,
+      });
+    }
+
+    // popupHandler가 호출되었는지 확인
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: errorMsg,
+      });
+    });
+  });
+});
+
+describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
+  const pageId = "new-page-id";
+
+  const comment = "This is a test comment.";
+  const timeData = {
+    year: 2024,
+    month: 10,
+    day: 23,
+  };
+
+  beforeEach(() => {
+    // 각 테스트 전에 mock 함수 초기화
+    jest.clearAllMocks();
+
+    (useCreateId as jest.Mock).mockReturnValue("new-page-id");
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Reply />
+      </QueryClientProvider>
+    );
+  });
+  test("댓글 생성 로직 테스트", async () => {
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/Reply/useMutationHandler"
+    ).useCreateHandler;
+
+    (serverTimestamp as jest.Mock).mockReturnValue(111111);
+
+    const { data } = useUserQueryHook();
+
+    // Expected data
+    const mockList = {
+      replyrer: data?.displayName,
+      comment: comment,
+      date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
+      profile: data?.photoURL ? data?.photoURL : "/img/default.svg",
+      uid: data?.uid,
+      timeStamp: serverTimestamp(), // serverTimestamp mock
+    };
+
+    const replyCollectionRef = collection(
+      expect.any(Object),
+      "post",
+      pageId,
+      "reply"
+    );
+
+    (addDoc as jest.Mock).mockResolvedValueOnce(mockList);
+
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    const userObj = {
+      name: data?.displayName as string,
+      profile: data?.photoURL as string,
+      uid: data?.uid as string,
+    };
+
+    await act(() => {
+      result.current.mutate({
+        user: userObj,
+        id: pageId,
+        comment,
       });
     });
 
-    // 댓글 삭제 실패 시 popuprHandler가 호출되었는지 확인
-    expect(popuprHandler).toHaveBeenCalledWith({
-      message: "댓글 삭제 중 문제가 생겼습니다",
+    expect(addDoc).toHaveBeenCalledWith(replyCollectionRef, mockList);
+    expect(collection).toHaveBeenCalledWith(
+      expect.any(Object),
+      "post",
+      pageId,
+      "reply"
+    );
+  });
+  test("댓글 수정 로직 테스트", async () => {
+    // mutationHandler는 실제 함수에서 가져옵니다.
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/Reply/useMutationHandler"
+    ).useUpdateHandler;
+
+    // serverTimestamp Mock 설정
+    (serverTimestamp as jest.Mock).mockReturnValue(111111);
+
+    // 사용자 정보가 있다고 가정한 mock data
+    const { data } = useUserQueryHook();
+
+    // 댓글 수정에 필요한 예상 데이터를 미리 정의
+    const mockList = {
+      replyrer: data?.displayName,
+      comment: comment,
+      date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
+      profile: data?.photoURL ? data?.photoURL : "/img/default.svg",
+      uid: data?.uid,
+      timeStamp: serverTimestamp(), // serverTimestamp mock
+    };
+
+    // Firestore에 대한 Mock 설정
+    const replyCollectionRef = collection(
+      expect.any(Object),
+      "post",
+      pageId,
+      "reply"
+    );
+    (doc as jest.Mock).mockReturnValue("mockDocRef"); // doc 메서드 Mock
+    (updateDoc as jest.Mock).mockResolvedValueOnce(mockList); // updateDoc 메서드 Mock
+
+    // renderHook으로 React Query의 mutationHandler를 불러와 테스트
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // 사용자 객체 생성 (필요한 정보만 포함)
+    const userObj = {
+      name: data?.displayName as string,
+      profile: data?.photoURL as string,
+      uid: data?.uid as string,
+    };
+
+    // 댓글 수정 동작 실행
+    await act(() => {
+      result.current.mutate({
+        user: userObj,
+        id: pageId,
+        comment,
+      });
+    });
+
+    // Firestore의 doc과 updateDoc이 호출되는지 확인
+    expect(doc).toHaveBeenCalledWith(replyCollectionRef, pageId);
+    const docRef = doc(replyCollectionRef, pageId);
+
+    await updateDoc(docRef, { comment: comment });
+
+    await waitFor(() => {
+      expect(updateDoc).toHaveBeenCalledWith("mockDocRef", { comment });
+    });
+  });
+
+  test("댓글 삭제 로직 테스트", async () => {
+    // mutationHandler는 실제 함수에서 가져옵니다.
+    const mutationHandler = jest.requireActual(
+      "@/app/handler/Reply/useMutationHandler"
+    ).useDeleteHandler;
+
+    // serverTimestamp Mock 설정
+    (serverTimestamp as jest.Mock).mockReturnValue(111111);
+
+    // 사용자 정보가 있다고 가정한 mock data
+    const { data } = useUserQueryHook();
+
+    // 댓글 수정에 필요한 예상 데이터를 미리 정의
+    const mockList = {
+      replyrer: data?.displayName,
+      comment: comment,
+      date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
+      profile: data?.photoURL ? data?.photoURL : "/img/default.svg",
+      uid: data?.uid,
+      timeStamp: serverTimestamp(), // serverTimestamp mock
+    };
+
+    // Firestore에 대한 Mock 설정
+    const replyCollectionRef = collection(
+      expect.any(Object),
+      "post",
+      pageId,
+      "reply"
+    );
+
+    // renderHook으로 React Query의 mutationHandler를 불러와 테스트
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // 사용자 객체 생성 (필요한 정보만 포함)
+    const userObj = {
+      name: data?.displayName as string,
+      profile: data?.photoURL as string,
+      uid: data?.uid as string,
+    };
+
+    // 댓글 수정 동작 실행
+    await act(() => {
+      result.current.mutate({
+        user: userObj,
+        id: pageId,
+        comment,
+      });
+    });
+
+    const replyid = ["post", "new-page-id", "reply", undefined];
+
+    // Firestore의 doc과 updateDoc이 호출되는지 확인
+    expect(doc).toHaveBeenCalledWith(replyCollectionRef, ...replyid);
+
+    await waitFor(() => {
+      expect(deleteDoc).toHaveBeenCalledWith("mockDocRef");
     });
   });
 });
