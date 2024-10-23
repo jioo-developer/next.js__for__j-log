@@ -16,7 +16,7 @@ export const createReplyHandler = async ({ user, id, comment }: propsType) => {
     replyrer: user.name,
     comment: comment,
     date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
-    profile: user.profile,
+    profile: user.profile ? user.profile : "/img/default.svg",
     uid: user.uid,
     timeStamp: serverTimestamp(),
   };
