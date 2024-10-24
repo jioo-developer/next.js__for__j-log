@@ -31,18 +31,18 @@ describe("onfileChange 테스트", () => {
       files: [file],
     });
   });
-});
 
-test("파일이 없을 때 함수 실패 테스트", async () => {
-  const mockFiles: File[] = [];
+  test("파일이 없을 때 함수 실패 테스트", async () => {
+    const mockFiles: File[] = [];
 
-  // 모킹된 onFileChange 함수가 파일이 없을 때 오류를 발생시키도록 설정
-  (onFileChange as jest.Mock).mockRejectedValueOnce(
-    new Error("유효한 파일이 없습니다.")
-  );
+    // 모킹된 onFileChange 함수가 파일이 없을 때 오류를 발생시키도록 설정
+    (onFileChange as jest.Mock).mockRejectedValueOnce(
+      new Error("유효한 파일이 없습니다.")
+    );
 
-  // onFileChange가 파일이 없을 때 reject되도록 테스트
-  await expect(onFileChange(mockFiles)).rejects.toThrow(
-    "유효한 파일이 없습니다."
-  );
+    // onFileChange가 파일이 없을 때 reject되도록 테스트
+    await expect(onFileChange(mockFiles)).rejects.toThrow(
+      "유효한 파일이 없습니다."
+    );
+  });
 });
