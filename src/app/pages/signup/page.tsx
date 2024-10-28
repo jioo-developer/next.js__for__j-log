@@ -25,7 +25,7 @@ const SignupPage = () => {
 
   const router = useRouter();
 
-  const { nicknameData, error, isLoading } = useNameQueryHook();
+  const { nicknameData, isLoading } = useNameQueryHook();
 
   const crateAccount = useSignupHandler();
 
@@ -33,20 +33,18 @@ const SignupPage = () => {
     const isEmailCheck = validateEmail(email);
     if (!isEmailCheck) {
       popuprHandler({ message: "올바른 이메일 형식이 아닙니다." });
-    } else if (password.length < 8) {
+    } else if (isEmailCheck && password.length < 8) {
       popuprHandler({ message: "비밀번호가 짧습니다." });
     } else {
-      if (error === null && nicknameData.length > 0) {
-        const isNamecheck = nicknameData.includes(nickname);
-        if (isNamecheck) {
-          popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
-        } else {
-          crateAccount.mutate({
-            email: email,
-            password: password,
-            nickname: nickname,
-          });
-        }
+      const isNamecheck = nicknameData.includes(nickname);
+      if (isNamecheck) {
+        popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
+      } else {
+        crateAccount.mutate({
+          email: email,
+          password: password,
+          nickname: nickname,
+        });
       }
     }
   }
