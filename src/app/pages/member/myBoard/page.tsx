@@ -15,6 +15,10 @@ const MyBoardPage = () => {
     router.push(`/pages/detail/${myData[0].pageId}`);
   }
 
+  if (isLoading) {
+    return <div></div>;
+  }
+
   return (
     <>
       {!isLoading && user && myData.length > 0 ? (
