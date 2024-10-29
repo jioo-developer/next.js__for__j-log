@@ -25,6 +25,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { timeData } from "@/app/handler/commonHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -291,11 +292,6 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
   const pageId = "new-page-id";
 
   const comment = "This is a test comment.";
-  const timeData = {
-    year: 2024,
-    month: 10,
-    day: 23,
-  };
 
   beforeEach(() => {
     // 각 테스트 전에 mock 함수 초기화
