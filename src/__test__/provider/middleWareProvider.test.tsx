@@ -1,8 +1,5 @@
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import {
-  isSecondaryPw,
-  onGoogle,
-} from "@/app/api_hooks/login/snsLogin/googleLogin";
+import { isSecondaryPw } from "@/app/api_hooks/login/snsLogin/googleLogin";
 import MainPage from "@/app/pages/main/page";
 import MiddleWareProvider from "@/app/provider/middlewareProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

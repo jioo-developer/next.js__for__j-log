@@ -403,8 +403,6 @@ describe("좋아요 로직 테스트", () => {
       }); // 좋아요 수 업데이트 시도
     });
 
-    console.log(result.current);
-
     // Firestore의 doc과 updateDoc이 호출되었는지 확인
     expect(doc).toHaveBeenCalledWith(expect.anything(), "post", pageId);
     expect(updateDoc).toHaveBeenCalledWith(expect.anything(), {

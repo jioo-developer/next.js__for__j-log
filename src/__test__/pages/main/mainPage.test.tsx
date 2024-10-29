@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { searchStore } from "@/app/store/common";
-import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
