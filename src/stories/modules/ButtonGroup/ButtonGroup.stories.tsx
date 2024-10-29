@@ -5,6 +5,11 @@ import { Button } from "@/stories/atoms/Button";
 export default {
   title: "components/ButtonGroup",
   component: ButtonGroup,
+  tags: ["autodocs"],
+
+  parameters: {
+    controls: { expanded: true },
+  },
   argTypes: {
     direction: {
       control: {
@@ -30,7 +35,7 @@ type propsType = {
   gap: string;
 };
 
-export const buttonGroup = ({ direction, rightAlign, gap }: propsType) => {
+export const GroupButton = ({ direction, rightAlign, gap }: propsType) => {
   return (
     <ButtonGroup direction={direction} rightAlign={rightAlign} gap={gap}>
       <Button>취소</Button>
@@ -39,11 +44,11 @@ export const buttonGroup = ({ direction, rightAlign, gap }: propsType) => {
   );
 };
 
-buttonGroup.story = {
+GroupButton.story = {
   name: "Default",
 };
 
-export const rightAlign = () => {
+export const RightAlign = () => {
   return (
     <ButtonGroup rightAlign>
       <Button theme="success">취소</Button>
@@ -52,7 +57,7 @@ export const rightAlign = () => {
   );
 };
 
-export const column = () => {
+export const Column = () => {
   return (
     <ButtonGroup direction="column">
       <Button>CLICK ME</Button>
@@ -61,7 +66,7 @@ export const column = () => {
   );
 };
 
-export const customGap = () => {
+export const CustomGap = () => {
   return (
     <ButtonGroup gap="1rem">
       <Button theme="success">취소</Button>
@@ -70,7 +75,7 @@ export const customGap = () => {
   );
 };
 
-export const customGapColumn = () => {
+export const CustomGapColumn = () => {
   return (
     <ButtonGroup direction="column" gap="1rem">
       <Button>CLICK ME</Button>
