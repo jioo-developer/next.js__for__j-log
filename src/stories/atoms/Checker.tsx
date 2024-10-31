@@ -1,5 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import Image from "next/image";
+import "@/app/globals.css";
+import "@/app/_asset/storybook.scss";
 import {
   ChangeEvent,
   Dispatch,
@@ -51,9 +53,9 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
     const important1 = checkArr.includes("auth");
     const important2 = checkArr.includes("data");
     if (important1 && important2) {
-      setState(false);
-    } else {
       setState(true);
+    } else {
+      setState(false);
     }
   }, [checkArr]);
 
@@ -83,7 +85,6 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
             {checkArr.length === items.length && (
               <Image src="/img/checked.svg" alt="체크" width={25} height={25} />
             )}
-            전체 약관 동의
           </label>
           <p className="check_text">전체 약관 동의</p>
         </div>
@@ -117,7 +118,6 @@ const Checker = ({ allcheck = true, items, setState }: propsType) => {
                     height={25}
                   />
                 )}
-                {item.text}
               </label>
               <p className="check_text">
                 <span style={!item.important ? { opacity: 0 } : {}}>

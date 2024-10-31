@@ -1,8 +1,7 @@
-import React from "react";
 import { Button } from "./Button";
 
 export default {
-  title: "atoms /Button",
+  title: "atoms/Button",
   component: Button,
   tags: ["autodocs"],
 
@@ -11,10 +10,6 @@ export default {
   },
 
   argTypes: {
-    theme: {
-      control: "select",
-      option: ["default", "success", "primary"],
-    },
     width: {
       control: { type: "number", min: 400, max: 1200 },
     },
@@ -31,38 +26,29 @@ export default {
   },
 };
 
-export const DefaultButton = () => {
-  return (
-    <Button theme="white" width={120} height={50}>
-      버튼
-    </Button>
-  );
+export const Default = {
+  args: {
+    theme: "white",
+    width: 120,
+    height: 50,
+    children: "버튼",
+  },
 };
 
-DefaultButton.story = {
-  name: "default",
+export const Success = {
+  args: {
+    theme: "success",
+    width: 120,
+    height: 50,
+    children: "버튼",
+  },
 };
 
-export const SuccessButton = () => {
-  return (
-    <Button theme="success" width={120} height={50}>
-      버튼
-    </Button>
-  );
-};
-
-SuccessButton.story = {
-  name: "success",
-};
-
-export const PrimaryButton = () => {
-  return (
-    <Button theme="primary" width={120} height={50}>
-      버튼
-    </Button>
-  );
-};
-
-PrimaryButton.story = {
-  name: "primary",
+export const Primary = {
+  args: {
+    theme: "primary",
+    width: 120,
+    height: 50,
+    children: "버튼",
+  },
 };
