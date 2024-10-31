@@ -14,9 +14,18 @@ const config: StorybookConfig = {
     options: {},
   },
   staticDirs: ["..\\public"],
-  babel: async (options) => {
-    options.presets?.push('@emotion/babel-preset-css-prop');
-    return options;
-  }
+  babel: async (config) => ({
+    ...config,
+    presets: [
+      [
+        "next/babel",
+        {
+          "preset-react": {
+            runtime: "automatic",
+          },
+        },
+      ],
+    ],
+  }),
 };
 export default config;
