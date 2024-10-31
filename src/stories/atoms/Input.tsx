@@ -17,6 +17,10 @@ interface propsType extends styleProps {
   placeholder?: string;
 }
 
+/**
+ * Input의 타입은 id / pw / textarea / email / text 로 나뉩니다
+ */
+
 export const Input = ({
   width = 375,
   height = "auto",

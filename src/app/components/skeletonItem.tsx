@@ -3,12 +3,7 @@ const postItem = () => {
   return (
     <div className="post skeleton" data-testid="skeleton">
       <figure className="thumbnail">
-        <div
-          style={{
-            width: 300,
-            height: 180,
-          }}
-        ></div>
+        <div></div>
       </figure>
       <div className="text_wrap">
         <p className="post_title"></p>

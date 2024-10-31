@@ -21,7 +21,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [disable, setDisable] = useState(true);
+  const [chekcedEnd, setChecked] = useState(false);
 
   const router = useRouter();
 
@@ -115,12 +115,12 @@ const SignupPage = () => {
           </label>
         </div>
 
-        <Checker allcheck items={authData} setState={setDisable} />
+        <Checker allcheck items={authData} setState={setChecked} />
         <Button
           width={"full"}
           theme="primary"
-          className={disable ? "un_btn" : "btn"}
-          disable={disable}
+          className={!chekcedEnd ? "un_btn" : "btn"}
+          disable={!chekcedEnd}
         >
           회원가입
         </Button>
