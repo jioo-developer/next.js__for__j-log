@@ -103,14 +103,6 @@
       }
     }
 
-    .check_text {
-      display: inline-block;
-      margin-left: 7px;
-      span {
-        color: #ff0000d9;
-      }
-    }
-
     .check_wrap {
       border: 1px solid #eee;
       box-sizing: border-box;
@@ -137,11 +129,6 @@
         box-sizing: border-box;
         cursor: pointer;
         font-size: 0;
-      }
-
-      .check_text {
-        color: #686868;
-        font-size: 15px;
       }
     }
   }

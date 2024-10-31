@@ -1,0 +1,16 @@
+.all_check {
+  display: flex;
+  @include size();
+  margin-bottom: 12px;
+}
+
+.check_wrap li {
+  display: flex;
+  @include size();
+  margin-bottom: 12px;
+  cursor: pointer;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

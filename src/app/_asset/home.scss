@@ -156,3 +156,8 @@ body {
 body:has(.is__white_bg) {
   background: #fff;
 }
+
+.skeleton .thumbnail div {
+  width: 300px;
+  height: 180px;
+}

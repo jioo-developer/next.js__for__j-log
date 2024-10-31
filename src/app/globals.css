@@ -77,3 +77,29 @@ button {
 #root {
   background: rgba(249, 249, 249, 0.7803921569);
 }
+
+input[type="checkbox"] {
+  display: none;
+}
+
+.text-blind {
+  font-size: 0;
+}
+
+.check {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.check + p {
+  display: inline-block;
+  padding-left: 8px;
+  color: #686868;
+  font-size: 15px;
+  span {
+    color: rgba(255, 0, 0, 0.8509803922);
+  }
+}
