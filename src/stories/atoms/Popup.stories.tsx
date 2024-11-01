@@ -1,44 +1,109 @@
-// popup.stories.ts
-import { Popup } from "./Popup";
-import { Button } from "@/stories/atoms/Button";
+// Popup.stories.tsx
+/** @jsxImportSource @emotion/react */
+import { Popup } from "@/stories/atoms/Popup"; // 실제 Popup 컴포넌트 경로로 업데이트하세요
+import { Meta, StoryObj } from "@storybook/react";
+import { Button } from "./Button";
 
 export default {
-  title: "Components/Popup", // Storybook에서 `Popup` 컴포넌트를 "Components/Popup"으로 찾을 수 있도록 설정합니다.
+  title: "ATOMS/Popup",
   component: Popup,
   tags: ["autodocs"],
-
-  parameters: {
-    controls: { expanded: true },
-  },
   argTypes: {
     type: {
-      control: {
-        type: "select",
-        options: ["alert", "custom"],
-      },
+      control: { type: "select" },
+      options: ["alert", "custom"],
+      description: "팝업 유형",
+    },
+    direction: {
+      control: { type: "select" },
+      options: ["row", "column"],
+      description: "팝업 내부 컨텐츠의 레이아웃 방향",
     },
     textAlign: {
-      control: {
-        type: "select",
-        options: ["left", "center", "right"],
-      },
+      control: { type: "select" },
+      options: ["left", "center"],
+      description: "팝업의 주요 텍스트 정렬",
     },
-    width: { control: "text" },
-    height: { control: "text" },
-    top: { control: "boolean" },
+    subText: {
+      control: { type: "text" },
+      description: "팝업에 표시되는 추가 텍스트",
+    },
+    customText: {
+      control: { type: "text" },
+      description: "주요 팝업 메시지에 대한 사용자 정의 텍스트",
+    },
+    width: {
+      control: { type: "text" },
+      description: "팝업의 너비",
+    },
+    height: {
+      control: { type: "text" },
+      description: "팝업의 높이",
+    },
+    top: {
+      control: false,
+    },
   },
 };
 
-// 기본 Alert 타입 팝업 예제
-export const popup = () => {
-  return (
-    <Popup
-      type="alert"
-      handText="Alert Message"
-      subText="This is an alert popup."
-      top
-    >
-      <Button theme="success">확인</Button>
-    </Popup>
-  );
+type Story = StoryObj<typeof Popup>;
+
+export const AlertPopup: Story = {
+  args: {
+    type: "alert",
+    width: "25rem",
+    height: "auto",
+    textAlign: "left",
+    subText: "이것은 예시 서브 텍스트입니다.",
+    customText: "알림 팝업",
+    top: true,
+  },
+};
+
+export const CustomPopupWithChildren: Story = {
+  args: {
+    type: "custom",
+    width: "25rem",
+    height: "auto",
+    customText: "자식이 포함된 사용자 정의 팝업",
+    top: true,
+    children: (
+      <>
+        <p> 사용자 지정 Element</p>
+        <br />
+        <Button theme="success">버튼</Button>
+      </>
+    ),
+  },
+};
+
+export const CenterAlignedTextPopup: Story = {
+  args: {
+    type: "alert",
+    textAlign: "center",
+    width: "25rem",
+    height: "auto",
+    customText: "중앙 정렬 텍스트 팝업",
+    top: true,
+  },
+};
+
+export const PopupWithOnlyCustomTitle: Story = {
+  args: {
+    type: "alert",
+    customText: "사용자 정의 텍스트만 포함된 팝업",
+    width: "25rem",
+    height: "auto",
+    top: true,
+  },
+};
+
+export const PopupWithSubTextOnly: Story = {
+  args: {
+    type: "alert",
+    subText: "서브 텍스트만 표시됩니다.",
+    width: "25rem",
+    height: "auto",
+    top: true,
+  },
 };

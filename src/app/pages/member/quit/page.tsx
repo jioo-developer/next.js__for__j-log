@@ -60,7 +60,7 @@ const QuitPage = ({ user, setQuit }: propsType) => {
     <Popup
       type="custom"
       width="28rem;"
-      handText="정말로 계정을 삭제 하시겠습니까?"
+      customText="정말로 계정을 삭제 하시겠습니까?"
     >
       <ButtonGroup>
         <Button onClick={() => setQuit(false)}>취소</Button>

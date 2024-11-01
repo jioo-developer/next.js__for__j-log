@@ -1,9 +1,14 @@
 // promptPopup.stories.ts
-import { Meta } from "@storybook/react";
+import "@/app/_asset/common.scss";
 import PromptPopup from "./PromptPopup";
+import { Popup } from "@/stories/atoms/Popup";
+import { Input } from "@/stories/atoms/Input";
+import ButtonGroup from "../ButtonGroup/ButtonGroup";
+import { Button } from "@/stories/atoms/Button";
+import { useState } from "react";
 
 export default {
-  title: "Components/PromptPopup", // Storybook에서 `PromptPopup` 컴포넌트를 "Components/PromptPopup"으로 찾을 수 있도록 설정합니다.
+  title: "Components/PromptPopup",
   component: PromptPopup,
   tags: ["autodocs"],
 
@@ -13,22 +18,42 @@ export default {
   argTypes: {
     width: { control: "text" },
     height: { control: "text" },
+    placeholder: {
+      control: {
+        type: "select",
+        options: [
+          "아이디를 입력하세요.",
+          "비밀번호를 8자리 이상 입력하세요.",
+          "내용을 입력하세요.",
+          "이메일을 입력하세요.",
+        ],
+      },
+    },
   },
-} as Meta;
+};
 
-// 기본 Prompt 팝업 예제
-export const DefaultPromptPopup = () => <PromptPopup />;
-
-/*
-코드 설명:
-
-1. `Meta` 설정:
-   - Storybook에서 `PromptPopup` 컴포넌트를 "Components/PromptPopup"으로 등록하고, 여러 속성(`width`, `height`, `top`)을 Storybook에서 조정할 수 있게 합니다.
-
-2. 각 Prompt 팝업 스토리:
-   - `DefaultPromptPopup`: 기본 설정으로 `PromptPopup`을 렌더링합니다.
-   - `TopPositionedPromptPopup`: `top` 속성을 활성화해 팝업이 화면 상단에 위치하도록 렌더링합니다.
-   - `SizedPromptPopup`: `width`와 `height` 값을 달리해 크기가 다른 `PromptPopup`을 테스트합니다.
-
-이 구성으로 Storybook에서 `PromptPopup` 컴포넌트를 다양한 조건에서 테스트할 수 있습니다.
-*/
+export const Default = {
+  args: {
+    placeholder: "아이디를 입력하세요.", // 기본 placeholder 값 설정
+  },
+  render: (args: any) => {
+    const [state, setState] = useState("");
+    return (
+      <>
+        <Popup type="custom" width="28rem;" top customText="제목">
+          <Input
+            type="password"
+            width="full"
+            setstate={setState}
+            placeholder={args.placeholder}
+          />
+          <ButtonGroup>
+            <Button>취소</Button>
+            <Button theme="success">확인</Button>
+          </ButtonGroup>
+        </Popup>
+        <p>입력 값 : {state}</p>
+      </>
+    );
+  },
+};

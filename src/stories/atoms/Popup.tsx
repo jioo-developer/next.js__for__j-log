@@ -7,15 +7,13 @@ import { popupInit } from "@/app/handler/error/ErrorHandler";
 
 type propsType = {
   type?: "alert" | string;
-  rightAlign?: boolean;
   top?: boolean;
   width?: number | string;
   height?: number | string;
-  direction?: "row" | "column";
-  textAlign?: "left" | "center" | "right";
+  textAlign?: "left" | "center";
   subText?: string;
   children?: ReactNode;
-  handText?: string;
+  customText?: string;
 };
 
 export const Popup = ({
@@ -26,7 +24,7 @@ export const Popup = ({
   textAlign = "left",
   subText,
   children,
-  handText = "",
+  customText = "",
 }: propsType) => {
   const msgContent = popupMessageStore();
 
@@ -42,7 +40,7 @@ export const Popup = ({
               font-weight: bold;
             `}
           >
-            {handText === "" ? msgContent.message : handText}
+            {customText === "" ? msgContent.message : customText}
           </p>
           {subText && (
             <p
@@ -56,7 +54,11 @@ export const Popup = ({
             </p>
           )}
           {type === "alert" ? (
-            <Button theme="success" onClick={popupInit}>
+            <Button
+              theme="success"
+              width={textAlign === "center" ? "full" : 100}
+              onClick={popupInit}
+            >
               확인
             </Button>
           ) : (

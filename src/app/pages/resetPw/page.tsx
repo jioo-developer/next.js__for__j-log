@@ -42,7 +42,7 @@ const ResetPwPage = () => {
   };
 
   return (
-    <Popup type="custom" width="28rem;" handText="비밀번호를 잊어버리셨나요?">
+    <Popup type="custom" width="28rem;" customText="비밀번호를 잊어버리셨나요?">
       <Input type="email" width="full" setstate={setFindPw} />
       <ButtonGroup>
         <Button onClick={() => router.push("/pages/login")}>취소</Button>
