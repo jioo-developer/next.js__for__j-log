@@ -5,7 +5,7 @@ import ButtonGroup from "../ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 
 export default {
-  title: "Components/ConfirmPopup",
+  title: "MODULES/ConfirmPopup",
   component: ConfirmPopup,
 
   tags: ["autodocs"],

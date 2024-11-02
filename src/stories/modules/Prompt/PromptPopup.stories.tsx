@@ -8,7 +8,7 @@ import { Button } from "@/stories/atoms/Button";
 import { useState } from "react";
 
 export default {
-  title: "Components/PromptPopup",
+  title: "MODULES/PromptPopup",
   component: PromptPopup,
   tags: ["autodocs"],
 
