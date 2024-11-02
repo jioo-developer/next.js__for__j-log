@@ -1,8 +1,8 @@
 import "@/app/_asset/home.scss";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { pageInfoStore } from "../store/common";
-import { FirebaseData } from "../api_hooks/detail/getDetailHook";
+import { pageInfoStore } from "../../../app/store/common";
+import { FirebaseData } from "../../../app/api_hooks/detail/getDetailHook";
 
 type itemProps = {
   item: FirebaseData;

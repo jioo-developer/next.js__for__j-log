@@ -1,6 +1,6 @@
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import MainPage from "@/app/pages/main/page";
-import SkeletonItem from "@/app/components/SkeletonItem";
+import SkeletonItem from "@/stories/modules/utils/SkeletonItem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { usePathname } from "next/navigation";

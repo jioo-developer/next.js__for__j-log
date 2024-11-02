@@ -4,7 +4,7 @@ import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import SearchIcon from "./SearchIcon";
+import SearchIcon from "@/stories/modules/utils/SearchIcon";
 import { searchStore } from "../store/common";
 import { useLogOut } from "../handler/commonHandler";
 

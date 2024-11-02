@@ -6,7 +6,13 @@ button.noShadow {
 
 .post.skeleton {
   gap: 16px;
-  figure,
+
+  figure {
+    margin-right: 0;
+    margin-left: 0;
+    background: #e7e7e7;
+  }
+
   .post_text,
   .text_wrap p {
     background: #e7e7e7;

@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import userQueryHook from "@/app/api_hooks/login/getUserHook";
-import SkeletonItem from "@/app/components/SkeletonItem";
-import PostItem from "@/app/components/PostItem";
+import SkeletonItem from "@/stories/modules/utils/SkeletonItem";
+import PostItem from "@/stories/modules/PostItem/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { searchStore } from "@/app/store/common";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";

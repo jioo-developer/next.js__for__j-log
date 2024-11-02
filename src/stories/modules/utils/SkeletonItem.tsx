@@ -1,4 +1,5 @@
 import "@/app/_asset/home.scss";
+import "@/app/_asset/common.scss";
 const postItem = () => {
   return (
     <div className="post skeleton" data-testid="skeleton">
