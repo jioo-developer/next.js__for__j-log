@@ -8,5 +8,11 @@ export default {
 };
 
 export const Skeleton = () => {
-  return <SkeletonItem />;
+  return (
+    <div className="in_wrap">
+      <div className="post_section">
+        <SkeletonItem />
+      </div>
+    </div>
+  );
 };

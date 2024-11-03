@@ -19,8 +19,8 @@ const mockData: FirebaseData = {
   title: "포스트 제목",
   text: "이것은 포스트의 내용을 보여주는 예시 텍스트입니다.",
   date: "2024-11-02",
-  url: ["/img/example.jpg"], // 예시 이미지 URL
-  profile: "/img/profile.jpg", // 예시 프로필 이미지 URL
+  url: ["/img/no-image.jpg"], // 예시 이미지 URL
+  profile: "/img/default.svg", // 예시 프로필 이미지 URL
   user: "user123",
   favorite: 42,
 } as unknown as FirebaseData;
