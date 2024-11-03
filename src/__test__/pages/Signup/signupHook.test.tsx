@@ -1,8 +1,7 @@
 import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
-import useSignupHandler from "@/app/api_hooks/signup/signupHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { QueryClient } from "@tanstack/react-query";
+import { waitFor } from "@testing-library/react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";

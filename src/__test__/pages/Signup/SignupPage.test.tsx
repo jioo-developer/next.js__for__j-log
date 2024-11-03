@@ -68,11 +68,14 @@ describe("회원가입 페이지 테스트", () => {
 
     const { checkbox, privateCheckbox } = commonElement();
 
-    const isCheckbox = checkbox.checked;
+    const isCheckbox = (checkbox.previousElementSibling as HTMLInputElement)
+      .checked;
 
     expect(isCheckbox).toBe(false);
 
-    const isPrivateCheckbox = privateCheckbox.checked;
+    const isPrivateCheckbox = (
+      privateCheckbox.previousElementSibling as HTMLInputElement
+    ).checked;
 
     expect(isPrivateCheckbox).toBe(false);
 
