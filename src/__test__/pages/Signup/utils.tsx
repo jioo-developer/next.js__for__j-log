@@ -9,12 +9,11 @@ export const commonElement = () => {
   const nicknameInput = screen.getByLabelText("닉네임") as HTMLInputElement;
   const signupForm = emailInput.closest("form") as HTMLFormElement;
 
-  const checkbox = screen.getByLabelText(
-    "회원가입 및 운영약관 동의"
-  ) as HTMLInputElement;
-  const privateCheckbox = screen.getByLabelText(
-    "개인정보 수집 및 동의"
-  ) as HTMLInputElement;
+  const checkbox = screen.getByText("회원가입 및 운영약관 동의")
+    .previousElementSibling as HTMLInputElement;
+
+  const privateCheckbox = screen.getByText("개인정보 수집 및 동의")
+    .previousElementSibling as HTMLInputElement;
 
   return {
     emailInput,
@@ -30,14 +29,16 @@ export const isSubmitActive = () => {
   const { checkbox, privateCheckbox } = commonElement();
   const checkboxResult = fireEvent.click(checkbox);
 
-  const isCheckbox = checkbox.checked;
-
+  const isCheckbox = (checkbox.previousElementSibling as HTMLInputElement)
+    .checked;
   expect(checkboxResult).toBe(true);
   expect(isCheckbox).toBe(true);
 
   const privateResult = fireEvent.click(privateCheckbox);
 
-  const isPrivatebox = privateCheckbox.checked;
+  const isPrivatebox = (
+    privateCheckbox.previousElementSibling as HTMLInputElement
+  ).checked;
 
   expect(privateResult).toBe(true);
   expect(isPrivatebox).toBe(true);
