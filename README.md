@@ -39,3 +39,11 @@
 ## Preview
 
   <img src="./public/img/preview.jpg" alt="" />
+
+## storybook Preview
+
+  <img src="./public/img/storybook.jpg" alt="" />
+
+## test preview
+
+  <img src="./public/img/jest.jpg" alt="" />
