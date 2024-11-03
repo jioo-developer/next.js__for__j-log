@@ -40,6 +40,10 @@
 
   <img src="./public/img/preview.jpg" alt="" />
 
+## directory map
+
+  <img src="./public/img/map.jpg" alt="" />
+
 ## storybook Preview
 
   <img src="./public/img/storybook.jpg" alt="" />
