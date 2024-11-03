@@ -17,12 +17,18 @@
   <br />
   <br />
 
-## 프로젝트 아이디어
+## 프로젝트 기술 채용 이유
 
-1. 개인 사이드 프로젝트를 하면서 백엔드를 연동 할 수 없을까 생각하다 firebase 를 채용
-2. firebase와 api 통신을 하면서 상태관리에 간편한 react-query를 채용
-   <br />
-   <br />
+1. 개발언어 : 현재 프론트엔드 채용 시장에서 가장 많이 사용되는 typescript 및 React로 선정
+2. 개발환경 : 본 프로젝트가 블로그형 커뮤니티 프로젝트 이기에 SEO가 필요하다고 생각 CSR인 React 보다는 SSR인 NEXT.JS를 사용 하는 것이 적합하다고 느껴 채용
+   (하지만 SSR의 제대로 된 사용은 못 해본 상황, 아무래도 서버 통신을 React query로 하기 때문이라고 생각)
+3. UI 스타일링
+
+- styled components를 사용하지 않은 이유 : SSR에선 서버 > 클라이언트에서 한 페이지의 HTML을 생성하여 보낸 후 클라이언트에서 hyduration 작업을 하게 되는데
+  이 작업 중 styled가 누락되어 document나 layout에서 한번더 ssr 사용 작업을 해줘야 하기 때문
+- tailwind를 사용 하지 않은 이유 : 본 프로젝트에서는 reset 관련 스타일링은 css / 페이지 레이아웃 관련 스타일링은 scss / 공용 컴포넌트 관련 스타일링은 emotion으로 진행 하기 때문에 tailwind가 필요 하지 않음
+  <br />
+  <br />
 
 ## Preview
 
