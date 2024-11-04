@@ -7,7 +7,7 @@
 - 개발 언어 : Typescript & React
 - 개발 환경 : Next.js 14
 - UI 스타일링 : emotion & SCSS
-- 컴포넌트 관리 : Storybook
+- 컴포넌트 관리 : Storybook (배포 : Chromatic)
 - 클라이언트 상태관리 : zustand
 - 서버 상태관리 : React Query
 - 사용 DB : Firebase
