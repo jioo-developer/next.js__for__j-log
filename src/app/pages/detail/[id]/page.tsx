@@ -34,6 +34,7 @@ const DetailPage = () => {
       }
     }
   }, [pageData, isLoading]);
+  // 페이지 정보가 없을 때 팝업 노출
 
   useEffect(() => {
     popupMessageStore.subscribe((state, prevState) => {
@@ -43,6 +44,7 @@ const DetailPage = () => {
       }
     });
   }, [msg]);
+  // 팝업 노출 후 확인 눌렀을 시 메인페이지로 이동
 
   function favoriteHandler() {
     const getcookie = `${user}-Cookie`;
@@ -53,6 +55,8 @@ const DetailPage = () => {
       });
     }
   }
+
+  // 좋아요 조절 함수
 
   useEffect(() => {
     if (ispopupClick) {

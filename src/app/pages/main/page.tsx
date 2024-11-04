@@ -42,6 +42,8 @@ const MainPage = () => {
     }
   }, [searchInfo.isSearch]);
 
+  // 검색 결과만 추출해서 return 하는 함수
+
   const fallbackHandler = () => {
     if (!rootPath) {
       return [1, 2, 3].map((item) => {
@@ -49,6 +51,7 @@ const MainPage = () => {
       });
     }
   };
+  // skeleton 랜더링 함수
 
   const showDataHandler = () => {
     if (data) {
@@ -58,6 +61,7 @@ const MainPage = () => {
       });
     }
   };
+  // 게시글 랜더링 함수
 
   return (
     <div className="post_section">

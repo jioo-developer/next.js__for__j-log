@@ -64,6 +64,9 @@ const EditorPage = () => {
     }
   }
 
+  // image url 생성 함수
+
+  // 게시글 생성 및 수정 함수
   async function CreateHandler() {
     const content = {
       title,
@@ -75,11 +78,13 @@ const EditorPage = () => {
       url: await imageUrl(),
       priority: priorty,
     };
+    // 게시글 수정 일 때
     if (editMode) {
       const obj = { ...(pageData as FirebaseData) };
       const resultObj = Object.assign(obj, content);
       postMutate.mutate({ data: resultObj, pageId: pageInfo });
     } else {
+      // 게시글 생성 일 때
       const addContent = setDataHandler(content);
       postMutate.mutate({ data: addContent, pageId: pageInfo });
     }

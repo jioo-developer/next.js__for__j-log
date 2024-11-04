@@ -45,7 +45,9 @@ const SocialLoginPage = () => {
   async function LoginHandler() {
     try {
       const googleUser = await onGoogle();
+      // 구글로그인이 맞는지 검증
       const isUserSecondPw = await isSecondaryPw(googleUser.userId);
+      // 초기 2차 비밀번호가 설정 되었는 지 검증
       if (!isUserSecondPw) {
         popuprHandler({
           message: "회원탈퇴에 사용 될 2차 비밀번호를 입력해주세요.",

@@ -46,10 +46,13 @@ const QuitPage = ({ user, setQuit }: propsType) => {
   async function deleteHandler(isSosial?: boolean) {
     try {
       deleteUserDB();
+      // 계정에 등록된 이미지나 포스트를 삭제
       if (isSosial) {
         SocialDeleteHandler();
+        // 소셜 로그인 삭제
       } else {
         originDeleteHandler({ data: user, password: quitPw });
+        // 기존 로그인 삭제
       }
     } catch {
       popuprHandler({ message: "회원탈퇴 도중 에러가 발생하였습니다" });

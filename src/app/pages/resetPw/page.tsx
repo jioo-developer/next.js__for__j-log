@@ -25,12 +25,15 @@ const ResetPwPage = () => {
       router.push("/pages/login");
     }
   }, [data, isLoading]);
+  // 유저 데이터가 있으면 login 페이지로 이동 (로그인 되어 있는  상태에선 사용 X)
 
   const resetHandler = async () => {
     try {
-      await sendPasswordResetEmail(authService, findPw);
       const isEmail = validateEmail(findPw);
+      // 올바른 이메일 인지 검증
       if (isEmail) {
+        await sendPasswordResetEmail(authService, findPw);
+        // 비밀번호 찾는 이메일 보내는  함수
         popuprHandler({ message: "입력하신 메일로 비밀번호 안내드렸습니다" });
         router.push("/pages/login");
       } else {

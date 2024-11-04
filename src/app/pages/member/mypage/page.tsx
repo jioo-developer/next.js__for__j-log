@@ -35,6 +35,7 @@ function MyPage() {
   async function changeNameHandler() {
     if (nicknameData && data) {
       const isNamecheck = nicknameData.includes(nickname);
+      // 닉네임 중복 체크
       if (!isNamecheck) {
         nameChangeMutate.mutate({ data, nickname });
         setnameToggle(!nameToggle);
@@ -50,7 +51,9 @@ function MyPage() {
     if (theFiles.length > 0) {
       try {
         const { result, files } = await onFileChange(theFiles);
+        // 업로드 한  파일을 URL로 변환하는 함수
         const upload = await storageUpload(result, files);
+        // Firebase에 등록 할 수 있게 URL 변환
         try {
           await updateProfile(user as User, { photoURL: upload[0] });
           // 배열이 하나 이므로 [0] 으로 고정 대체
