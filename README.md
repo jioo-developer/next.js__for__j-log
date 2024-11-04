@@ -14,6 +14,7 @@
 - 테스트 : Jest + RTL
 - 형상관리 : github
 - CI/CD : git actions
+- privatekey : env으로 처리
   <br />
   <br />
 
