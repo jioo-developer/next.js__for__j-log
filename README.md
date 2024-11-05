@@ -15,6 +15,7 @@
 - 형상관리 : github
 - CI/CD : git actions
 - privatekey : env으로 처리
+- 배포 : vercel
   <br />
   <br />
 
