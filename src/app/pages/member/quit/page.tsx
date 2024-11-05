@@ -12,12 +12,7 @@ import { Popup } from "@/stories/atoms/Popup";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 
-type propsType = {
-  user: User;
-  setQuit: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const QuitPage = ({ user, setQuit }: propsType) => {
+const QuitPage = ({ user, setQuit }: any) => {
   const [quitPw, setPw] = useState("");
   const isPopupClick = popupMessageStore().isClick;
 
@@ -28,7 +23,7 @@ const QuitPage = ({ user, setQuit }: propsType) => {
   }, [isPopupClick]);
 
   async function LogintypeCheck() {
-    const Credential = await isCredential(user);
+    const Credential = await isCredential(user as User);
     // 계정 타입을 체크
 
     if (Credential === "sosial") {
