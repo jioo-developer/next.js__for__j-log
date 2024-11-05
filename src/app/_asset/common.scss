@@ -62,11 +62,14 @@ button.noShadow {
   display: flex;
   width: 100%;
   gap: 16px;
+  align-items: center;
   input {
     display: block;
   }
   label {
     display: flex;
+    width: 123px;
+    height: auto;
     img {
       order: 0;
     }
