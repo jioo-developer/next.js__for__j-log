@@ -107,7 +107,7 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
   test("유저 정보가 있고 2차 비밀번호 검증에 성공 했을 시 라우팅 유지", async () => {
     (usePathname as jest.Mock).mockReturnValueOnce("/pages/main");
     (useUserQueryHook as jest.Mock).mockReturnValue({
-      data: { uid: "123" },
+      data: { uid: "123", providerData: [{ providerId: "password" }] },
       error: null,
       isLoading: false,
       refetch: jest.fn(),
@@ -118,15 +118,19 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
   });
 
   test("검증에 실패 했을 시 로그인 페이지로 리다이렉트 되는지 확인", async () => {
+    (useUserQueryHook as jest.Mock).mockReturnValue({
+      data: { uid: "123", providerData: [{ providerId: "google" }] },
+      error: null,
+      isLoading: false,
+      refetch: jest.fn(),
+    });
     (usePathname as jest.Mock).mockReturnValueOnce("/pages/main");
 
     (isSecondaryPw as jest.Mock).mockResolvedValueOnce(false);
 
     (authService.signOut as jest.Mock).mockResolvedValueOnce(true);
 
-    const secondFun = await isSecondaryPw("123");
-    //return이 false
-    expect(secondFun).toBe(false);
+    await isSecondaryPw("123");
 
     await act(() => {
       render(
