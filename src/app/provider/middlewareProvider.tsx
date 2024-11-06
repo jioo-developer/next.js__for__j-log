@@ -43,6 +43,8 @@ const MiddleWareProvider = ({ children }: childrenProps) => {
       popupInit();
       // 팝업 CLOSE
       if (!data) {
+        console.log(data);
+        console.log("실행");
         router.handler.push("/pages/login");
         // 유저 정보가 없을 시 로그인 페ㅣ이지로 이동
       } else {
