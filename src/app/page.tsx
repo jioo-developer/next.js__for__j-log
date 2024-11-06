@@ -1,4 +1,5 @@
-import Main from "@/app/pages/main/page";
+import { redirect } from "next/navigation";
+
 export default function Root() {
-  return <Main />;
+  redirect("/pages/main");
 }

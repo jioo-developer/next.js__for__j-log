@@ -6,7 +6,6 @@ import PostItem from "@/stories/modules/PostItem/PostItem";
 import usePostQueryHook from "@/app/api_hooks/main/getPostHook";
 import { searchStore } from "@/app/store/common";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
-import { usePathname, useRouter } from "next/navigation";
 
 const MainPage = () => {
   const [postState, setState] = useState<FirebaseData[]>([]);
@@ -18,19 +17,6 @@ const MainPage = () => {
     params: searchStore().searchText,
     isSearch: searchStore().searchText !== "" ? true : false,
   };
-
-  const router = {
-    pathname: usePathname(),
-    handler: useRouter(),
-  };
-
-  const rootPath = router.pathname === "/";
-
-  useEffect(() => {
-    if (rootPath) {
-      window.location.href = "/pages/main";
-    }
-  }, []);
 
   useEffect(() => {
     if (searchInfo.isSearch) {
@@ -45,11 +31,9 @@ const MainPage = () => {
   // 검색 결과만 추출해서 return 하는 함수
 
   const fallbackHandler = () => {
-    if (!rootPath) {
-      return [1, 2, 3].map((item) => {
-        return <SkeletonItem key={item} />;
-      });
-    }
+    return [1, 2, 3].map((item) => {
+      return <SkeletonItem key={item} />;
+    });
   };
   // skeleton 랜더링 함수
 
