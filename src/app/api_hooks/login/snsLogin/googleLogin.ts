@@ -26,18 +26,12 @@ export async function isSecondaryPw(id: string) {
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    if (docSnap.data().service === "password") {
-      return true;
-    }
-
     if (docSnap.data().service !== "password" && docSnap.data().password) {
       return true;
     } else {
       return false;
       // 문서 안에 service 타입과 패스워드가 있는지 체크
     }
-  } else {
-    return false;
   }
 }
 

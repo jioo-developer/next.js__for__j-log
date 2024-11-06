@@ -43,10 +43,13 @@ const MiddleWareProvider = ({ children }: childrenProps) => {
       popupInit();
       // 팝업 CLOSE
       if (!data) {
-        // router.handler.push("/pages/login");
+        router.handler.push("/pages/login");
         // 유저 정보가 없을 시 로그인 페ㅣ이지로 이동
       } else {
-        isSecondaryHandler();
+        const providerId = data.providerData[0].providerId;
+        if (providerId !== "password") {
+          isSecondaryHandler();
+        }
         // 소셜 로그인시 최초 2차 비밀번호 생성 검증 함수로 이동
       }
     }
