@@ -113,6 +113,13 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
       refetch: jest.fn(),
     });
     (isSecondaryPw as jest.Mock).mockResolvedValueOnce(true);
+
+    const result = await isSecondaryPw("123");
+
+    await waitFor(() => {
+      expect(result).toBe(true);
+    });
+
     const pathname = usePathname();
     expect(pathname).toBe("/pages/main");
   });
@@ -130,7 +137,11 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
 
     (authService.signOut as jest.Mock).mockResolvedValueOnce(true);
 
-    await isSecondaryPw("123");
+    const result = await isSecondaryPw("123");
+
+    await waitFor(() => {
+      expect(result).toBe(false);
+    });
 
     await act(() => {
       render(
