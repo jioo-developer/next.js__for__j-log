@@ -40,6 +40,7 @@ const useSignupHandler = () => {
       // 사용자 프로필 업데이트
       await updateProfile(user, {
         displayName: nickname,
+        photoURL: "/img/default.svg",
       });
     },
     onSuccess: async () => {
