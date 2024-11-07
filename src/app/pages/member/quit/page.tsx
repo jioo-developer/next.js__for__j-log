@@ -55,13 +55,13 @@ const QuitPage = ({ setQuit }: any) => {
       if (loginType === "sosial") {
         await SocialDeleteHandler();
         await deleteUser(user);
-        popupInit(); // 3. 초기화 작업 수행
+        popupInit();
         router.push("/pages/login"); // 4. 로그인 페이지로 네비게이션 (비동기 작업이므로 완료 전에 다음 줄로 넘어갈 수 있음)
         // 소셜 로그인 삭제
       } else {
         await originDeleteHandler(quitPw); // 1. `quitPw`를 사용하여 원래 삭제 핸들러 실행
         await deleteUser(user); // 2. 사용자를 Firebase 인증에서 삭제
-        popupInit(); // 3. 초기화 작업 수행
+        popupInit();
         router.push("/pages/login"); // 4. 로그인 페이지로 네비게이션 (비동기 작업이므로 완료 전에 다음 줄로 넘어갈 수 있음)
         // 기존 로그인 삭제
       }
