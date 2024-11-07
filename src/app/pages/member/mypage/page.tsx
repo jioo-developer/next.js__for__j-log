@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import QuitPage from "../quit/page";
 
 function MyPage() {
-  const { data } = useUserQueryHook();
+  const { data, isLoading } = useUserQueryHook();
   const { nicknameData } = useNickQueryHook();
 
   const [nickname, setnickname] = useState(
@@ -81,14 +81,27 @@ function MyPage() {
                   changeImageHandler(e)
                 }
               />
+
               <figure className="profileImg">
-                <Image
-                  width={135}
-                  height={135}
-                  src={data.photoURL as string}
-                  alt="프로필 이미지"
-                />
+                {isLoading ? (
+                  <div
+                    style={{
+                      width: 135,
+                      height: 135,
+                      background: "#888",
+                      borderRadius: "50%",
+                    }}
+                  ></div>
+                ) : (
+                  <Image
+                    width={135}
+                    height={135}
+                    src={data.photoURL ? data.photoURL : "/img/no-image.jpg"}
+                    alt="프로필 이미지"
+                  />
+                )}
               </figure>
+
               <label htmlFor="img_check" className="uploads btn">
                 이미지 업로드
               </label>
@@ -152,7 +165,7 @@ function MyPage() {
             </p>
           </div>
         </section>
-        {quit && <QuitPage user={data} setQuit={setQuit} />}
+        {quit && <QuitPage setQuit={setQuit} />}
       </div>
     )
   );
