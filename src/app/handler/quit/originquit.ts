@@ -3,13 +3,13 @@ import {
   reauthenticateWithCredential,
   User,
 } from "firebase/auth";
-import { userProps } from "@/app/type_global/commonType";
 import { authService } from "@/app/Firebase";
 
-async function originDeleteHandler({ data, password }: userProps) {
+async function originDeleteHandler(password: string) {
   const user = authService.currentUser as User;
-  const credential = EmailAuthProvider.credential(
-    data.email as string,
+
+  const credential = await EmailAuthProvider.credential(
+    user.email as string,
     password
   );
   return await reauthenticateWithCredential(user, credential);
