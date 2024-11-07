@@ -32,11 +32,15 @@ export default {
   },
 };
 
+type ArgsType = {
+  placeholder: string;
+};
+
 export const Default = {
   args: {
     placeholder: "아이디를 입력하세요.", // 기본 placeholder 값 설정
-  },
-  render: (args: any) => {
+  } as ArgsType,
+  render: (args: ArgsType) => {
     const [state, setState] = useState("");
     return (
       <>

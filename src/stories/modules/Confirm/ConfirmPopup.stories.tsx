@@ -16,7 +16,7 @@ export default {
 };
 
 export const Default = {
-  render: (args: any) => (
+  render: () => (
     <Popup type="confirm" top customText="제목" subText="내용">
       <ButtonGroup>
         <Button>취소</Button>

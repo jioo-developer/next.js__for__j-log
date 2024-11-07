@@ -23,13 +23,19 @@ export default {
   },
 };
 
+type argsType = {
+  direction: "row" | "column";
+  rightAlign: boolean;
+  gap: string;
+};
+
 export const Default = {
   args: {
     direction: "row",
     rightAlign: false,
     gap: "8",
   },
-  render: (args: any) => (
+  render: (args: argsType) => (
     <ButtonGroup {...args}>
       <Button>취소</Button>
       <Button theme="success">확인</Button>
@@ -43,7 +49,7 @@ export const CustomGap = {
     rightAlign: false,
     gap: "12",
   },
-  render: (args: any) => (
+  render: (args: argsType) => (
     <ButtonGroup {...args}>
       <Button theme="success">취소</Button>
       <Button>확인</Button>
@@ -57,7 +63,7 @@ export const Column = {
     rightAlign: false,
     gap: "8",
   },
-  render: (args: any) => (
+  render: (args: argsType) => (
     <ButtonGroup {...args}>
       <Button>취소</Button>
       <Button theme="success">확인</Button>
@@ -71,7 +77,7 @@ export const CustomGapColumn = {
     rightAlign: false,
     gap: "14",
   },
-  render: (args: any) => (
+  render: (args: argsType) => (
     <ButtonGroup {...args}>
       <Button>취소</Button>
       <Button theme="success">확인</Button>
