@@ -1,4 +1,4 @@
-import { deleteField, doc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { authService, db } from "@/app/Firebase";
 import { updateProfile, User } from "firebase/auth";
 import { changeHanlderType, userData } from "@/app/type_global/commonType";

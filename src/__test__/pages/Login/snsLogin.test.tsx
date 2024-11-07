@@ -100,11 +100,7 @@ describe("구글 로그인 시 계정 조회 테스트", () => {
     });
 
     await waitFor(() => {
-      expect(onGoogle()).resolves.toEqual({
-        userId: "123",
-        userName: "Test User",
-        providerData: "goggle.com",
-      });
+      expect(onGoogle()).resolves.toEqual(mockUser);
     });
   });
 
