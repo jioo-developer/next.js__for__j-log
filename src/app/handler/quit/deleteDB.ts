@@ -1,21 +1,22 @@
 import { User } from "firebase/auth";
-import { authService, db, storageService } from "@/app/Firebase";
-import { deleteObject, ref } from "firebase/storage";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { db, storageService } from "@/app/Firebase";
+import { deleteObject, listAll, ref } from "firebase/storage";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 
-export async function deleteUserDB() {
-  const user = authService.currentUser as User;
+export default async function deleteUserDB(user: User) {
   const imageRef = ref(storageService, `${user.uid}`); // Storage 참조 생성
+  // 파일이 존재하는지 확인
+  const result = await listAll(imageRef);
 
-  const deletePromises = [
-    setDoc(doc(db, "delete", `${user.uid}`), {
-      상태: "탈퇴",
-      id: user.uid,
-      nickname: user.displayName,
-    }), // 상태 문서 설정
-    deleteDoc(doc(db, "nickname", `${user.uid}`)), // 닉네임 문서 삭제
-    deleteObject(imageRef), // 이미지 삭제
-  ];
+  // 파일이 존재할 경우에만 삭제 작업 수행
+  if (result.items.length > 0 || result.prefixes.length > 0) {
+    const deleteData = result.items.map((item) => deleteObject(item));
+    await Promise.all(deleteData);
+  }
+  const docRef = doc(db, "nickname", `${user.uid}`);
+  const docSnap = await getDoc(docRef);
 
-  Promise.all(deletePromises);
+  if (docSnap.exists()) {
+    await deleteDoc(docRef);
+  }
 }
