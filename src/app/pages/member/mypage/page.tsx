@@ -1,36 +1,36 @@
 "use client";
 import "@/app/_asset/profile.scss";
 import Image from "next/image";
-import React, { ChangeEvent, useState } from "react";
-
+import React, { ChangeEvent, useEffect, useState } from "react";
 import useNickQueryHook from "@/app/api_hooks/common/getnameHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
 import storageUpload from "@/app/handler/file/storageUploadHandler";
-import { updateProfile, User } from "firebase/auth";
-import { authService } from "@/app/Firebase";
+import { User } from "firebase/auth";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { Input } from "@/stories/atoms/Input";
 import useNameChanger from "@/app/handler/mypage/useMutationHandler";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
-import { useRouter } from "next/navigation";
 import QuitPage from "../quit/page";
+import useImageChanger from "@/app/handler/mypage/useImaeMutationHandler";
 
 function MyPage() {
   const { data, isLoading } = useUserQueryHook();
-  const { nicknameData } = useNickQueryHook();
+  const { nicknameData, refetch } = useNickQueryHook();
 
-  const [nickname, setnickname] = useState(
-    data ? (data.displayName as string) : ""
-  );
+  const [nickname, setnickname] = useState("");
   const [nameToggle, setnameToggle] = useState(false);
   const [quit, setQuit] = useState(false);
 
-  const router = useRouter();
-
   const nameChangeMutate = useNameChanger();
+  const imageChangeMutate = useImageChanger();
+
+  useEffect(() => {
+    if (data) {
+      setnickname(data.displayName as string);
+    }
+  }, [data]);
 
   async function changeNameHandler() {
     if (nicknameData && data) {
@@ -39,6 +39,7 @@ function MyPage() {
       if (!isNamecheck) {
         nameChangeMutate.mutate({ data, nickname });
         setnameToggle(!nameToggle);
+        refetch();
       } else {
         popuprHandler({ message: "이미 사용중인 닉네임 입니다" });
       }
@@ -46,7 +47,6 @@ function MyPage() {
   }
 
   async function changeImageHandler(e: ChangeEvent<HTMLInputElement>) {
-    const user = authService.currentUser;
     const theFiles = Array.from(e.target.files || []);
     if (theFiles.length > 0) {
       try {
@@ -54,13 +54,7 @@ function MyPage() {
         // 업로드 한  파일을 URL로 변환하는 함수
         const upload = await storageUpload(result, files);
         // Firebase에 등록 할 수 있게 URL 변환
-        try {
-          await updateProfile(user as User, { photoURL: upload[0] });
-          // 배열이 하나 이므로 [0] 으로 고정 대체
-          router.push("/pages/main");
-        } catch {
-          popuprHandler({ message: "프로필 변경에 실패하였습니다." });
-        }
+        imageChangeMutate.mutate({ user: data as User, imgurl: upload[0] });
       } catch (error) {
         popuprHandler({ message: "프로필 업로드에 실패하였습니다." });
       }
