@@ -12,20 +12,24 @@ async function getNickName() {
 }
 
 const useNameQueryHook = () => {
-  const { data, error, isLoading }: QueryObserverResult<string[], Error> =
-    useQuery({
-      queryKey: ["getNickname"],
-      queryFn: getNickName,
-      select: (data) => {
-        return data.map((item) => item.nickname);
-      },
-      staleTime: 1 * 60 * 1000, // 1분
-      notifyOnChangeProps: ["data"],
-    });
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+  }: QueryObserverResult<string[], Error> = useQuery({
+    queryKey: ["getNickname"],
+    queryFn: getNickName,
+    select: (data) => {
+      return data.map((item) => item.nickname);
+    },
+    staleTime: 1 * 60 * 1000, // 1분
+    notifyOnChangeProps: ["data"],
+  });
 
   const nicknameData = data ? data : [];
 
-  return { nicknameData, error, isLoading };
+  return { nicknameData, error, isLoading, refetch };
 };
 
 export default useNameQueryHook;
