@@ -41,7 +41,7 @@ export async function CreateImgUrl({ image, file, isEdit }: urlProps) {
 }
 
 type deleteProps = {
-  array: { image: string[]; file: File[] };
+  array: { image: string[]; file: string[] };
   fileIndex: number;
 };
 

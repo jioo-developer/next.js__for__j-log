@@ -12,7 +12,6 @@ type propsType = {
 
 const useCreateMutation = () => {
   const router = useRouter();
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ data, pageId }: propsType) => {
       await setDoc(doc(db, "post", pageId), data);
@@ -20,9 +19,6 @@ const useCreateMutation = () => {
     },
     onSuccess: (result) => {
       router.push(`/pages/detail/${result.pageId}`);
-      queryClient.setQueryData<FirebaseData>(["getPost"], () => {
-        return result.data;
-      });
     },
     onError: () => {
       popuprHandler({ message: "게시글 작성 중 오류가 발생하였습니다" });
