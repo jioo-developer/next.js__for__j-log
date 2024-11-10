@@ -101,7 +101,7 @@ const flexDirection = css`
 const whiteBox = (width: string | number, height: string | number) => css`
   box-sizing: border-box;
   border-radius: 4px;
-  width: ${width}
+  width: ${width}px;
   height : ${height === "auto" ? "auto;" : height + "px;"}
   background: white;
   box-shadow: 0px 4px 8px 8px rgba(0, 0, 0, 0.05);
