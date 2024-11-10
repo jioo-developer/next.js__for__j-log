@@ -11,7 +11,7 @@ async function getMyData() {
   if (!snapshot.empty) {
     const user = authService.currentUser as User;
     const filter = snapshot.docs.filter((doc) => {
-      return doc.data().id === user.uid;
+      return doc.data().writer === user.uid;
     });
 
     if (filter.length > 0) {
@@ -32,6 +32,8 @@ async function getMyData() {
       );
       return result;
     }
+  } else {
+    return [];
   }
 }
 
@@ -42,11 +44,13 @@ const useMyDataQueryHook = () => {
       queryFn: getMyData,
       staleTime: 1 * 60 * 1000, // 1분
       notifyOnChangeProps: ["data"],
+      refetchOnMount: "always",
+      retry: 3,
     });
 
   const myData = data ? data : [];
 
-  return { isLoading, myData, error };
+  return { myData, isLoading, error };
 };
 
 export default useMyDataQueryHook;

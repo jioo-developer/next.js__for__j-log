@@ -27,6 +27,7 @@ const usePostQueryHook = () => {
       queryFn: getPostData,
       staleTime: 1 * 60 * 1000, // 1분
       notifyOnChangeProps: ["data"],
+      refetchOnMount: "always",
     });
 
   let postData = data ? data : [];
