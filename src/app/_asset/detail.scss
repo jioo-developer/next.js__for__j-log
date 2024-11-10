@@ -155,19 +155,22 @@
         #favorite_check {
           display: none;
         }
+        .right_box {
+          display: flex;
+          gap: 8px;
+          .favorite_btn {
+            @include flex();
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
 
-        .favorite_btn {
-          @include flex();
-          border: 1px solid #ddd;
-          box-sizing: border-box;
-          padding: 5px 10px;
-          border-radius: 3px;
-          cursor: pointer;
-
-          &:hover {
-            background: #12b886;
-            color: #fff;
-            border-radius: 5px;
+            &:hover {
+              background: #12b886;
+              color: #fff;
+              border-radius: 5px;
+            }
           }
         }
       }

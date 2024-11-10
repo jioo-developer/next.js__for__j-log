@@ -47,6 +47,11 @@
         width: 100%;
       }
 
+      figure {
+        margin: 16px 0;
+        overflow: hidden;
+      }
+
       figcaption {
         display: flex;
         flex-direction: column;
