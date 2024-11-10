@@ -1,5 +1,6 @@
 "use client";
 import "@/app/_asset/upload.scss";
+import useCashQueryHook from "@/app/api_hooks/common/getCashHook";
 import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
@@ -12,21 +13,27 @@ import {
 import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 const EditorPage = () => {
   const { data: user } = useUserQueryHook();
   const { pgId: pageInfo, editMode } = pageInfoStore();
-  const { pageData } = useDetailQueryHook(pageInfo);
+
+  const { pageData } = useDetailQueryHook(editMode ? pageInfo : "");
+
+  const { CashData } = useCashQueryHook();
+  const getData = CashData[0];
 
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [previewImg, setPreview] = useState<string[]>([]);
   const [file, setFile] = useState<File[]>([]);
+  const [fileName, setName] = useState<string[]>([]);
   const [priorty, setPriorty] = useState(false);
 
   const router = useRouter();
@@ -47,22 +54,34 @@ const EditorPage = () => {
       // 이전에 있는 내용
       const imageUrl = oldData.url;
       setPreview(imageUrl);
+
+      setName(oldData.fileName);
       // 이전에 있는 이미지
     }
   }, [editMode, pageData]);
 
   async function imageUrl() {
-    const resultUrl = await CreateImgUrl({
-      image: previewImg,
-      file,
-      isEdit: editMode,
-    });
-    if (resultUrl) {
-      return resultUrl;
+    const oldData = editMode ? (pageData as FirebaseData) : { url: [] };
+    if (previewImg === oldData.url || file.length === 0) {
+      return previewImg;
     } else {
-      return [];
+      return await CreateImgUrl({
+        image: previewImg,
+        file,
+        isEdit: editMode,
+      });
     }
   }
+
+  const fileNameHandler = () => {
+    if (editMode) {
+      return fileName;
+    } else {
+      return file
+        .map((value: File) => value.name)
+        .filter((item) => item !== "");
+    }
+  };
 
   // image url 생성 함수
 
@@ -71,24 +90,45 @@ const EditorPage = () => {
     const content = {
       title,
       text,
-      fileName: file
-        .map((value: File) => value.name)
-        .filter((item) => item !== ""),
+      fileName: fileNameHandler(),
       pageId: pageInfo,
-      url: await imageUrl(),
+      url: previewImg.length === 0 ? previewImg : await imageUrl(),
       priority: priorty,
     };
     // 게시글 수정 일 때
     if (editMode) {
       const obj = { ...(pageData as FirebaseData) };
       const resultObj = Object.assign(obj, content);
-      postMutate.mutate({ data: resultObj, pageId: pageInfo });
+      await postMutate.mutateAsync({ data: resultObj, pageId: pageInfo });
+      formReset();
     } else {
       // 게시글 생성 일 때
       const addContent = setDataHandler(content);
-      postMutate.mutate({ data: addContent, pageId: pageInfo });
+      await postMutate.mutateAsync({ data: addContent, pageId: pageInfo });
+      formReset();
     }
   }
+
+  const formReset = () => {
+    setTitle("");
+    setText("");
+    setPreview([]);
+    setFile([]);
+    setPriorty(false);
+  };
+
+  const isCheckHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    if (getData.item > 0) {
+      setPriorty(e.target.checked);
+    } else {
+      popuprHandler({ message: "아이템을 보유 하고 있지 않습니다" });
+      e.target.checked = false;
+    }
+  };
+
+  useEffect(() => {
+    console.log(fileName);
+  }, [fileName]);
 
   return (
     <div className="upload">
@@ -108,7 +148,7 @@ const EditorPage = () => {
             onHeightChange={(height) => {}}
             className="text"
             autoComplete="off"
-            minRows={10}
+            minRows={1}
             defaultValue={text}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
               setText(e.target.value);
@@ -123,11 +163,16 @@ const EditorPage = () => {
                     className="preview_delete"
                     data-testid="delete-button"
                     onClick={() => {
-                      const array = { image: previewImg, file: file };
-                      ImageDeleteHandler({ array, fileIndex: index });
+                      const array = { image: previewImg, file: fileName };
+                      const result = ImageDeleteHandler({
+                        array,
+                        fileIndex: index,
+                      });
+                      setPreview(result.image);
+                      setName(result.files);
                     }}
                   >
-                    <img src="./img/close.png" alt="" />
+                    <img src="/img/close.png" alt="" />
                   </button>
                   <img src={url} alt="" className="att" key={index} />
                 </div>
@@ -156,9 +201,11 @@ const EditorPage = () => {
             type="checkbox"
             className="eachCheckbox"
             id="use__Check"
-            onChange={(e) => setPriorty(e.target.checked)}
+            onChange={(e) => {
+              isCheckHandler(e);
+            }}
           />
-          <label htmlFor="use__check" className="check">
+          <label htmlFor="use__Check" className="check">
             <p>노출 우선권 사용하기</p>
           </label>
         </div>

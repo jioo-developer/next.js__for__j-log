@@ -8,11 +8,12 @@ import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import Reply from "@/app/pages/detail/_reply/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
-import pageDelete from "@/app/handler/detail/pageDeleteHanlder";
 import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
+import usePageDeleteHandler from "@/app/handler/detail/crud/useDeleteMutationHandler";
+import { User } from "firebase/auth";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -20,16 +21,17 @@ const DetailPage = () => {
   const { data: user } = useUserQueryHook();
 
   const pageInfo = useGetPageInfo();
-  const { pageData, isLoading } = useDetailQueryHook(pageInfo);
+  const { pageData, isLoading, error } = useDetailQueryHook(pageInfo);
 
   const msg = popupMessageStore().message;
   const ispopupClick = popupMessageStore().isClick;
 
   const favoriteMutate = useFavoriteMutate();
+  const pageDeleteMutate = usePageDeleteHandler();
 
   useEffect(() => {
     if (!isLoading) {
-      if (!pageData) {
+      if (!pageData || error) {
         popuprHandler({ message: "페이지 정보가 조회 되지 않습니다." });
       }
     }
@@ -47,7 +49,7 @@ const DetailPage = () => {
   // 팝업 노출 후 확인 눌렀을 시 메인페이지로 이동
 
   function favoriteHandler() {
-    const getcookie = `${user}-Cookie`;
+    const getcookie = `${(user as User).uid}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
       favoriteMutate.mutate({
         value: (pageData as FirebaseData).favorite,
@@ -74,14 +76,21 @@ const DetailPage = () => {
 
   async function onDelete() {
     if (from === "detail") {
-      try {
-        await pageDelete(pageData as FirebaseData);
-        router.push("/pages/main");
-      } catch {
-        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
-      }
+      pageDeleteMutate.mutate(pageData as FirebaseData);
     }
   }
+
+  const pathname = usePathname();
+  const currentUrl = `${window.location.origin}${pathname}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      popuprHandler({ message: "클립보드에 해당 주소가 복사되었습니다." });
+    } catch (err) {
+      console.error("URL 복사 실패:", err);
+    }
+  };
 
   return (
     pageData &&
@@ -139,9 +148,15 @@ const DetailPage = () => {
             <div className="comment">
               <div className="favorite_wrap">
                 <p className="com_title">게시글에 대한 댓글을 달아주세요.</p>
-                <button className="favorite_btn" onClick={favoriteHandler}>
-                  <span>👍</span>추천&nbsp;{pageData.favorite}
-                </button>
+                <div className="right_box">
+                  <button className="favorite_btn" onClick={handleCopy}>
+                    공유하기
+                  </button>
+
+                  <button className="favorite_btn" onClick={favoriteHandler}>
+                    <span>👍</span>추천&nbsp;{pageData.favorite}
+                  </button>
+                </div>
               </div>
               <Reply />
             </div>
