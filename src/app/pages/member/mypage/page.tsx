@@ -14,6 +14,7 @@ import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
 import QuitPage from "../quit/page";
 import useImageChanger from "@/app/handler/mypage/useImaeMutationHandler";
+import ItemStore from "@/stories/modules/ItemStore/ItemStore";
 
 function MyPage() {
   const { data, isLoading } = useUserQueryHook();
@@ -22,6 +23,7 @@ function MyPage() {
   const [nickname, setnickname] = useState("");
   const [nameToggle, setnameToggle] = useState(false);
   const [quit, setQuit] = useState(false);
+  const [storeToggle, setStore] = useState(false);
 
   const nameChangeMutate = useNameChanger();
   const imageChangeMutate = useImageChanger();
@@ -148,6 +150,18 @@ function MyPage() {
                 회원 탈퇴
               </button>
             </div>
+            <div className="delete_wrap" style={{ marginTop: 35 }}>
+              <p className="withdrawal_title" style={{ marginRight: 35 }}>
+                우선권 구매
+              </p>
+              <Button
+                theme="white"
+                width={110}
+                onClick={() => setStore(!storeToggle)}
+              >
+                구매하기
+              </Button>
+            </div>
             <p
               className="explan"
               style={{ borderBottom: "1px solid #eee", paddingBottom: 15 }}
@@ -155,11 +169,12 @@ function MyPage() {
               탈퇴 시 작성한 포스트 및 댓글이 모두 삭제되며 복구되지 않습니다.
             </p>
             <p className="explan">
-              소셜로그인 회원탈퇴는 첫 가입 시 입력했던 비밀번호 입니다.
+              소셜로그인 회원탈퇴는 첫 가입 시 입력했던 2차 비밀번호 입니다.
             </p>
           </div>
         </section>
         {quit && <QuitPage setQuit={setQuit} />}
+        {storeToggle && <ItemStore setState={setStore} />}
       </div>
     )
   );

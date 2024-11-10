@@ -2,26 +2,33 @@
 import "@/app/_asset/myboard.scss";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import useMyDataQueryHook from "@/app/api_hooks/mypage/getMyPostData";
-import { pageInfoStore } from "@/app/store/common";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const MyBoardPage = () => {
   const { data: user } = useUserQueryHook();
-  const { myData, isLoading } = useMyDataQueryHook();
+  const { myData, isLoading, error } = useMyDataQueryHook();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (myData.length === 0 || error) {
+        popuprHandler({ message: "게시글이 조회되지 않습니다." });
+      }
+    }
+  }, [myData]);
+
   function routeHandler() {
     pageInfoStore.setState({ pgId: myData[0].pageId });
     router.push(`/pages/detail/${myData[0].pageId}`);
   }
 
-  if (isLoading) {
-    return <div></div>;
-  }
-
   return (
     <>
-      {!isLoading && user && myData.length > 0 ? (
+      {!isLoading && user && myData.length > 0 && (
         <div className="wrap board_wrap">
           <section className="board__header">
             <Image
@@ -68,8 +75,6 @@ const MyBoardPage = () => {
             </div>
           </section>
         </div>
-      ) : (
-        <div className="no__board">게시글이 존재하지 않습니다.</div>
       )}
     </>
   );
