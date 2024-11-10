@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SearchIcon from "@/stories/modules/utils/SearchIcon";
-import { searchStore } from "../store/common";
+import { pageInfoStore, searchStore } from "../store/common";
 import { useLogOut } from "../handler/commonHandler";
 
 const activePathName = [
@@ -16,18 +16,20 @@ const activePathName = [
 ];
 
 function Header() {
-  const { data, refetch, isLoading } = useUserQueryHook();
+  const { data } = useUserQueryHook();
   const [displayName, setName] = useState("");
+  const [profile, setProfile] = useState("");
 
   const router = useRouter();
   const pathname = usePathname();
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (!isLoading && data) {
+    if (data) {
       setName(data.displayName as string);
+      setProfile(data.photoURL as string);
     }
-  }, [data, isLoading]);
+  }, [data]);
 
   useEffect(() => {
     if (ref.current?.checked) {
@@ -57,7 +59,10 @@ function Header() {
           <div className="ui_wrap">
             <button
               className="go__poster"
-              onClick={() => router.push("/pages/editor")}
+              onClick={() => {
+                router.push("/pages/editor");
+                pageInfoStore.setState({ editMode: false });
+              }}
             >
               새&nbsp;글&nbsp;작성
             </button>
@@ -70,7 +75,7 @@ function Header() {
                 <Image
                   width={40}
                   height={40}
-                  src={data.photoURL ? data.photoURL : "/img/default.svg"}
+                  src={profile !== "" ? profile : "/img/default.svg"}
                   alt="프로필 이미지"
                   className="profile"
                   referrerPolicy="no-referrer"
