@@ -32,7 +32,7 @@ const DetailPage = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      if (!pageData || error) {
+      if (!pageData) {
         popuprHandler({ message: "페이지 정보가 조회 되지 않습니다." });
       }
     }

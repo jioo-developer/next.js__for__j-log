@@ -14,7 +14,11 @@ import { Button } from "@/stories/atoms/Button";
 import { authService } from "@/app/Firebase";
 import { useRouter } from "next/navigation";
 
-const QuitPage = ({ setQuit }: any) => {
+type propsType = {
+  setQuit: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const QuitPage = ({ setQuit }: propsType) => {
   const [quitPw, setPw] = useState("");
   const [loginType, setType] = useState("");
   const isPopupClick = popupMessageStore().isClick;

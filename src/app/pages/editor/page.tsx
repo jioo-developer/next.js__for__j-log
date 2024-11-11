@@ -126,10 +126,6 @@ const EditorPage = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(fileName);
-  }, [fileName]);
-
   return (
     <div className="upload">
       <form
