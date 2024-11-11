@@ -8,12 +8,13 @@ import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import Reply from "@/app/pages/detail/_reply/page";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useGetPageInfo } from "@/app/handler/detail/pageInfoHandler";
 import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
 import usePageDeleteHandler from "@/app/handler/detail/crud/useDeleteMutationHandler";
 import { User } from "firebase/auth";
+import { MyContextProvider } from "../_reply/context";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -80,15 +81,13 @@ const DetailPage = () => {
     }
   }
 
-  const pathname = usePathname();
-  const currentUrl = `${window.location.origin}${pathname}`;
-
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(currentUrl);
-      popuprHandler({ message: "클립보드에 해당 주소가 복사되었습니다." });
+      // 현재 페이지 URL을 가져와 클립보드에 복사합니다.
+      await navigator.clipboard.writeText(window.location.href);
+      popuprHandler({ message: "클립보드에 복사되었습니다" });
     } catch (err) {
-      console.error("URL 복사 실패:", err);
+      console.error("복사 실패:", err);
     }
   };
 
@@ -158,7 +157,9 @@ const DetailPage = () => {
                   </button>
                 </div>
               </div>
-              <Reply />
+              <MyContextProvider>
+                <Reply />
+              </MyContextProvider>
             </div>
           </section>
         </div>
