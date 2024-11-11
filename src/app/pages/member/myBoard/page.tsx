@@ -15,7 +15,7 @@ const MyBoardPage = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      if (myData.length === 0 || error) {
+      if (myData.length === 0) {
         popuprHandler({ message: "게시글이 조회되지 않습니다." });
       }
     }

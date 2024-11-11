@@ -18,6 +18,7 @@ import { pageInfoStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 const EditorPage = () => {
@@ -110,11 +111,13 @@ const EditorPage = () => {
   }
 
   const formReset = () => {
-    setTitle("");
-    setText("");
-    setPreview([]);
-    setFile([]);
-    setPriorty(false);
+    flushSync(() => {
+      setTitle("");
+      setText("");
+      setPreview([]);
+      setName([]);
+      setPriorty(false);
+    });
   };
 
   const isCheckHandler = (e: ChangeEvent<HTMLInputElement>) => {

@@ -19,6 +19,7 @@ import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
 import { useRouter } from "next/navigation";
 import { setDoc } from "firebase/firestore";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { ImageDeleteHandler } from "@/app/handler/detail/crud/imageCrudHandler";
 
 // 필요한 훅과 모듈을 모킹
 
@@ -76,6 +77,7 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
 
 (useCreateMutation as jest.Mock).mockReturnValue({
   mutate: jest.fn(),
+  mutateAsync: jest.fn(),
 });
 
 describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
@@ -103,7 +105,9 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
       target: { value: "Test content" },
     });
 
-    fireEvent.submit(form);
+    await act(async () => {
+      fireEvent.submit(form);
+    });
     await waitFor(() => {
       expect(setDataHandler).toHaveBeenCalled();
     });
@@ -118,7 +122,9 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
       target: { value: "Test content" },
     });
 
-    fireEvent.submit(form);
+    await act(async () => {
+      fireEvent.submit(form);
+    });
     await waitFor(() => {
       expect(setDataHandler).not.toHaveBeenCalled();
     });
@@ -145,7 +151,7 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
     );
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const { form, input, textarea } = getElement();
 
     fireEvent.change(input, {
@@ -155,7 +161,9 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
       target: { value: "Test content" },
     });
 
-    fireEvent.submit(form);
+    await act(async () => {
+      fireEvent.submit(form);
+    });
   });
 
   test("페이지 생성 함수 호출 테스트", async () => {
@@ -179,12 +187,12 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
 
     const postMutate = useCreateMutation();
 
-    postMutate.mutate({
+    postMutate.mutateAsync({
       data: addContent as any, // data에 resultObj 전달
       pageId: storeState.pgId,
     });
 
-    expect(postMutate.mutate).toHaveBeenCalledWith({
+    expect(postMutate.mutateAsync).toHaveBeenCalledWith({
       data: addContent,
       pageId: storeState.pgId,
     });
@@ -340,5 +348,50 @@ describe("페이지 생성 & 수정 로직 테스트", () => {
         message: "게시글 작성 중 오류가 발생하였습니다",
       });
     });
+  });
+});
+
+describe("이미 업로도 된 이미지 삭제 테스트", () => {
+  beforeEach(async () => {
+    jest.clearAllMocks();
+  });
+  test("이미지 삭제 성공 테스트 ", () => {
+    const handler = jest.requireActual(
+      "@/app/handler/detail/crud/imageCrudHandler"
+    ).ImageDeleteHandler;
+    // 테스트용 데이터 준비
+    const mockArray = {
+      image: ["img1.jpg", "img2.jpg", "img3.jpg"],
+      file: ["file1", "file2", "file3"],
+    };
+
+    // 첫 번째 이미지를 삭제
+    const result1 = handler({ array: mockArray, fileIndex: 0 });
+    expect(result1.image).toEqual(["img2.jpg", "img3.jpg"]);
+    expect(result1.files).toEqual(["file2", "file3"]);
+
+    // 두 번째 이미지를 삭제
+    const result2 = handler({ array: mockArray, fileIndex: 1 });
+    expect(result2.image).toEqual(["img1.jpg", "img3.jpg"]);
+    expect(result2.files).toEqual(["file1", "file3"]);
+
+    // 세 번째 이미지를 삭제
+    const result3 = handler({ array: mockArray, fileIndex: 2 });
+    expect(result3.image).toEqual(["img1.jpg", "img2.jpg"]);
+    expect(result3.files).toEqual(["file1", "file2"]);
+  });
+
+  test("이미지 삭제 싪패 테스트", () => {
+    const handler = jest.requireActual(
+      "@/app/handler/detail/crud/imageCrudHandler"
+    ).ImageDeleteHandler;
+    const mockArray = {
+      image: ["img1.jpg", "img2.jpg"],
+      file: ["file1", "file2"],
+    };
+
+    const result = handler({ array: mockArray, fileIndex: 5 });
+    expect(result.image).toEqual(["img1.jpg", "img2.jpg"]);
+    expect(result.files).toEqual(["file1", "file2"]);
   });
 });
