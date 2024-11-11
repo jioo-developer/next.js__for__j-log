@@ -80,6 +80,7 @@ describe("회원가입 페이지 로직 테스트", () => {
       // USER 정보
       expect.objectContaining({
         displayName: "existingNickname",
+        photoURL: "/img/default.svg",
       })
       // firebase 로그인이 아이디 & 비밀번호만으로 계정이 생성 되서 닉네임 추가를 수동으로 해줘야함
     );

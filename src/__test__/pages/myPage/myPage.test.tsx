@@ -17,7 +17,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/Firebase";
 import storageUpload from "@/app/handler/file/storageUploadHandler";
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
-import { useRouter } from "next/navigation";
+import useImageChanger from "@/app/handler/mypage/useImaeMutationHandler";
 jest.mock("@/app/Firebase", () => ({
   authService: {
     currentUser: {
@@ -67,6 +67,7 @@ jest.mock("@/app/api_hooks/common/getnameHook", () => ({
     nicknameData: ["Nickname1", "Nickname2"],
     error: null,
     isLoading: false,
+    refetch: jest.fn(),
   }),
 }));
 
@@ -77,6 +78,8 @@ jest.mock("@/app/handler/mypage/useMutationHandler", () => jest.fn());
 (useNameChanger as jest.Mock).mockReturnValue({ mutate: jest.fn() });
 
 jest.mock("@/app/handler/file/storageUploadHandler", () => jest.fn());
+
+jest.mock("@/app/handler/mypage/useImaeMutationHandler", () => jest.fn());
 
 const queryClient = new QueryClient();
 
@@ -169,6 +172,8 @@ describe("닉네임 변경 로직 테스트", () => {
         displayName: "NewNick",
       }
     );
+    const { refetch } = useNameQueryHook();
+    expect(refetch).toHaveBeenCalled();
   });
   test("닉네임 변경 실패 테스트", async () => {
     const queryClient = new QueryClient();
@@ -276,43 +281,80 @@ describe("프로필 이미지 변경 로직 테스트", () => {
   const upload = ["uploadedUrl"];
   beforeEach(async () => {
     jest.clearAllMocks();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MyPage />
+      </QueryClientProvider>
+    );
   });
   test("프로필 이미지 변경 성공 테스트", async () => {
-    // updateProfile을 성공적으로 호출하고, 라우터가 호출되는지 확인
+    const handler = jest.requireActual(
+      "@/app/handler/mypage/useImaeMutationHandler"
+    ).default;
+
+    const { result } = renderHook(() => handler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    const user = {
+      uid: "123",
+      displayName: "OldNick",
+      photoURL: "/profile.jpg",
+    } as User;
+    const imgurl = expect.any(String);
+
+    // mutation 실행
     await act(async () => {
-      await updateProfile({ uid: "123" } as User, { photoURL: upload[0] });
-      useRouter().push("/pages/main");
+      await result.current.mutateAsync({ user, imgurl });
     });
 
     await waitFor(() => {
-      expect(updateProfile).toHaveBeenCalledWith(
-        { uid: "123" },
-        { photoURL: "uploadedUrl" }
-      );
+      expect(result.current.isSuccess).toBe(true);
     });
 
-    await waitFor(() => {
-      expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
+    // updateProfile 함수가 올바르게 호출되었는지 확인
+    expect(updateProfile).toHaveBeenCalledWith(user, {
+      photoURL: imgurl,
     });
   });
   test("프로필 이미지 변경 실패 테스트", async () => {
-    const errorMessage = "프로필 변경에 실패하였습니다.";
-    (updateProfile as jest.Mock).mockRejectedValue(
-      new Error("Profile update failed")
-    );
+    const handler = jest.requireActual(
+      "@/app/handler/mypage/useImaeMutationHandler"
+    ).default;
+
+    const errorMsg = "프로필 업로드에 실패하였습니다.";
+    (updateProfile as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+
+    const { result } = renderHook(() => handler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // 프로필 업데이트 mutation 실행 (실패 시나리오)
     await act(async () => {
       try {
-        await updateProfile({ uid: "123" } as User, { photoURL: null });
-      } catch {
-        popuprHandler({ message: errorMessage });
+        await result.current.mutateAsync({ user: null, imgurl: null });
+      } catch (error) {
+        popuprHandler({ message: errorMsg });
       }
     });
 
+    // popuprHandler가 호출되었는지 확인
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "프로필 업로드에 실패하였습니다.",
+    });
+
+    // isError 상태를 확인
     await waitFor(() => {
-      // popuprHandler가 호출되었는지 확인
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: errorMessage,
-      });
+      expect(result.current.isError).toBe(true);
     });
   });
 });

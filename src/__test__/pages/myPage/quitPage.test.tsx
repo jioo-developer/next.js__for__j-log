@@ -1,5 +1,5 @@
 import { authService } from "@/app/Firebase";
-import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import deleteDB from "@/app/handler/quit/deleteDB";
 import originDeleteHandler from "@/app/handler/quit/originquit";
 import SocialDeleteHandler from "@/app/handler/quit/socialquit";
@@ -107,7 +107,7 @@ describe("회원탈퇴 로직 테스트", () => {
     });
   });
 
-  test("isCredential이 'origin'일 때  originDeleteHandler 호출 테스트", async () => {
+  test("isSosial이 false 일 때 회원 탈퇴 성공 테스트", async () => {
     (isCredential as jest.Mock).mockReturnValueOnce("origin");
     const activeBtn = screen.getByText("확인");
 
@@ -143,7 +143,7 @@ describe("회원탈퇴 로직 테스트", () => {
     }
   });
 
-  test("isSosial이 ture일 때 SosialDeleteHandler 호출 테스트", async () => {
+  test("isSosial이 ture 일 때 회원 탈퇴 성공 테스트", async () => {
     (isCredential as jest.Mock).mockReturnValueOnce("sosial");
 
     const activeBtn = screen.getByText("확인");
