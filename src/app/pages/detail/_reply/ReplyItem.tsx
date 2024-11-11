@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Input } from "@/stories/atoms/Input";
 import { replyType } from "@/app/api_hooks/Reply/getReplyHook";
 import { useReplyContext } from "./context";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import {
   useDeleteHandler,
@@ -42,30 +42,32 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
 
   const from = pageInfoStore().fromAction;
 
+  const [deleteIndex, setDeleteIndex] = useState(0);
+
   function AskDeleteHandler(index: number, isClick?: boolean) {
     if (!isClick) {
       popuprHandler({
         message: "댓글을 정말로 삭제하시겠습니까?",
         type: "confirm",
       });
-      setTarget(index);
+      setDeleteIndex(index);
       pageInfoStore.setState({ fromAction: "reply" });
-    }
-
-    if (isClick && from === "reply") {
-      const replyId = (replyData as replyType[])[index].id;
-      deleteMutation.mutate({ id: pageId, replyId, comment });
     }
   }
 
+  const DeleteHandler = (isClick?: boolean) => {
+    if (isClick && from === "reply") {
+      const replyId = (replyData as replyType[])[deleteIndex].id;
+      deleteMutation.mutate({ id: pageId, replyId, comment });
+    }
+  };
+
   useEffect(() => {
     if (isClickValue) {
-      AskDeleteHandler(commentTarget as number, true);
+      DeleteHandler(true);
       popupInit();
     }
   }, [isClickValue]);
-
-  const isDelete = msg.includes("삭제");
 
   return (
     <div className="reply_wrap" key={`reply-${index}`}>
@@ -82,7 +84,7 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
         </div>
         <div className="edit_comment">
           <ButtonGroup>
-            {isDelete || commentTarget !== index ? (
+            {commentTarget !== index ? (
               <Button
                 width={50}
                 className="edit btns"
@@ -115,7 +117,7 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
           </ButtonGroup>
         </div>
       </div>
-      {isDelete || commentTarget !== index ? (
+      {commentTarget !== index ? (
         <p className={`reply_text`}>{item.comment}</p>
       ) : (
         <Input type="text" value={comment} setstate={setComment} />

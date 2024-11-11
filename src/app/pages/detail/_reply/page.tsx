@@ -21,7 +21,7 @@ const Reply = () => {
 
   const createMutation = useCreateHandler();
 
-  const CreateRely = () => {
+  const CreateRely = async () => {
     const user = data as User;
     const userObj = {
       name: user.displayName as string,
@@ -29,7 +29,8 @@ const Reply = () => {
       uid: user.uid as string,
     };
 
-    createMutation.mutate({ user: userObj, id, comment });
+    await createMutation.mutateAsync({ user: userObj, id, comment });
+    setComment("");
   };
 
   return (
@@ -58,6 +59,7 @@ const Reply = () => {
           onHeightChange={(height) => ""}
           minRows={4}
           className="comment_input"
+          value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
         <button className="btn">댓글 작성</button>

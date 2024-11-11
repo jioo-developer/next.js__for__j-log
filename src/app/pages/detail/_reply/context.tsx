@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { popupMessageStore } from "@/app/store/common";
 
-type contextProps = {
+type ContextProps = {
   comment: string;
   setComment: Dispatch<React.SetStateAction<string>>;
   commentTarget: string | number;
@@ -18,7 +18,7 @@ type contextProps = {
   ChangeTargetHandler: (text: string, index: number) => void;
 };
 
-const initialContext = createContext<contextProps>({
+const initialContext = createContext<ContextProps>({
   comment: "",
   setComment: () => {},
   commentTarget: "",
@@ -28,17 +28,17 @@ const initialContext = createContext<contextProps>({
   ChangeTargetHandler: () => {},
 });
 
-export const MyContextProvider = (children: ReactNode) => {
-  const [comment, setComment] = useState("");
+export const MyContextProvider = ({ children }: { children: ReactNode }) => {
+  const [comment, setComment] = useState<string>("");
   const [commentTarget, setTarget] = useState<string | number>("");
 
   const msg = popupMessageStore().message;
   const isClickValue = popupMessageStore().isClick;
 
-  function ChangeTargetHandler(text: string, index: number) {
+  const ChangeTargetHandler = (text: string, index: number) => {
     setComment(text);
     setTarget(index);
-  }
+  };
 
   return (
     <initialContext.Provider
