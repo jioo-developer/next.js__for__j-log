@@ -51,14 +51,20 @@ function MyPage() {
   async function changeImageHandler(e: ChangeEvent<HTMLInputElement>) {
     const theFiles = Array.from(e.target.files || []);
     if (theFiles.length > 0) {
+      let upload = null;
       try {
         const { result, files } = await onFileChange(theFiles);
         // 업로드 한  파일을 URL로 변환하는 함수
-        const upload = await storageUpload(result, files);
+        upload = await storageUpload(result, files);
+        if (upload.length === 0 || !upload[0]) return;
         // Firebase에 등록 할 수 있게 URL 변환
-        imageChangeMutate.mutate({ user: data as User, imgurl: upload[0] });
       } catch (error) {
         popuprHandler({ message: "프로필 업로드에 실패하였습니다." });
+        return;
+      }
+
+      if (upload && upload.length > 0 && upload[0]) {
+        imageChangeMutate.mutate({ user: data as User, imgurl: upload[0] });
       }
     }
   }
