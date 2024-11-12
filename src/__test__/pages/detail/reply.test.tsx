@@ -21,6 +21,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -36,6 +37,7 @@ jest.mock("firebase/firestore", () => ({
   addDoc: jest.fn(),
   updateDoc: jest.fn(),
   deleteDoc: jest.fn(),
+  getDocs: jest.fn(),
   collection: jest.fn(),
   serverTimestamp: jest.fn(),
 }));
@@ -80,12 +82,15 @@ jest.mock("@/app/api_hooks/Reply/getReplyHook", () => ({
 jest.mock("@/app/handler/Reply/useMutationHandler", () => ({
   useCreateHandler: jest.fn().mockReturnValue({
     mutate: jest.fn(),
+    mutateAsync: jest.fn(),
   }),
   useUpdateHandler: jest.fn().mockReturnValue({
     mutate: jest.fn(),
+    mutateAsync: jest.fn(),
   }),
   useDeleteHandler: jest.fn().mockReturnValue({
     mutate: jest.fn(),
+    mutateAsync: jest.fn(),
   }),
 }));
 
@@ -124,7 +129,7 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이전", () => {
     const createMutation = useCreateHandler();
 
     await waitFor(() => {
-      expect(createMutation.mutate).toHaveBeenCalledWith({
+      expect(createMutation.mutateAsync).toHaveBeenCalledWith({
         user: {
           name: data?.displayName,
           profile: "img/default.svg",
@@ -348,7 +353,7 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
     };
 
     await act(() => {
-      result.current.mutate({
+      result.current.mutateAsync({
         user: userObj,
         id: pageId,
         comment,
@@ -413,7 +418,7 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
 
     // 댓글 수정 동작 실행
     await act(() => {
-      result.current.mutate({
+      result.current.mutateAsync({
         user: userObj,
         id: pageId,
         comment,
@@ -444,14 +449,6 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
     const { data } = useUserQueryHook();
 
     // 댓글 수정에 필요한 예상 데이터를 미리 정의
-    const mockList = {
-      replyrer: data?.displayName,
-      comment: comment,
-      date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
-      profile: data?.photoURL ? data?.photoURL : "/img/default.svg",
-      uid: data?.uid,
-      timeStamp: serverTimestamp(), // serverTimestamp mock
-    };
 
     // Firestore에 대한 Mock 설정
     const replyCollectionRef = collection(
