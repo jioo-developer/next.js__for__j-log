@@ -2,6 +2,7 @@ import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import usePageDeleteHandler from "@/app/handler/detail/crud/useDeleteMutationHandler";
 import pageDelete from "@/app/handler/detail/pageDeleteHanlder";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
@@ -72,6 +73,12 @@ jest.mock("@/app/handler/detail/pageInfoHandler");
 jest.mock("@/app/handler/detail/pageDeleteHanlder");
 
 jest.mock("@/app/handler/detail/useMutationHandler");
+
+jest.mock("@/app/handler/detail/crud/useDeleteMutationHandler");
+
+(usePageDeleteHandler as jest.Mock).mockReturnValue({
+  mutate: jest.fn(),
+});
 
 (useFavoriteMutate as jest.Mock).mockReturnValue({
   mutate: jest.fn(),
@@ -195,21 +202,20 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
 });
 
 describe("페이지 삭제 로직 테스트", () => {
-  const queryClient = new QueryClient();
   const pageId = "new-page-id";
   const mockList: FirebaseData = {
-    fileName: [], // fileName을 string[]로 전달
+    fileName: [],
     writer: "test-writer",
-    pageId: "new-page-id",
+    pageId: pageId,
     user: "test-user",
     profile: "test-profile-url",
     date: "2023-01-01",
-    timestamp: 1672531200 as unknown as Timestamp, // Firestore Timestamp 사용
-    title: "Test Title", // 추가 필드
-    url: ["https://example.com"], // 추가 필드
-    favorite: 0, // 추가 필드
-    text: "Test content of the page", // 추가 필드
-    id: "unique-document-id", // 추가 필드
+    timestamp: 1672531200 as unknown as Timestamp,
+    title: "Test Title",
+    url: ["https://example.com"],
+    favorite: 0,
+    text: "Test content",
+    id: "unique-document-id",
   };
 
   beforeEach(async () => {
@@ -226,6 +232,8 @@ describe("페이지 삭제 로직 테스트", () => {
       error: null,
       isLoading: false,
     });
+
+    const queryClient = new QueryClient();
 
     await act(async () => {
       render(
@@ -248,68 +256,95 @@ describe("페이지 삭제 로직 테스트", () => {
     await act(async () => {
       pageInfoStore.setState({ fromAction: "detail" }); // 상태를 ""로 변경
     });
+
+    await act(async () => {
+      popupMessageStore.setState({ isClick: true }); // 상태를 ""로 변경
+    });
   });
-  test("페이지 삭제 로직 성공", async () => {
+
+  test("페이지 삭제 성공 테스트", async () => {
+    // 모의 함수 설정
     (doc as jest.Mock).mockResolvedValue(true);
     (deleteDoc as jest.Mock).mockResolvedValue(true);
+    (pageDelete as jest.Mock).mockResolvedValue(true);
 
+    // `jest.requireActual`로 훅 가져오기
     const pageDeleteHandler = jest.requireActual(
-      "@/app/handler/detail/pageDeleteHanlder"
+      "@/app/handler/detail/crud/useDeleteMutationHandler"
     ).default;
 
+    // `renderHook`을 사용하여 훅을 테스트할 때 `QueryClientProvider`로 감싸기
+    const queryClient = new QueryClient();
+    const { result } = renderHook(() => pageDeleteHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // mutation 실행
     await act(async () => {
-      popupMessageStore.setState({ isClick: true });
+      result.current.mutate(mockList);
     });
 
+    // 성공 여부 확인
     await waitFor(() => {
-      expect(pageDelete).toHaveBeenCalled();
+      expect(result.current.isSuccess).toBe(true);
     });
 
-    await waitFor(() => {
-      expect(pageDelete).toHaveBeenCalledWith(expect.any(Object)); // FirebaseData로 pageDelete 호출
-      expect(useRouter().push).toHaveBeenCalledWith("/pages/main"); // 페이지가 메인으로 이동
-    });
+    // Firestore 함수 호출 확인
+    expect(pageDelete).toHaveBeenCalledWith(mockList);
 
-    // pageDelete 함수 호출
-    await pageDeleteHandler(mockList);
-
-    // doc 함수가 올바르게 호출되었는지 확인
-    await waitFor(() => {
-      expect(doc).toHaveBeenCalledWith(expect.anything(), "post", pageId);
-
-      // deleteDoc 함수가 doc 함수에서 반환된 ref로 호출되었는지 확인
-      expect(deleteDoc).toHaveBeenCalledWith(expect.anything());
-    });
+    // 페이지 리다이렉트 확인
+    const router = useRouter();
+    expect(router.push).toHaveBeenCalledWith("/pages/main");
   });
 
-  test("페이지 삭제 로직 실패", async () => {
+  test("페이지 삭제 실패 테스트", async () => {
+    // 모의 함수 설정: 삭제 시 에러 발생
+    (doc as jest.Mock).mockResolvedValue(true);
+    (deleteDoc as jest.Mock).mockResolvedValue(true);
     (pageDelete as jest.Mock).mockRejectedValue(new Error("삭제 실패"));
 
+    // `jest.requireActual`로 훅 가져오기
+    const pageDeleteHandler = jest.requireActual(
+      "@/app/handler/detail/crud/useDeleteMutationHandler"
+    ).default;
+
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(() => pageDeleteHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    // mutation 실행
     await act(async () => {
-      popupMessageStore.setState({ isClick: true });
+      result.current.mutate(mockList);
     });
 
+    // 실패 여부 확인
     await waitFor(() => {
-      expect(pageDelete).toHaveBeenCalled();
+      expect(result.current.isError).toBe(true);
     });
 
-    const currentState = pageInfoStore.getState();
-    const from = currentState.fromAction;
-
-    if (from === "detail") {
-      try {
-        await pageDelete(mockList);
-        useRouter().push("/pages/main");
-      } catch {
-        popuprHandler({ message: "페이지 삭제 도중 문제가 생겼습니다" });
-      }
-    }
-
+    // 팝업 핸들러가 호출되었는지 확인
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "페이지 삭제 도중 문제가 생겼습니다",
       });
     });
+
+    // Firestore 함수 호출 확인 (에러 시에도 호출했는지 확인)
+    expect(pageDelete).toHaveBeenCalledWith(mockList);
+
+    // 페이지 리다이렉트가 발생하지 않았는지 확인
+    const router = useRouter();
+    expect(router.push).not.toHaveBeenCalled();
   });
 });
 
