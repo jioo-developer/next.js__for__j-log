@@ -4,6 +4,7 @@ import {
   waitFor,
   renderHook,
   act,
+  screen,
 } from "@testing-library/react";
 import EditorPage from "@/app/pages/editor/page";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
@@ -18,8 +19,10 @@ import useDetailQueryHook, {
 import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
 import { useRouter } from "next/navigation";
 import { setDoc } from "firebase/firestore";
-import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { ImageDeleteHandler } from "@/app/handler/detail/crud/imageCrudHandler";
+import { popupMessageStore } from "@/app/store/common";
+import useCashQueryHook from "@/app/api_hooks/common/getCashHook";
 
 // 필요한 훅과 모듈을 모킹
 
@@ -40,6 +43,7 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popuprHandler: jest.fn(),
+  popupInit: jest.fn(),
 }));
 
 // 사용자 정보 모킹
@@ -57,6 +61,20 @@ jest.mock("@/app/api_hooks/detail/getDetailHook", () => ({
   __esModule: true, // ES 모듈로 인식되도록 설정
   default: jest.fn().mockReturnValue({
     pageData: { title: "", text: "", url: [] },
+    error: null,
+    isLoading: false,
+  }),
+}));
+
+jest.mock("@/app/api_hooks/common/getCashHook", () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    CashData: [
+      {
+        cash: 0,
+        item: 0,
+      },
+    ],
     error: null,
     isLoading: false,
   }),
@@ -393,5 +411,73 @@ describe("이미 업로도 된 이미지 삭제 테스트", () => {
     const result = handler({ array: mockArray, fileIndex: 5 });
     expect(result.image).toEqual(["img1.jpg", "img2.jpg"]);
     expect(result.files).toEqual(["file1", "file2"]);
+  });
+});
+
+describe("노출 우선권 소유 테스트", () => {
+  const queryClient = new QueryClient();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test("노출 우선권 있을 때 팝업 미 호출 테스트", async () => {
+    (useCashQueryHook as jest.Mock).mockReturnValue({
+      CashData: [
+        {
+          cash: 10000,
+          item: 5,
+        },
+      ],
+      error: null,
+      isLoading: false,
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <EditorPage />
+      </QueryClientProvider>
+    );
+    const { CashData } = useCashQueryHook();
+    const button = screen.getByText("노출 우선권 사용하기") as HTMLElement;
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(popuprHandler).not.toHaveBeenCalled();
+    });
+  });
+
+  test("노출 우선권 없을 때 팝업 호출 테스트", async () => {
+    (useCashQueryHook as jest.Mock).mockReturnValue({
+      CashData: [
+        {
+          cash: 0,
+          item: 0,
+        },
+      ],
+      error: null,
+      isLoading: false,
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <EditorPage />
+      </QueryClientProvider>
+    );
+    const button = screen.getByText("노출 우선권 사용하기") as HTMLElement;
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "아이템을 보유 하고 있지 않습니다, 구매하러 가시겠습니까?",
+        type: "confirm",
+      });
+    });
+
+    await act(async () => {
+      popupMessageStore.setState({ isClick: true });
+    });
+
+    await waitFor(() => {
+      expect(useRouter().push).toHaveBeenCalledWith("/pages/member/mypage");
+    });
   });
 });

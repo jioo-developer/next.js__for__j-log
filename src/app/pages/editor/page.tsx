@@ -13,8 +13,8 @@ import {
 import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
-import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { pageInfoStore } from "@/app/store/common";
+import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import { Input } from "@/stories/atoms/Input";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
@@ -124,10 +124,22 @@ const EditorPage = () => {
     if (getData.item > 0) {
       setPriorty(e.target.checked);
     } else {
-      popuprHandler({ message: "아이템을 보유 하고 있지 않습니다" });
+      popuprHandler({
+        message: "아이템을 보유 하고 있지 않습니다, 구매하러 가시겠습니까?",
+        type: "confirm",
+      });
       e.target.checked = false;
     }
   };
+
+  const isClick = popupMessageStore().isClick;
+
+  useEffect(() => {
+    if (isClick) {
+      router.push("/pages/member/mypage");
+      popupInit();
+    }
+  }, [isClick]);
 
   return (
     <div className="upload">
