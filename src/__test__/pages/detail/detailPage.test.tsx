@@ -487,3 +487,58 @@ describe("좋아요 로직 테스트", () => {
     }
   });
 });
+
+describe("공유하기 버튼 테스트", () => {
+  const queryClient = new QueryClient();
+  const pageId = "new-page-id";
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    (useCreateId as jest.Mock).mockReturnValue(pageId);
+
+    (useUserQueryHook as jest.Mock).mockReturnValue({
+      data: { uid: "user-id", displayName: "Test User" },
+      error: null,
+      isLoading: false,
+    });
+    (useDetailQueryHook as jest.Mock).mockReturnValue({
+      pageData: { title: "123", text: "123", url: [] },
+      error: null,
+      isLoading: false,
+    });
+
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: jest.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    await act(async () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <DetailPage />
+        </QueryClientProvider>
+      );
+    });
+  });
+  test("공유하기 버튼 실행 테스트", async () => {
+    const button = screen.getByText("공유하기") as HTMLButtonElement;
+    fireEvent.click(button);
+
+    const url = window.location.href;
+
+    // 클립보드에 URL 복사
+    await navigator.clipboard.writeText(url);
+
+    // `writeText`가 올바르게 호출되었는지 확인
+    await waitFor(() => {
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
+
+    await waitFor(() => {
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "클립보드에 복사되었습니다",
+      });
+    });
+  });
+});
