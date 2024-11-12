@@ -1,8 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ItemStore from "@/stories/modules/ItemStore/ItemStore";
-import useCashQueryHook from "@/app/api_hooks/common/getCashHook";
 import useCashMutation from "@/app/api_hooks/common/setCashMutation";
-import { convertPrice } from "@/app/handler/commonHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -66,7 +64,9 @@ describe("ItemStore 테스트", () => {
     const confirmButton = screen.getByText("확인");
     fireEvent.click(confirmButton);
 
-    expect(useCashMutation().mutateAsync).toHaveBeenCalledWith({
+    const mutation = useCashMutation();
+
+    expect(mutation.mutateAsync).toHaveBeenCalledWith({
       cash: 7500,
       item: 6,
     });
@@ -82,8 +82,10 @@ describe("ItemStore 테스트", () => {
     const confirmButton = screen.getByText("확인");
     fireEvent.click(confirmButton);
 
+    const mutation = useCashMutation();
+
     await waitFor(() => {
-      expect(useCashMutation().mutateAsync).toHaveBeenCalledWith({
+      expect(mutation.mutateAsync).toHaveBeenCalledWith({
         cash: 7500, // 10000 - 2500
         item: 6, // 기존 2 + 1
       });
