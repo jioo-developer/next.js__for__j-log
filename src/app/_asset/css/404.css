@@ -8,13 +8,11 @@ body {
   margin: 0;
 }
 
-header {
-  display: none !important;
-}
-
 #notfound {
   position: relative;
+  width: 100%;
   height: 90vh;
+  top: -32px;
   background-color: #fafbfd;
 }
 
