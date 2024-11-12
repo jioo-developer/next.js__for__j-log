@@ -40,7 +40,7 @@ const ItemStore = ({ setState }: propsType) => {
       <div className="flex-box">
         <p>현재 포인트 :{getData ? convertPrice(getData.cash) : 0} +</p>
         <ButtonGroup>
-          <Button onClick={popupInit}>취소</Button>
+          <Button onClick={() => setState(false)}>취소</Button>
           <Button theme="success" onClick={() => buying()}>
             확인
           </Button>
