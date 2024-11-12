@@ -31,6 +31,8 @@ async function getMyData() {
         })
       );
       return result;
+    } else {
+      return [];
     }
   } else {
     return [];

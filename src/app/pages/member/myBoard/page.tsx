@@ -34,7 +34,7 @@ const MyBoardPage = () => {
             <Image
               width={128}
               height={128}
-              src={user.photoURL as string}
+              src={user.photoURL ? user.photoURL : "/img/no-image.jpg"}
               alt="프로필 이미지"
               className="header_img"
             />
