@@ -15,6 +15,7 @@ import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
 import usePageDeleteHandler from "@/app/handler/detail/crud/useDeleteMutationHandler";
 import { User } from "firebase/auth";
 import { MyContextProvider } from "../_reply/context";
+import { cookieHandler } from "@/app/handler/commonHandler";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -49,13 +50,14 @@ const DetailPage = () => {
   }, [msg]);
   // 팝업 노출 후 확인 눌렀을 시 메인페이지로 이동
 
-  function favoriteHandler() {
+  async function favoriteHandler() {
     const getcookie = `${(user as User).uid}-Cookie`;
     if (!document.cookie.includes(getcookie)) {
-      favoriteMutate.mutate({
+      await favoriteMutate.mutateAsync({
         value: (pageData as FirebaseData).favorite,
         id: pageInfo,
       });
+      cookieHandler((user as User).uid);
     }
   }
 
