@@ -75,7 +75,7 @@ function Header() {
                 <Image
                   width={40}
                   height={40}
-                  src={profile !== "" ? profile : "/img/default.svg"}
+                  src={profile !== "" && profile ? profile : "/img/default.svg"}
                   alt="프로필 이미지"
                   className="profile"
                   referrerPolicy="no-referrer"

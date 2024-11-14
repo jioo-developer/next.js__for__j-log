@@ -1,5 +1,3 @@
-import EditorPage from "@/app/pages/editor/page";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { within, screen, render } from "@testing-library/react";
 
 export const getElement = () => {

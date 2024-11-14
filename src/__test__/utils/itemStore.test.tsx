@@ -43,7 +43,7 @@ jest.mock("@/app/api_hooks/common/getCashHook");
 jest.mock("@/app/api_hooks/common/setCashMutation");
 
 (useCashMutation as jest.Mock).mockReturnValue({
-  mutateAsync: jest.fn().mockResolvedValue(true),
+  mutateAsync: jest.fn(),
 });
 
 const mockSetState = jest.fn();

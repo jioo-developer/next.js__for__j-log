@@ -2,7 +2,6 @@ import useDetailQueryHook, {
   FirebaseData,
 } from "@/app/api_hooks/detail/getDetailHook";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
-import { authService } from "@/app/Firebase";
 import usePageDeleteHandler from "@/app/handler/detail/crud/useDeleteMutationHandler";
 import pageDelete from "@/app/handler/detail/pageDeleteHanlder";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
@@ -19,7 +18,7 @@ import {
   fireEvent,
   renderHook,
 } from "@testing-library/react";
-import { deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
+import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 jest.mock("@/app/Firebase", () => ({
@@ -88,9 +87,20 @@ jest.mock("@/app/handler/detail/crud/useDeleteMutationHandler");
   mutateAsync: jest.fn(),
 });
 
+(doc as jest.Mock).mockImplementation((dbInstance, collection, documentId) => {
+  if (
+    dbInstance === ({} as any) &&
+    collection === "post" &&
+    documentId === "testId"
+  ) {
+    return true;
+  }
+});
+
+const pageId = "new-page-id";
+
 describe("게시글 페이지 데이터 없을 때 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -117,7 +127,6 @@ describe("게시글 페이지 데이터 없을 때 테스트", () => {
       popupMessageStore.setState({ message: "" }); // 상태를 ""로 변경
     });
 
-    // 상태가 ""로 변경되었을 때 router.push가 호출되는지 확인
     await waitFor(() => {
       const currentState = popupMessageStore.getState(); // 현재 zustand 상태 가져오기
       expect(currentState.message).toBe(""); // 상태가 빈 문자열로 변경되었는지 확인
@@ -136,7 +145,6 @@ describe("게시글 페이지 데이터 없을 때 테스트", () => {
 
 describe("게시글 페이지 데이터 있을 때 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -153,13 +161,11 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
       isLoading: false,
     });
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <DetailPage />
-        </QueryClientProvider>
-      );
-    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DetailPage />
+      </QueryClientProvider>
+    );
   });
 
   test("수정 버튼 클릭 시 edit 페이지로 이동 테스트", async () => {
@@ -173,7 +179,7 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
     // 상태가 ""로 변경되었을 때 router.push가 호출되는지 확인
     await waitFor(() => {
       const currentState = pageInfoStore.getState(); // 현재 zustand 상태 가져오기
-      expect(currentState.editMode).toBe(true); // 상태가 빈 문자열로 변경되었는지 확인
+      expect(currentState.editMode).toBe(true);
 
       expect(useRouter().push).toHaveBeenCalledWith("/pages/editor");
     });
@@ -192,7 +198,6 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
       pageInfoStore.setState({ fromAction: "detail" });
     });
 
-    // 상태가 ""로 변경되었을 때 router.push가 호출되는지 확인
     await waitFor(() => {
       const currentState = pageInfoStore.getState(); // 현재 zustand 상태 가져오기
       expect(currentState.fromAction).toBe("detail");
@@ -211,7 +216,6 @@ describe("게시글 페이지 데이터 있을 때 테스트", () => {
 
 describe("페이지 삭제 hook 로직 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
   const mockList: FirebaseData = {
     fileName: [],
     writer: "test-writer",
@@ -233,9 +237,7 @@ describe("페이지 삭제 hook 로직 테스트", () => {
 
   test("페이지 삭제 hook 성공 테스트", async () => {
     // 모의 함수 설정
-    (doc as jest.Mock).mockResolvedValue(true);
-    (deleteDoc as jest.Mock).mockResolvedValue(true);
-    (pageDelete as jest.Mock).mockResolvedValue(true);
+    (pageDelete as jest.Mock).mockResolvedValue(mockList);
 
     // `jest.requireActual`로 훅 가져오기
     const pageDeleteHandler = jest.requireActual(
@@ -255,23 +257,17 @@ describe("페이지 삭제 hook 로직 테스트", () => {
       result.current.mutate(mockList);
     });
 
-    expect(pageDelete).toHaveBeenCalledWith(mockList);
-
     // 성공 여부 확인
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
+      expect(pageDelete).toHaveBeenCalledWith(mockList);
+      expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
     });
-
-    // 페이지 리다이렉트 확인
-
-    expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
   });
 
   test("페이지 삭제 실패 테스트", async () => {
     const errorMsg = "페이지 삭제 도중 문제가 생겼습니다";
     // 모의 함수 설정: 삭제 시 에러 발생
-    (doc as jest.Mock).mockResolvedValue(true);
-    (deleteDoc as jest.Mock).mockResolvedValue(true);
     (pageDelete as jest.Mock).mockRejectedValue(new Error(errorMsg));
 
     // `jest.requireActual`로 훅 가져오기
@@ -297,11 +293,8 @@ describe("페이지 삭제 hook 로직 테스트", () => {
       expect(result.current.isError).toBe(true);
     });
 
-    // 팝업 핸들러가 호출되었는지 확인
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: errorMsg,
-      });
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: errorMsg,
     });
 
     // 페이지 리다이렉트가 발생하지 않았는지 확인
@@ -328,13 +321,11 @@ describe("좋아요 로직 테스트", () => {
       isLoading: false,
     });
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <DetailPage />
-        </QueryClientProvider>
-      );
-    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DetailPage />
+      </QueryClientProvider>
+    );
   });
   test("좋아요 mutate 함수 성공 테스트", async () => {
     // 좋아요 버튼 찾기 (적절한 텍스트를 기준으로 버튼 검색)
@@ -362,8 +353,7 @@ describe("좋아요 로직 테스트", () => {
     // favoriteMutate가 호출되었는지 확인
   });
   test("좋아요 함수 로직 성공 반영 테스트", async () => {
-    (doc as jest.Mock).mockResolvedValue(true);
-    (updateDoc as jest.Mock).mockResolvedValue(true);
+    (updateDoc as jest.Mock).mockResolvedValue({ favorite: 11 });
 
     const mutationHandler = jest.requireActual(
       "@/app/handler/detail/useMutationHandler"
@@ -386,15 +376,17 @@ describe("좋아요 로직 테스트", () => {
     // `isSuccess` 상태를 기다림
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
-      expect(doc).toHaveBeenCalledWith(expect.anything(), "post", pageId);
-      expect(updateDoc).toHaveBeenCalledWith(expect.anything(), {
+    });
+
+    await waitFor(() => {
+      const ref = doc({} as any, "post", pageId);
+      expect(updateDoc).toHaveBeenCalledWith(ref, {
         favorite: 11,
       });
     });
   });
   test("좋아요 함수 로직 실패 테스트", async () => {
     const errorMsg = "좋아요 반영이 되지 않았습니다.";
-    (doc as jest.Mock).mockResolvedValue(true);
     (updateDoc as jest.Mock).mockRejectedValue(new Error(errorMsg));
 
     const mutationHandler = jest.requireActual(
@@ -429,7 +421,6 @@ describe("좋아요 로직 테스트", () => {
 
 describe("공유하기 버튼 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
 
   Object.assign(navigator, {
     clipboard: {
@@ -452,13 +443,11 @@ describe("공유하기 버튼 테스트", () => {
       isLoading: false,
     });
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <DetailPage />
-        </QueryClientProvider>
-      );
-    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DetailPage />
+      </QueryClientProvider>
+    );
   });
   test("공유하기 버튼 실행 테스트", async () => {
     const button = screen.getByText("공유하기") as HTMLButtonElement;

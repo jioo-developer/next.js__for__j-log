@@ -13,11 +13,12 @@ jest.mock("@/app/Firebase", () => ({
 
 jest.mock("firebase/auth", () => ({
   createUserWithEmailAndPassword: jest.fn(),
-  updateProfile: jest.fn().mockResolvedValue(true),
+  updateProfile: jest.fn(),
 }));
 
 jest.mock("firebase/firestore", () => ({
-  setDoc: jest.fn().mockResolvedValue(true),
+  setDoc: jest.fn(),
+  // 뭔가를 return 하는 함수가 아님
   doc: jest.fn().mockReturnValue({}),
 }));
 

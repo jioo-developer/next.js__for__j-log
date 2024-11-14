@@ -94,6 +94,8 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
   mutateAsync: jest.fn(),
 });
 
+const pageId = "new-page-id";
+
 describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
   const queryClient = new QueryClient();
 
@@ -158,7 +160,6 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
 
 describe("페이지 생성 & 수정 함수 호출 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
   beforeEach(() => {
     jest.clearAllMocks();
     // 페이지 정보 스토어 초기화
@@ -268,34 +269,31 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
 
 describe("페이지 생성 & 수정 로직 테스트", () => {
   const queryClient = new QueryClient();
-  const pageId = "new-page-id";
+
+  const content = {
+    title: "Mock Title",
+    text: "This is some mock text.",
+    file: [
+      new File(["file content 1"], "file1.png", { type: "image/png" }),
+      new File(["file content 2"], "file2.jpg", { type: "image/jpeg" }),
+    ],
+    previewImg: [
+      "http://example.com/preview1.png",
+      "http://example.com/preview2.png",
+    ],
+    pageInfo: "mockPageId",
+    editMode: false,
+    priority: true,
+    url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (setDoc as jest.Mock).mockResolvedValue(true);
-    // 페이지 정보 스토어 초기화
   });
   test("CreateHandler 함수 성공 테스트", async () => {
     const mutationHandler = jest.requireActual(
       "@/app/handler/detail/crud/useMutationHandler"
     ).default;
-
-    const content = {
-      title: "Mock Title",
-      text: "This is some mock text.",
-      file: [
-        new File(["file content 1"], "file1.png", { type: "image/png" }),
-        new File(["file content 2"], "file2.jpg", { type: "image/jpeg" }),
-      ],
-      previewImg: [
-        "http://example.com/preview1.png",
-        "http://example.com/preview2.png",
-      ],
-      pageInfo: "mockPageId",
-      editMode: false,
-      priority: true,
-      url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
-    };
 
     const { result } = renderHook(() => mutationHandler(), {
       wrapper: ({ children }) => (

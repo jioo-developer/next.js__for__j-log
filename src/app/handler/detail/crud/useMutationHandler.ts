@@ -15,7 +15,7 @@ const useCreateMutation = () => {
   return useMutation({
     mutationFn: async ({ data, pageId }: propsType) => {
       await setDoc(doc(db, "post", pageId), data);
-      return { data, pageId };
+      return { pageId };
     },
     onSuccess: (result) => {
       router.push(`/pages/detail/${result.pageId}`);
