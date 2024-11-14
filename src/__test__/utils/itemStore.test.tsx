@@ -84,11 +84,9 @@ describe("ItemStore 테스트", () => {
 
     const mutation = useCashMutation();
 
-    await waitFor(() => {
-      expect(mutation.mutateAsync).toHaveBeenCalledWith({
-        cash: 7500, // 10000 - 2500
-        item: 6, // 기존 2 + 1
-      });
+    expect(mutation.mutateAsync).toHaveBeenCalledWith({
+      cash: 7500, // 10000 - 2500
+      item: 6, // 기존 2 + 1
     });
   });
 });

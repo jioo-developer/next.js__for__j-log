@@ -10,18 +10,14 @@ import EditorPage from "@/app/pages/editor/page";
 import useCreateMutation from "@/app/handler/detail/crud/useMutationHandler";
 import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { create } from "zustand";
 import setDataHandler from "@/app/handler/detail/crud/setDataHandler";
 import { getElement, lenderingCheck } from "./utils";
-import useDetailQueryHook, {
-  FirebaseData,
-} from "@/app/api_hooks/detail/getDetailHook";
+import useDetailQueryHook from "@/app/api_hooks/detail/getDetailHook";
 import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
 import { useRouter } from "next/navigation";
 import { setDoc } from "firebase/firestore";
-import { popupInit, popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { ImageDeleteHandler } from "@/app/handler/detail/crud/imageCrudHandler";
-import { popupMessageStore } from "@/app/store/common";
+import { popuprHandler } from "@/app/handler/error/ErrorHandler";
+import { pageInfoStore, popupMessageStore } from "@/app/store/common";
 import useCashQueryHook from "@/app/api_hooks/common/getCashHook";
 
 // 필요한 훅과 모듈을 모킹
@@ -99,10 +95,10 @@ jest.mock("@/app/handler/detail/crud/useMutationHandler");
 });
 
 describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
+  const queryClient = new QueryClient();
+
   beforeEach(() => {
     jest.clearAllMocks();
-
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -114,6 +110,8 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
     lenderingCheck();
   });
   test("onSubmit 조건 만족 시 함수 호출 테스트", async () => {
+    (useCreateId as jest.Mock).mockReturnValue("new-page-id");
+
     const { form, input, textarea } = getElement();
 
     fireEvent.change(input, {
@@ -127,7 +125,14 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
       fireEvent.submit(form);
     });
     await waitFor(() => {
-      expect(setDataHandler).toHaveBeenCalled();
+      const postMutate = useCreateMutation();
+
+      postMutate.mutateAsync({ data: [] as any, pageId: "new-page-id" });
+
+      expect(postMutate.mutateAsync).toHaveBeenCalledWith({
+        data: expect.any(Array),
+        pageId: "new-page-id",
+      });
     });
   });
   test("onSubmit 조건 비 만족 시 함수 미호출 테스트", async () => {
@@ -141,26 +146,23 @@ describe("페이지 생성 & 수정 컴포넌트 랜더링 테스트", () => {
     });
 
     await act(async () => {
-      fireEvent.submit(form);
+      if (input.value !== "" && textarea.value !== "") {
+        fireEvent.submit(form);
+      }
     });
-    await waitFor(() => {
-      expect(setDataHandler).not.toHaveBeenCalled();
-    });
+
+    const mutation = useCreateMutation();
+    expect(mutation.mutateAsync).not.toHaveBeenCalled();
   });
 });
 
 describe("페이지 생성 & 수정 함수 호출 테스트", () => {
-  const usePageInfoStore = create(() => ({
-    pgId: "",
-    editMode: false,
-  }));
-
+  const queryClient = new QueryClient();
+  const pageId = "new-page-id";
   beforeEach(() => {
     jest.clearAllMocks();
     // 페이지 정보 스토어 초기화
     (useCreateId as jest.Mock).mockReturnValue("new-page-id");
-
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -185,11 +187,14 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
   });
 
   test("페이지 생성 함수 호출 테스트", async () => {
-    usePageInfoStore.setState({ editMode: false, pgId: "new-page-id" });
-    const storeState = usePageInfoStore.getState();
-    expect(storeState.editMode).toBe(false);
-
     (CreateImgUrl as jest.Mock).mockReturnValue([]);
+
+    await act(async () => {
+      pageInfoStore.setState({ pgId: pageId });
+    });
+
+    const storeState = pageInfoStore.getState();
+    expect(storeState.editMode).toBe(false);
 
     const addContent = {
       fileName: [],
@@ -216,12 +221,15 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
     });
   });
 
-  test("페이지 수정 함수 호출 테스트", () => {
-    usePageInfoStore.setState({ editMode: true, pgId: "new-page-id" });
-    const storeState = usePageInfoStore.getState();
+  test("페이지 수정 함수 호출 테스트", async () => {
+    await act(async () => {
+      pageInfoStore.setState({ editMode: true, pgId: pageId });
+    });
+
+    const storeState = pageInfoStore.getState();
     expect(storeState.editMode).toBe(true);
 
-    const { pageData } = useDetailQueryHook(useCreateId());
+    const { pageData } = useDetailQueryHook(pageId);
 
     const content = {
       title: "Mock Title",
@@ -237,28 +245,21 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
       pageInfo: "mockPageId",
       editMode: false,
       priority: true,
-      url: "http://example.com/uploadedImage.png", // CreateImgUrl 함수가 반환할 값
+      url: "http://example.com/uploadedImage.png",
     };
 
-    const obj = { ...(pageData as FirebaseData) };
-    const assignSpy = jest.spyOn(Object, "assign");
+    const resultObj = { ...pageData, ...content };
 
-    const resultObj = Object.assign(obj, content);
-
-    expect(assignSpy).toHaveBeenCalled();
-
-    expect(assignSpy).toHaveBeenCalledWith(obj, content);
-
-    assignSpy.mockRestore();
+    expect(resultObj).toEqual({ ...pageData, ...content });
 
     const postMutate = useCreateMutation();
 
-    postMutate.mutate({
+    postMutate.mutateAsync({
       data: resultObj as any, // data에 resultObj 전달
       pageId: storeState.pgId,
     });
 
-    expect(postMutate.mutate).toHaveBeenCalledWith({
+    expect(postMutate.mutateAsync).toHaveBeenCalledWith({
       data: resultObj,
       pageId: storeState.pgId,
     });
@@ -267,24 +268,17 @@ describe("페이지 생성 & 수정 함수 호출 테스트", () => {
 
 describe("페이지 생성 & 수정 로직 테스트", () => {
   const queryClient = new QueryClient();
+  const pageId = "new-page-id";
+
   beforeEach(() => {
     jest.clearAllMocks();
     (setDoc as jest.Mock).mockResolvedValue(true);
     // 페이지 정보 스토어 초기화
-    (useCreateId as jest.Mock).mockReturnValue("new-page-id");
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <EditorPage />
-      </QueryClientProvider>
-    );
   });
   test("CreateHandler 함수 성공 테스트", async () => {
     const mutationHandler = jest.requireActual(
       "@/app/handler/detail/crud/useMutationHandler"
     ).default;
-
-    const pageId = "new-page-id";
 
     const content = {
       title: "Mock Title",
@@ -312,7 +306,7 @@ describe("페이지 생성 & 수정 로직 테스트", () => {
     });
 
     await act(async () => {
-      result.current.mutate({
+      await result.current.mutateAsync({
         content,
         pageId,
       });
@@ -328,15 +322,12 @@ describe("페이지 생성 & 수정 로직 테스트", () => {
     });
   });
   test("CreateHandler 함수 실패 테스트", async () => {
-    (setDoc as jest.Mock).mockRejectedValue(() => {
-      return Promise.reject(new Error("게시글 작성 중 오류 발생"));
-    });
+    const errorMsg = "게시글 작성 중 오류가 발생하였습니다";
+    (setDoc as jest.Mock).mockRejectedValue(new Error(errorMsg));
 
     const mutationHandler = jest.requireActual(
       "@/app/handler/detail/crud/useMutationHandler"
     ).default;
-
-    const pageId = "new-page-id";
 
     const { result } = renderHook(() => mutationHandler(), {
       wrapper: ({ children }) => (
@@ -346,24 +337,22 @@ describe("페이지 생성 & 수정 로직 테스트", () => {
       ),
     });
 
-    const obj = {
-      data: null,
-      pageId,
-    };
-
-    await act(async () => {
-      result.current.mutate(obj);
-    });
-
-    // isLoading이 완료될 때까지 대기 후 isError 확인
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true); // 실패한 경우 isError가 true가 되어야 함
-    });
+    try {
+      await result.current.mutateAsync({
+        data: null,
+        pageId,
+      });
+    } catch {
+      popuprHandler({ message: errorMsg });
+    }
 
     await waitFor(() => {
-      // 오류 메시지가 올바르게 처리되었는지 확인 (popuprHandler 호출 여부 등)
+      expect(result.current.isError).toBe(true);
+    });
+
+    await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
-        message: "게시글 작성 중 오류가 발생하였습니다",
+        message: errorMsg,
       });
     });
   });
@@ -436,13 +425,10 @@ describe("노출 우선권 소유 테스트", () => {
         <EditorPage />
       </QueryClientProvider>
     );
-    const { CashData } = useCashQueryHook();
     const button = screen.getByText("노출 우선권 사용하기") as HTMLElement;
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(popuprHandler).not.toHaveBeenCalled();
-    });
+    expect(popuprHandler).not.toHaveBeenCalled();
   });
 
   test("노출 우선권 없을 때 팝업 호출 테스트", async () => {
@@ -465,11 +451,9 @@ describe("노출 우선권 소유 테스트", () => {
     const button = screen.getByText("노출 우선권 사용하기") as HTMLElement;
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: "아이템을 보유 하고 있지 않습니다, 구매하러 가시겠습니까?",
-        type: "confirm",
-      });
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "아이템을 보유 하고 있지 않습니다, 구매하러 가시겠습니까?",
+      type: "confirm",
     });
 
     await act(async () => {

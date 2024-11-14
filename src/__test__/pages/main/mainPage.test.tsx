@@ -40,9 +40,9 @@ jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popuprHandler: jest.fn(),
 }));
 
-describe("메인페이지 테스트 - skeleton 함수까지", () => {
-  const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
+describe("메인페이지 테스트 - skeleton 함수까지", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -52,7 +52,7 @@ describe("메인페이지 테스트 - skeleton 함수까지", () => {
       error: null,
       isLoading: true,
     });
-    const { data, isLoading } = useUserQueryHook();
+    const { isLoading } = useUserQueryHook();
     render(
       <QueryClientProvider client={queryClient}>
         <>{isLoading ? <SkeletonItem /> : <MainPage />}</>
@@ -72,7 +72,6 @@ describe("메인페이지 테스트 - skeleton 함수까지", () => {
 });
 
 describe("메인 페이지 테스트 - skeleton 함수 이후", () => {
-  const queryClient = new QueryClient();
   beforeEach(() => {
     jest.clearAllMocks();
   });

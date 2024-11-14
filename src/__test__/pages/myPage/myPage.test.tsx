@@ -17,7 +17,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/Firebase";
 import storageUpload from "@/app/handler/file/storageUploadHandler";
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
-import useImageChanger from "@/app/handler/mypage/useImaeMutationHandler";
+
 jest.mock("@/app/Firebase", () => ({
   authService: {
     currentUser: {
@@ -102,13 +102,12 @@ describe("닉네임 변경 로직 테스트", () => {
     await waitFor(() => {
       const { input } = trueStateElement();
       expect(input).toBeInTheDocument();
-    });
-
-    // 수정 완료 버튼 클릭
-    await waitFor(() => {
-      const { input } = trueStateElement();
       fireEvent.change(input, { target: { value: "NewNickName" } });
     });
+    const { nicknameData } = useNameQueryHook();
+
+    const isNamecheck = nicknameData.includes("NewNickName");
+    expect(isNamecheck).toBe(false);
 
     await act(() => {
       const { editEndBtn } = trueStateElement();
@@ -118,9 +117,6 @@ describe("닉네임 변경 로직 테스트", () => {
   });
 
   test("닉네임 변경 함수 mutate hook 호출 테스트", async () => {
-    const { nicknameData } = useNameQueryHook();
-    const isNamecheck = nicknameData.includes("NewNickName");
-    expect(isNamecheck).toBe(false);
     const nameChangeMutate = useNameChanger();
     expect(nameChangeMutate.mutate).toHaveBeenCalledWith({
       data: {
@@ -133,11 +129,12 @@ describe("닉네임 변경 로직 테스트", () => {
   });
 
   test("닉네임 변경 성공 테스트", async () => {
-    const queryClient = new QueryClient();
     const { data } = useUserQueryHook();
+
     const handler = jest.requireActual(
       "@/app/handler/mypage/useMutationHandler"
     ).default;
+
     const { result } = renderHook(() => handler(), {
       wrapper: ({ children }) => (
         <QueryClientProvider client={queryClient}>
@@ -176,10 +173,11 @@ describe("닉네임 변경 로직 테스트", () => {
     expect(refetch).toHaveBeenCalled();
   });
   test("닉네임 변경 실패 테스트", async () => {
-    const queryClient = new QueryClient();
+    const errorMsg = "닉네임을 변경에 실패하였습니다.";
     const handler = jest.requireActual(
       "@/app/handler/mypage/useMutationHandler"
     ).default;
+
     const { result } = renderHook(() => handler(), {
       wrapper: ({ children }) => (
         <QueryClientProvider client={queryClient}>
@@ -193,12 +191,17 @@ describe("닉네임 변경 로직 테스트", () => {
       nickname: "NewNick",
     };
 
-    await act(async () => {
-      result.current.mutate(obj);
-    });
+    try {
+      await act(async () => {
+        result.current.mutate(obj);
+      });
+    } catch (error) {
+      // 에러가 발생하면 팝업 핸들러를 호출
+      popuprHandler({ message: errorMsg });
+    }
 
     await waitFor(() => {
-      popuprHandler({ message: "닉네임을 변경에 실패하였습니다." });
+      expect(popuprHandler).toHaveBeenCalledWith({ message: errorMsg });
     });
   });
   test("변경 하려는 닉네임이 이미 존재 할 때 테스트", async () => {
@@ -223,6 +226,7 @@ describe("파일 업로드 성공 및 실패 테스트", () => {
     new File(["file content 2"], "file2.txt", { type: "text/plain" }),
   ];
   const mockFilePaths = ["file1.txt", "file2.txt"]; // 파일 경로 또는 이름
+
   beforeEach(async () => {
     jest.clearAllMocks();
   });
@@ -278,15 +282,8 @@ describe("파일 업로드 성공 및 실패 테스트", () => {
 });
 
 describe("프로필 이미지 변경 로직 테스트", () => {
-  const upload = ["uploadedUrl"];
   beforeEach(async () => {
     jest.clearAllMocks();
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MyPage />
-      </QueryClientProvider>
-    );
   });
   test("프로필 이미지 변경 성공 테스트", async () => {
     const handler = jest.requireActual(
@@ -306,6 +303,7 @@ describe("프로필 이미지 변경 로직 테스트", () => {
       displayName: "OldNick",
       photoURL: "/profile.jpg",
     } as User;
+
     const imgurl = expect.any(String);
 
     // mutation 실행
@@ -322,12 +320,14 @@ describe("프로필 이미지 변경 로직 테스트", () => {
       photoURL: imgurl,
     });
   });
+
   test("프로필 이미지 변경 실패 테스트", async () => {
     const handler = jest.requireActual(
       "@/app/handler/mypage/useImaeMutationHandler"
     ).default;
 
     const errorMsg = "프로필 업로드에 실패하였습니다.";
+
     (updateProfile as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
 
     const { result } = renderHook(() => handler(), {

@@ -9,7 +9,6 @@ import {
   fireEvent,
   render,
   waitFor,
-  screen,
   renderHook,
   act,
 } from "@testing-library/react";
@@ -45,6 +44,10 @@ jest.mock("@/app/api_hooks/login/getUserHook", () => ({
 
 jest.mock("@/app/api_hooks/login/setUserHook", () => jest.fn());
 
+(useLoginHook as jest.Mock).mockReturnValue({
+  mutate: jest.fn(),
+});
+
 jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popuprHandler: jest.fn(),
 }));
@@ -77,19 +80,16 @@ describe("로그인 페이지 테스트", () => {
   });
 
   test("로그인 함수 호출에 성공하는 지 테스트", async () => {
-    (useLoginHook as jest.Mock).mockReturnValue({
-      mutate: jest.fn(),
-    });
-    // mutate를 여기서만 mocking
-
     const { id, password, loginBtn } = getElementsHandler();
     fireEvent.change(id, { target: { value: "user@test.com" } });
     fireEvent.change(password, { target: { value: "password123" } });
 
     fireEvent.click(loginBtn);
 
+    const mutation = useLoginHook();
+
     await waitFor(() => {
-      expect(useLoginHook().mutate).toHaveBeenCalledWith({
+      expect(mutation.mutate).toHaveBeenCalledWith({
         id: "user@test.com",
         pw: "password123",
       });
@@ -129,10 +129,10 @@ describe("로그인 페이지 테스트", () => {
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
-    });
 
-    expect(popuprHandler).toHaveBeenCalledWith({
-      message: "아이디 또는 비밀번호가 맞지 않습니다.",
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "아이디 또는 비밀번호가 맞지 않습니다.",
+      });
     });
   });
 });
@@ -144,14 +144,19 @@ describe("로그아웃 로직 테스트", () => {
 
   test("로그아웃 기능이 성공적으로 호출되는지 테스트", async () => {
     // useLogOut 훅을 테스트 환경에서 실행
-    const { result } = renderHook(() => useLogOut());
+    const { result } = renderHook(() => useLogOut(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
 
     // logOut 함수 실행
     await act(async () => {
       await result.current();
     });
 
-    // authService.signOut가 호출되었는지 확인
     expect(authService.signOut).toHaveBeenCalled();
 
     // refetch 함수가 호출되었는지 확인

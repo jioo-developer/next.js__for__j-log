@@ -19,10 +19,7 @@ import { useRouter } from "next/navigation";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
-    currentUser: {
-      uid: "123",
-      email: "test@example.com",
-    } as User,
+    currentUser: expect.any(String),
   },
 }));
 
@@ -66,26 +63,27 @@ jest.mock("@/app/handler/quit/userCredential/credentialHandler", () =>
 describe("회원탈퇴 로직 테스트", () => {
   const setQuitMock = jest.fn().mockReturnValue(true);
   const queryClient = new QueryClient();
+  const user = expect.any(String);
 
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    await act(async () => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <QuitPage setQuit={setQuitMock} />
-        </QueryClientProvider>
-      );
-    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <QuitPage setQuit={setQuitMock} />
+      </QueryClientProvider>
+    );
   });
 
   test("isCredential이 'sosial'일 때 팝업 호출 테스트", async () => {
     (isCredential as jest.Mock).mockReturnValueOnce("sosial");
 
     const activeBtn = screen.getByText("확인");
+
     await act(async () => {
       fireEvent.click(activeBtn);
     });
+
     expect(popuprHandler).toHaveBeenCalledWith({
       message: "회원탈퇴에 사용 될 2차비밀번호를 입력 해주세요",
       type: "prompt",
@@ -97,9 +95,11 @@ describe("회원탈퇴 로직 테스트", () => {
     (isCredential as jest.Mock).mockReturnValueOnce("origin");
 
     const activeBtn = screen.getByText("확인");
+
     await act(async () => {
       fireEvent.click(activeBtn);
     });
+
     expect(popuprHandler).toHaveBeenCalledWith({
       message: "로그인에 사용 되는 비밀번호를 입력 해주세요",
       type: "prompt",
@@ -125,19 +125,14 @@ describe("회원탈퇴 로직 테스트", () => {
       popupMessageStore.setState({ isClick: true });
     });
 
-    const user = authService.currentUser as User;
-
     expect(deleteDB).toHaveBeenCalledWith(user);
 
-    const Credential = await isCredential(user as User);
+    const Credential = await isCredential(user);
 
     if (Credential === "origin") {
       expect(originDeleteHandler).toHaveBeenCalled();
       await waitFor(() => {
         expect(deleteUser).toHaveBeenCalledWith(user);
-      });
-
-      await waitFor(() => {
         expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
       });
     }
@@ -147,6 +142,7 @@ describe("회원탈퇴 로직 테스트", () => {
     (isCredential as jest.Mock).mockReturnValueOnce("sosial");
 
     const activeBtn = screen.getByText("확인");
+
     await act(async () => {
       fireEvent.click(activeBtn);
     });
@@ -161,31 +157,26 @@ describe("회원탈퇴 로직 테스트", () => {
       popupMessageStore.setState({ isClick: true });
     });
 
-    const user = authService.currentUser as User;
-
     expect(deleteDB).toHaveBeenCalledWith(user);
 
-    const Credential = await isCredential(user as User);
+    const Credential = await isCredential(user);
 
     if (Credential === "sosial") {
       expect(SocialDeleteHandler).toHaveBeenCalled();
       await waitFor(() => {
         expect(deleteUser).toHaveBeenCalledWith(user);
-      });
-
-      await waitFor(() => {
         expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
       });
     }
   });
   test("회원정보 삭제 실패 로직", async () => {
+    const errorMsg = "회원 탈퇴에 실패하였습니다";
     (isCredential as jest.Mock).mockReturnValueOnce("sosial");
 
-    (SocialDeleteHandler as jest.Mock).mockImplementation(() => {
-      throw new Error("Error during delete");
-    });
+    (SocialDeleteHandler as jest.Mock).mockRejectedValue(new Error(errorMsg));
 
     const activeBtn = screen.getByText("확인");
+
     await act(async () => {
       fireEvent.click(activeBtn);
     });
@@ -200,18 +191,16 @@ describe("회원탈퇴 로직 테스트", () => {
       popupMessageStore.setState({ isClick: true });
     });
 
-    const user = authService.currentUser as User;
-
     expect(deleteDB).toHaveBeenCalledWith(user);
 
-    const Credential = await isCredential(user as User);
+    const Credential = await isCredential(user);
 
     if (Credential === "sosial") {
       expect(SocialDeleteHandler).toHaveBeenCalled();
 
       await waitFor(() => {
         expect(popuprHandler).toHaveBeenCalledWith({
-          message: "회원 탈퇴에 실패하였습니다",
+          message: errorMsg,
         });
       });
     }

@@ -4,14 +4,12 @@ import MyBoardPage from "@/app/pages/member/myBoard/page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   render,
-  renderHook,
   waitFor,
   screen,
   act,
   fireEvent,
 } from "@testing-library/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -59,25 +57,6 @@ describe("myboard 페이지 테스트", () => {
       </QueryClientProvider>
     );
 
-    renderHook(
-      () => {
-        const { myData, isLoading } = useMyDataQueryHook();
-
-        // useEffect 테스트
-        useEffect(() => {
-          if (!isLoading && myData.length === 0) {
-            popuprHandler({ message: "게시글이 조회되지 않습니다." });
-          }
-        }, [myData, isLoading]);
-      },
-      {
-        wrapper: ({ children }) => (
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        ),
-      }
-    );
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
         message: "게시글이 조회되지 않습니다.",

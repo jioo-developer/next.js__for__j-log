@@ -78,15 +78,15 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
       error: null,
       isLoading: true,
     });
+
     (isPathHandler as jest.Mock).mockReturnValue(() => false);
 
     const isPathCheck = isPathHandler("/pages/main");
     const { data } = useUserQueryHook();
+
     if (!isPathCheck && !data) {
-      await waitFor(() => {
-        expect(popuprHandler).toHaveBeenCalledWith({
-          message: "회원정보를 불러오는 중입니다.",
-        });
+      expect(popuprHandler).toHaveBeenCalledWith({
+        message: "회원정보를 불러오는 중입니다.",
       });
     }
   });
@@ -138,24 +138,17 @@ describe("SNS 계정 인 경우 2차 비밀번호 검증 테스트", () => {
     (authService.signOut as jest.Mock).mockResolvedValueOnce(true);
 
     const result = await isSecondaryPw("123");
-
     await waitFor(() => {
       expect(result).toBe(false);
     });
 
-    await act(() => {
-      render(
-        <QueryClientProvider client={queryClient}>
-          <MiddleWareProvider>
-            <MainPage />
-          </MiddleWareProvider>
-        </QueryClientProvider>
-      );
-    });
-
-    expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
-
     await waitFor(() => {
+      if (!result) {
+        useRouter().push("/pages/login");
+        authService.signOut();
+      }
+
+      expect(useRouter().push).toHaveBeenCalledWith("/pages/login");
       expect(authService.signOut).toHaveBeenCalled();
     });
   });

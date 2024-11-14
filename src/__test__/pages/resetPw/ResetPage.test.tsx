@@ -88,6 +88,7 @@ describe("비밀번호 찾기 로직 테스트", () => {
         "test@example.com"
       );
     });
+
     expect(popuprHandler).toHaveBeenCalledWith({
       message: "입력하신 메일로 비밀번호 안내드렸습니다",
     });
@@ -117,8 +118,6 @@ describe("비밀번호 찾기 로직 테스트", () => {
     const confirmButton = screen.getByText("확인");
     fireEvent.click(confirmButton);
 
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({ message: error });
-    });
+    expect(popuprHandler).toHaveBeenCalledWith({ message: error });
   });
 });

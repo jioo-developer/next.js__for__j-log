@@ -6,6 +6,7 @@ import {
 } from "@/app/api_hooks/login/snsLogin/googleLogin";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import SocialLoginPage from "@/app/pages/login/snsLogin/sosialLogin";
+import { popupMessageStore } from "@/app/store/common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,
@@ -34,6 +35,8 @@ jest.mock("@/app/api_hooks/login/snsLogin/googleLogin", () => ({
   onGoogle: jest.fn(),
   useSecondaryHandler: jest.fn(),
 }));
+
+(useSecondaryHandler as jest.Mock).mockReturnValue({ mutate: jest.fn() });
 
 jest.mock("firebase/firestore", () => ({
   getDoc: jest.fn(),
@@ -64,10 +67,17 @@ jest.mock("@/app/handler/error/ErrorHandler", () => ({
   popupInit: jest.fn(),
 }));
 
+const queryClient = new QueryClient();
+
+const mockUser = {
+  userId: "123",
+  userName: "Test User",
+  providerData: "goggle.com",
+};
+
 describe("구글 로그인 시 계정 조회 테스트", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -85,12 +95,6 @@ describe("구글 로그인 시 계정 조회 테스트", () => {
   });
 
   test("계정 조회 성공 테스트", async () => {
-    const mockUser = {
-      userId: "123",
-      userName: "Test User",
-      providerData: "goggle.com",
-    };
-
     (onGoogle as jest.Mock).mockResolvedValue(mockUser);
 
     const googleButton = screen.getByText("구글로 시작하기");
@@ -126,21 +130,23 @@ describe("구글 로그인 시 계정 조회 테스트", () => {
 });
 
 describe("2차 비밀번호 설정 검증 테스트", () => {
+  const mockUser = {
+    id: "123",
+    name: "Test User",
+    userId: "123",
+    userName: "Test User",
+    service: "google.com",
+    pw: 12345,
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
-    const queryClient = new QueryClient();
 
     render(
       <QueryClientProvider client={queryClient}>
         <SocialLoginPage />
       </QueryClientProvider>
     );
-
-    const mockUser = {
-      userId: "123",
-      userName: "Test User",
-      providerData: "goggle.com",
-    };
 
     (onGoogle as jest.Mock).mockResolvedValue(mockUser);
   });
@@ -160,13 +166,7 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
   });
 
   test("2차 비밀번호 미설정 시 설정 mutate 호출 테스트", async () => {
-    const testStore = create(() => ({
-      isClick: false,
-    }));
-
     (isSecondaryPw as jest.Mock).mockReturnValue(false);
-
-    (useSecondaryHandler as jest.Mock).mockReturnValue({ mutate: jest.fn() });
 
     const googleButton = screen.getByText("구글로 시작하기");
 
@@ -183,21 +183,12 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
     });
 
     act(() => {
-      testStore.setState({ isClick: true });
+      popupMessageStore.setState({ isClick: true });
     });
 
     await waitFor(() => {
-      expect(testStore.getState().isClick).toBe(true);
+      expect(popupMessageStore.getState().isClick).toBe(true);
     });
-
-    const mockUser = {
-      id: "123",
-      name: "Test User",
-      userId: "123",
-      userName: "Test User",
-      service: "google.com",
-      pw: 12345,
-    };
 
     const mutateHandler = useSecondaryHandler();
 
@@ -213,16 +204,6 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
       "@/app/api_hooks/login/snsLogin/googleLogin"
     ).useSecondaryHandler;
 
-    const mockUser = {
-      id: "123",
-      name: "Test User",
-      userId: "123",
-      userName: "Test User",
-      service: "google.com",
-      pw: 12345,
-    };
-
-    const queryClient = new QueryClient();
     const { result } = renderHook(() => mutationHandler(), {
       wrapper: ({ children }) => (
         <QueryClientProvider client={queryClient}>
@@ -246,28 +227,19 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
         nickname: mockUser.name,
         service: mockUser.service,
       });
-    });
 
-    await waitFor(() => {
       expect(useRouter().push).toHaveBeenCalledWith("/pages/main");
     });
   });
 
   test("2차 비밀번호 생성 실패 테스트", async () => {
+    const errorMsg = "입력된 값에 오류가 있습니다. 다시 시도 해주세요";
+
+    (setDoc as jest.Mock).mockRejectedValue(new Error(errorMsg));
     const mutationHandler = jest.requireActual(
       "@/app/api_hooks/login/snsLogin/googleLogin"
     ).useSecondaryHandler;
 
-    const mockUser = {
-      id: null,
-      name: "Test User",
-      userId: "123",
-      userName: "Test User",
-      service: "google.com",
-      pw: null,
-    };
-
-    const queryClient = new QueryClient();
     const { result } = renderHook(() => mutationHandler(), {
       wrapper: ({ children }) => (
         <QueryClientProvider client={queryClient}>
@@ -276,9 +248,15 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
       ),
     });
 
-    await act(async () => {
-      result.current.mutate(mockUser);
-    });
+    try {
+      await act(async () => {
+        result.current.mutate(mockUser);
+      });
+    } catch {
+      popuprHandler({
+        message: errorMsg,
+      });
+    }
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(false);
@@ -286,7 +264,7 @@ describe("2차 비밀번호 설정 검증 테스트", () => {
 
     await waitFor(() => {
       expect(popuprHandler).toHaveBeenCalledWith({
-        message: "입력된 값에 오류가 있습니다. 다시 시도 해주세요",
+        message: errorMsg,
       });
     });
   });

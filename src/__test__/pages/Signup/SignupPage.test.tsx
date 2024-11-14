@@ -111,10 +111,8 @@ describe("회원가입 페이지 테스트", () => {
 
     fireEvent.submit(signupForm);
 
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: "올바른 이메일 형식이 아닙니다.",
-      });
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "올바른 이메일 형식이 아닙니다.",
     });
   });
 
@@ -135,10 +133,8 @@ describe("회원가입 페이지 테스트", () => {
 
     fireEvent.submit(signupForm);
 
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: "비밀번호가 짧습니다.",
-      });
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "비밀번호가 짧습니다.",
     });
   });
 
@@ -163,10 +159,8 @@ describe("회원가입 페이지 테스트", () => {
 
     fireEvent.submit(signupForm);
 
-    await waitFor(() => {
-      expect(popuprHandler).toHaveBeenCalledWith({
-        message: "이미 사용중인 닉네임 입니다",
-      });
+    expect(popuprHandler).toHaveBeenCalledWith({
+      message: "이미 사용중인 닉네임 입니다",
     });
   });
 
