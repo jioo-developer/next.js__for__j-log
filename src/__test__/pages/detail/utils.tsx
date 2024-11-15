@@ -1,3 +1,4 @@
+import { replyType } from "@/app/api_hooks/Reply/getReplyHook";
 import { within, screen, render } from "@testing-library/react";
 
 export const getElement = () => {
@@ -27,3 +28,24 @@ export const lenderingCheck = () => {
   expect(exitBtn).toBeInTheDocument();
   expect(submitBtn).toBeInTheDocument();
 };
+
+export const mockReplyData: replyType[] = [
+  {
+    id: "reply1",
+    comment: "This is a test comment",
+    uid: "user123",
+    replyrer: "Test User 1",
+    date: "2024년11월14일",
+    timestamp: { second: 1699988400, nanoseconds: 123000000 },
+    profile: "/img/profile1.png",
+  },
+  {
+    id: "reply2",
+    comment: "Another comment",
+    uid: "user456",
+    replyrer: "Test User 2",
+    date: "2024년11월14일",
+    timestamp: { second: 1699988400, nanoseconds: 123000000 },
+    profile: "/img/profile2.png",
+  },
+];

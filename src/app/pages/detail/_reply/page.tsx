@@ -25,7 +25,7 @@ const Reply = () => {
     const user = data as User;
     const userObj = {
       name: user.displayName as string,
-      profile: user.photoURL ? user.photoURL : "img/default.svg",
+      profile: user.photoURL ? user.photoURL : "/img/default.svg",
       uid: user.uid as string,
     };
     createMutation.mutate({ user: userObj, id, comment });

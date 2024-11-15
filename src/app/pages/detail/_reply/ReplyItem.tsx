@@ -23,9 +23,7 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
   const {
     comment,
     setComment,
-    msg,
     commentTarget,
-    setTarget,
     isClickValue,
     ChangeTargetHandler,
   } = useReplyContext();
@@ -58,7 +56,7 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
     if (isClick && from === "reply") {
       const replyId = (replyData as replyType[])[deleteIndex]?.id;
       if (replyId) {
-        deleteMutation.mutate({ id: pageId, replyId, comment });
+        deleteMutation.mutate({ id: pageId, replyId });
         setDeleteIndex(10000);
       }
     }
