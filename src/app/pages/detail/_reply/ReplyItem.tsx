@@ -33,16 +33,15 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
   const updateMutation = useUpdateHandler();
 
   function replyUpdateHandler(replyId: string) {
-    updateMutation.mutateAsync({ id: pageId, replyId, comment });
-    setComment("");
-    setTarget("");
+    updateMutation.mutate({ id: pageId, replyId, comment });
+    ChangeTargetHandler("", "" as unknown as number);
   }
 
   const deleteMutation = useDeleteHandler();
 
   const from = pageInfoStore().fromAction;
 
-  const [deleteIndex, setDeleteIndex] = useState(0);
+  const [deleteIndex, setDeleteIndex] = useState(10000);
 
   function AskDeleteHandler(index: number, isClick?: boolean) {
     if (!isClick) {
@@ -57,8 +56,11 @@ const ReplyItem = ({ item, index, replyData, pageId }: propsType) => {
 
   const DeleteHandler = (isClick?: boolean) => {
     if (isClick && from === "reply") {
-      const replyId = (replyData as replyType[])[deleteIndex].id;
-      deleteMutation.mutate({ id: pageId, replyId, comment });
+      const replyId = (replyData as replyType[])[deleteIndex]?.id;
+      if (replyId) {
+        deleteMutation.mutate({ id: pageId, replyId, comment });
+        setDeleteIndex(10000);
+      }
     }
   };
 

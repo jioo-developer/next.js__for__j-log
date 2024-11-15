@@ -1,7 +1,8 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { timeData } from "@/app/handler/commonHandler";
-import { db } from "@/app/Firebase";
+import { authService, db } from "@/app/Firebase";
 import { useReplyProps } from "@/app/handler/Reply/useMutationHandler";
+import { User } from "firebase/auth";
 
 interface propsType extends useReplyProps {
   user: {
@@ -12,8 +13,9 @@ interface propsType extends useReplyProps {
 }
 
 export const createReplyHandler = async ({ user, id, comment }: propsType) => {
+  const currentUser = authService.currentUser as User;
   const commentData = {
-    replyrer: user.name,
+    replyrer: user.name ? user.name : currentUser.displayName,
     comment: comment,
     date: `${timeData.year}년${timeData.month}월${timeData.day}일`,
     profile: user.profile ? user.profile : "/img/default.svg",

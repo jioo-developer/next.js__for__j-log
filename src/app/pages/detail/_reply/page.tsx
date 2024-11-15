@@ -3,10 +3,10 @@ import { useReplyQueryHook } from "@/app/api_hooks/Reply/getReplyHook";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { pageInfoStore } from "@/app/store/common";
 import ReplyItem from "@/app/pages/detail/_reply/ReplyItem";
-import { useReplyContext } from "./context";
-import { User } from "firebase/auth";
+import { useReplyContext } from "@/app/pages/detail/_reply/context";
 import { useCreateHandler } from "@/app/handler/Reply/useMutationHandler";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
+import { User } from "firebase/auth";
 
 const Reply = () => {
   const id = pageInfoStore().pgId;
@@ -15,7 +15,7 @@ const Reply = () => {
 
   const { replyData, isLoading } = useReplyQueryHook(id);
 
-  const { comment, setComment } = useReplyContext();
+  const { comment, setComment, commentTarget } = useReplyContext();
 
   const isReply = !isLoading && replyData && replyData.length > 0;
 
@@ -28,8 +28,7 @@ const Reply = () => {
       profile: user.photoURL ? user.photoURL : "img/default.svg",
       uid: user.uid as string,
     };
-
-    await createMutation.mutateAsync({ user: userObj, id, comment });
+    createMutation.mutate({ user: userObj, id, comment });
     setComment("");
   };
 
@@ -49,9 +48,12 @@ const Reply = () => {
           );
         })}
       <form
+        role="form"
         onSubmit={(e) => {
-          e.preventDefault();
-          CreateRely();
+          if (comment !== "") {
+            e.preventDefault();
+            CreateRely();
+          }
         }}
       >
         <ReactTextareaAutosize
@@ -59,8 +61,10 @@ const Reply = () => {
           onHeightChange={(height) => ""}
           minRows={4}
           className="comment_input"
-          value={comment}
+          placeholder="댓글을 입력하세요"
+          value={commentTarget === "" ? comment : ""}
           onChange={(e) => setComment(e.target.value)}
+          readOnly={commentTarget !== ""}
         />
         <button className="btn">댓글 작성</button>
       </form>
