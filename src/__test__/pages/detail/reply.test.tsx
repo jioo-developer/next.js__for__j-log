@@ -382,8 +382,6 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
       "@/app/handler/Reply/useMutationHandler"
     ).useUpdateHandler;
 
-    (updateDoc as jest.Mock).mockResolvedValueOnce(mockReplyData); // updateDoc 메서드 Mock
-
     // renderHook으로 React Query의 mutationHandler를 불러와 테스트
     const { result } = renderHook(() => mutationHandler(), {
       wrapper: ({ children }) => (
@@ -444,7 +442,6 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
   });
 
   test("댓글 삭제 로직 테스트", async () => {
-    (deleteDoc as jest.Mock).mockResolvedValueOnce(true);
     // mutationHandler는 실제 함수에서 가져옵니다.
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
