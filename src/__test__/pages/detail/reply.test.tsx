@@ -375,6 +375,8 @@ describe("Reply 페이지 로직 테스트", () => {
   test("댓글 수정 로직 테스트", async () => {
     (ReplyUpdate as jest.Mock).mockResolvedValueOnce(comment);
 
+    let updatedComment: string | Error;
+
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
     ).useUpdateHandler;
@@ -387,8 +389,6 @@ describe("Reply 페이지 로직 테스트", () => {
         </QueryClientProvider>
       ),
     });
-
-    let updatedComment: string | Error = "";
 
     // 댓글 수정 동작 실행
     await act(async () => {
