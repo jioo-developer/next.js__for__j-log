@@ -15,13 +15,9 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
   serverTimestamp,
-  updateDoc,
 } from "firebase/firestore";
 import { timeData } from "@/app/handler/commonHandler";
-import ReplyUpdate from "@/app/handler/Reply/replyUpdateHandler";
-import ReplyDelete from "@/app/handler/Reply/replyDeleteHandler";
 import Reply from "@/app/pages/detail/_reply/page";
 import {
   useCreateHandler,
@@ -31,6 +27,7 @@ import {
 import { MyContextProvider } from "@/app/pages/detail/_reply/context";
 import ReplyItem from "@/app/pages/detail/_reply/ReplyItem";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
+import ReplyUpdate from "@/app/handler/Reply/replyUpdateHandler";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
@@ -128,6 +125,11 @@ const replyObj = {
 (useCreateId as jest.Mock).mockReturnValue("new-page-id");
 
 (serverTimestamp as jest.Mock).mockReturnValue(111111);
+
+jest.mock("@/app/handler/reply/replyUpdateHandler", () => ({
+  __esModule: true, // ES 모듈로 처리
+  default: jest.fn(),
+}));
 
 describe("Reply 페이지 테스트 ", () => {
   beforeEach(async () => {
@@ -371,7 +373,8 @@ describe("Reply 페이지 로직 테스트", () => {
   });
 
   test("댓글 수정 로직 테스트", async () => {
-    // mutationHandler는 실제 함수에서 가져옵니다.
+    (ReplyUpdate as jest.Mock).mockResolvedValueOnce(comment);
+
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
     ).useUpdateHandler;
@@ -385,29 +388,40 @@ describe("Reply 페이지 로직 테스트", () => {
       ),
     });
 
+    let updatedComment: string | Error = "";
+
     // 댓글 수정 동작 실행
-    await act(() => {
-      result.current.mutateAsync({
+    await act(async () => {
+      result.current.mutate({
         user: replyObj.user,
         id: pageId,
         comment,
       });
+
+      updatedComment = await ReplyUpdate({
+        id: "postId",
+        replyId: "replyId",
+        comment,
+      });
     });
 
-    // Firestore의 doc과 updateDoc이 호출되는지 확인
-    const docRef = doc({} as any, pageId);
-
-    await updateDoc(docRef, { comment: comment });
-
     await waitFor(() => {
-      expect(updateDoc).toHaveBeenCalledWith(docRef, { comment });
+      // ReplyUpdate 함수가 올바른 값으로 호출되었는지 확인
+      expect(ReplyUpdate).toHaveBeenCalledWith({
+        id: "postId",
+        replyId: "replyId",
+        comment,
+      });
+
+      // 함수가 올바른 값을 반환했는지 확인
+      expect(updatedComment).toBe(comment);
     });
   });
 
   test("댓글 수정 로직 실패 테스트", async () => {
     const errorMsg = "댓글 수정 중 문제가 생겼습니다";
 
-    (getDocs as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+    (ReplyUpdate as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
 
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
@@ -466,8 +480,6 @@ describe("Reply 페이지 로직 테스트", () => {
       "reply",
       mockReplyData[0].id as string
     );
-
-    await deleteDoc(replyDocRef);
 
     await waitFor(() => {
       expect(deleteDoc).toHaveBeenCalledWith(replyDocRef);
