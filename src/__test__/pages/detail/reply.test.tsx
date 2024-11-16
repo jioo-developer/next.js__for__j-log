@@ -28,13 +28,9 @@ import {
   useDeleteHandler,
   useUpdateHandler,
 } from "@/app/handler/Reply/useMutationHandler";
-import {
-  MyContextProvider,
-  useReplyContext,
-} from "@/app/pages/detail/_reply/context";
+import { MyContextProvider } from "@/app/pages/detail/_reply/context";
 import ReplyItem from "@/app/pages/detail/_reply/ReplyItem";
 import { pageInfoStore, popupMessageStore } from "@/app/store/common";
-import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {
@@ -113,10 +109,6 @@ jest.mock("@/app/handler/error/ErrorHandler", () => ({
 
 jest.mock("@/app/handler/detail/pageInfoHandler");
 
-jest.mock("@/app/handler/Reply/replyUpdateHandler");
-
-jest.mock("@/app/handler/Reply/replyDeleteHandler");
-
 const queryClient = new QueryClient();
 
 const pageId = "new-page-id";
@@ -136,16 +128,6 @@ const replyObj = {
 (useCreateId as jest.Mock).mockReturnValue("new-page-id");
 
 (serverTimestamp as jest.Mock).mockReturnValue(111111);
-
-(doc as jest.Mock).mockImplementation((dbInstance, collection, documentId) => {
-  if (
-    dbInstance === ({} as any) &&
-    collection === "post" &&
-    documentId === "testId"
-  ) {
-    return true;
-  }
-});
 
 describe("Reply 페이지 테스트 ", () => {
   beforeEach(async () => {
@@ -274,7 +256,7 @@ describe("Reply 페이지 테스트 ", () => {
   });
 });
 
-describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
+describe("Reply 페이지 로직 테스트", () => {
   // Expected data
   const mockList = {
     replyrer: replyObj.user.name,
@@ -288,6 +270,18 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
   beforeEach(() => {
     // 각 테스트 전에 mock 함수 초기화
     jest.clearAllMocks();
+
+    (doc as jest.Mock).mockImplementation(
+      (dbInstance, collection, documentId) => {
+        if (
+          dbInstance === ({} as any) &&
+          collection === "post" &&
+          documentId === "testId"
+        ) {
+          return true;
+        }
+      }
+    );
 
     (collection as jest.Mock).mockImplementation(
       (db, collectionPath, id, subCollection) => {
@@ -413,7 +407,7 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
   test("댓글 수정 로직 실패 테스트", async () => {
     const errorMsg = "댓글 수정 중 문제가 생겼습니다";
 
-    (ReplyUpdate as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+    (getDocs as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
 
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
@@ -483,7 +477,7 @@ describe("Reply 페이지 함수 호출 테스트 - mutate 이후", () => {
   test("댓글 삭제 로직 실패 테스트", async () => {
     const errorMsg = "댓글 삭제 중 문제가 생겼습니다";
 
-    (ReplyDelete as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+    (deleteDoc as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
 
     const mutationHandler = jest.requireActual(
       "@/app/handler/Reply/useMutationHandler"
