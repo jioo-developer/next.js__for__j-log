@@ -42,7 +42,68 @@ jobs:
             fi
           done
 
+          echo "Test files to run: $TEST_FILES"name: CI
+
+on:
+  push:
+    paths:
+      - "src/app/pages/**/*.tsx" # src/app/pages 디렉토리 내 .tsx 파일 변경 시 실행
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 레포지토리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 전체 Git 히스토리를 가져옵니다.
+
+      # 2. Node.js 설정
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      # 3. 의존성 설치
+      - name: Install dependencies
+        run: npm install
+
+      # 4. 변경된 파일 추출
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
+      # 5. 변경된 파일에서 테스트 파일로 변환
+      - name: Generate test files list
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo "Changed files: $ALL_CHANGED_FILES"
+
+          # 변경된 파일에서 .tsx를 .test.tsx로 변환
+          TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/pages/.*\.tsx$' | sed 's/\.tsx$/.test.tsx/' || true)
+
+          # 테스트 파일 로그 출력
           echo "Test files to run: $TEST_FILES"
+
+          # 환경 변수로 저장
+          echo "TEST_FILES=$TEST_FILES" >> $GITHUB_ENV
+
+      # 6. 테스트 실행
+      - name: Run tests for changed test files
+        run: |
+          if [ -z "$TEST_FILES" ]; then
+            echo "No .test.tsx files found. Skipping tests."
+            exit 0
+          fi
+
+          echo "Running tests for the following files:"
+          echo "$TEST_FILES"
+
+          # Jest로 테스트 실행
+          npm test $TEST_FILES
 
           # 테스트 파일이 있는 경우만 실행
           if [ -n "$TEST_FILES" ]; then
