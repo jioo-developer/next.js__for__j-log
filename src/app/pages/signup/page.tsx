@@ -25,7 +25,7 @@ const SignupPage = () => {
 
   const router = useRouter();
 
-  const { nicknameData } = useNameQueryHook();
+  const { nicknameData, isLoading } = useNameQueryHook();
 
   const crateAccount = useSignupHandler();
 
