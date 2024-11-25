@@ -1,0 +1,52 @@
+name: push test
+
+on:
+  push:
+    paths:
+      - "pages/**/*.tsx" # 특정 파일 경로에서만 실행
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Node.js 설정
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      # 3. 의존성 설치
+      - name: Install dependencies
+        run: npm install
+
+      # 4. 수정된 파일 감지 및 테스트 실행
+      - name: Run tests for modified files
+        run: |
+          # 수정된 파일 목록 가져오기
+          MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD | grep '^pages/.*\.tsx$' || true)
+          echo "Modified files: $MODIFIED_FILES"
+
+          # 테스트 파일 목록 초기화
+          TEST_FILES=""
+
+          # 수정된 파일에서 관련된 테스트 파일 경로 생성
+          for FILE in $MODIFIED_FILES; do
+            TEST_FILE="${FILE%.tsx}.test.tsx"  # 수정된 파일 경로를 테스트 파일 경로로 변환
+            if [ -f "$TEST_FILE" ]; then
+              TEST_FILES="$TEST_FILES $TEST_FILE"  # 테스트 파일 목록에 추가
+            fi
+          done
+
+          echo "Test files to run: $TEST_FILES"
+
+          # 테스트 파일이 있는 경우만 실행
+          if [ -n "$TEST_FILES" ]; then
+            npx jest $TEST_FILES
+          else
+            echo "No related test files found. Skipping tests."
+          fi
