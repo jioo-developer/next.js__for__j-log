@@ -112,4 +112,4 @@ jobs:
           echo "$TEST_FILES"
 
           # Jest로 테스트 실행
-          npm test -- $TEST_FILES
+          npm test -- --runInBand $TEST_FILES
