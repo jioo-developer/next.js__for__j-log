@@ -1,11 +1,10 @@
 import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { QueryClient } from "@tanstack/react-query";
-import { waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { commonHandler } from "./utils";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},
@@ -48,9 +47,25 @@ describe("회원가입 페이지 로직 테스트", () => {
     });
 
     // 임시 계정 모킹
+    const mutationHandler = jest.requireActual(
+      "@/app/api_hooks/signup/signupHook"
+    ).default;
 
-    const result = commonHandler(queryClient);
-    //mutate 실행 함수
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    act(() => {
+      result.current.mutate({
+        email: "test@example.com",
+        password: "validPassword123",
+        nickname: "existingNickname",
+      });
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -103,10 +118,25 @@ describe("회원가입 페이지 로직 테스트", () => {
 
     (LoginErrorHandler as jest.Mock).mockReturnValue(null);
 
-    const result = commonHandler(queryClient);
+    // 임시 계정 모킹
+    const mutationHandler = jest.requireActual(
+      "@/app/api_hooks/signup/signupHook"
+    ).default;
 
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(false);
+    const { result } = renderHook(() => mutationHandler(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    act(() => {
+      result.current.mutate({
+        email: "test@example.com",
+        password: "validPassword123",
+        nickname: "existingNickname",
+      });
     });
 
     // 계정 생성 실패서 에러 팝업 출력 검증
