@@ -23,7 +23,7 @@ const DetailPage = () => {
   const { data: user } = useUserQueryHook();
 
   const pageInfo = useGetPageInfo();
-  const { pageData, isLoading, error } = useDetailQueryHook(pageInfo);
+  const { pageData, isLoading } = useDetailQueryHook(pageInfo);
 
   const msg = popupMessageStore().message;
   const ispopupClick = popupMessageStore().isClick;
