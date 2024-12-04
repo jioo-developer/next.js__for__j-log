@@ -86,6 +86,13 @@ jobs:
 
           TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/pages/.*\.tsx$' | sed -E 's/\.tsx$/.test.tsx/; s/\.test\.test\.tsx$/.test.tsx/' || true)
 
+          if echo "$TEST_FILES" | grep -q '\[.*\]'; then
+              TEST_FILES=$(echo "$TEST_FILES" | sed 's/\[/\\[/g; s/\]/\\]/g')
+              echo "Escaped TEST_FILES: $TEST_FILES"
+          else
+              echo "No square brackets found, using original TEST_FILES"
+          fi
+
           echo "Test files to run: $TEST_FILES"
 
           echo "TEST_FILES=$TEST_FILES" >> $GITHUB_ENV
