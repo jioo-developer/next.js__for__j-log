@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     paths:
-      - "src/app/pages/**/*.tsx" # src/app/pages 디렉토리 내 .tsx 파일 변경 시 실행
+      - "src/app/pages/**/*.tsx"
+      - "src/app/provider/**/*.tsx"
+        # src/app/pages 디렉토리 내 .tsx 파일 변경 시 실행
 
 jobs:
   lint:
@@ -82,13 +84,10 @@ jobs:
         run: |
           echo "Changed files: $ALL_CHANGED_FILES"
 
-          # 변경된 파일에서 .tsx를 .test.tsx로 변환
-          TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/pages/.*\.tsx$' | sed 's/\.tsx$/.test.tsx/' || true)
+          TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/pages/.*\.tsx$' | sed -E 's/\.tsx$/.test.tsx/; s/\.test\.test\.tsx$/.test.tsx/' || true)
 
-          # 테스트 파일 로그 출력
           echo "Test files to run: $TEST_FILES"
 
-          # 환경 변수로 저장
           echo "TEST_FILES=$TEST_FILES" >> $GITHUB_ENV
 
       # 6. 테스트 실행
