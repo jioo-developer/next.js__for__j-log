@@ -1,6 +1,6 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { timeData } from "@/app/handler/commonHandler";
-import { authService, db } from "@/Firebase";
+import { authService, db } from "../../../Firebase";
 import { useReplyProps } from "@/app/handler/Reply/useMutationHandler";
 import { User } from "firebase/auth";
 

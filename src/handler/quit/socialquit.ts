@@ -1,4 +1,4 @@
-import { authService } from "@/Firebase";
+import { authService } from "../../../Firebase";
 import {
   GoogleAuthProvider,
   reauthenticateWithPopup,

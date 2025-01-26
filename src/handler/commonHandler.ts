@@ -1,5 +1,5 @@
 import { usePathname, useRouter } from "next/navigation";
-import { authService } from "../Firebase";
+import { authService } from "../../Firebase";
 import { QueryClient } from "@tanstack/react-query";
 import useUserQueryHook from "../api_hooks/login/getUserHook";
 

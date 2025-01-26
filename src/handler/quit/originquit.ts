@@ -3,7 +3,7 @@ import {
   reauthenticateWithCredential,
   User,
 } from "firebase/auth";
-import { authService } from "@/Firebase";
+import { authService } from "../../../Firebase";
 
 async function originDeleteHandler(password: string) {
   const user = authService.currentUser as User;

@@ -1,4 +1,4 @@
-import { authService } from "@/Firebase";
+import { authService } from "../../../../Firebase";
 import { User } from "firebase/auth";
 import { timeData } from "../../commonHandler";
 import { serverTimestamp, Timestamp } from "firebase/firestore";

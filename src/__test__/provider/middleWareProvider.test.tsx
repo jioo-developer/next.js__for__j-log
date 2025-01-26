@@ -7,7 +7,7 @@ import { act, render, waitFor } from "@testing-library/react";
 import { usePathname, useRouter } from "next/navigation";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { isPathHandler } from "@/app/handler/commonHandler";
-import { authService } from "@/Firebase";
+import { authService } from "../../../Firebase";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {

@@ -1,4 +1,4 @@
-import { authService, db } from "@/Firebase";
+import { authService, db } from "../../../Firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
