@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { doc, updateDoc } from "firebase/firestore";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { FirebaseData } from "../../api_hooks/detail/getDetailHook";
+import { FirebaseData } from "../../service/detail/getDetailHook";
 import { db } from "../../../Firebase";
 
 type favoriteType = {

@@ -1,8 +1,8 @@
 "use client";
 import { useEffect } from "react";
-import useUserQueryHook from "../api_hooks/login/getUserHook";
+import useUserQueryHook from "../service/login/getUserHook";
 import { popupInit, popuprHandler } from "../handler/error/ErrorHandler";
-import { isSecondaryPw } from "../api_hooks/login/snsLogin/googleLogin";
+import { isSecondaryPw } from "../service/login/snsLogin/googleLogin";
 import { childrenProps } from "../type/commonType";
 import { User } from "firebase/auth";
 import { authService } from "../../Firebase";
