@@ -1,0 +1,34 @@
+yarn run v1.22.22
+$ storybook build --output-dir=C:\Users\82103\AppData\Local\Temp\chromatic--13876-f5zPl2Dq3h2g
+@storybook/cli v8.1.11
+
+info => Cleaning outputDir: ..\..\AppData\Local\Temp\chromatic--13876-f5zPl2Dq3h2g
+info => Loading presets
+info => Building manager..
+info => Manager built (441 ms)
+info => Building preview..
+info Addon-docs: using MDX3
+info => Using implicit CSS loaders
+info => Using Babel as compiler
+info => Copying static files: public at ..\..\AppData\Local\Temp\chromatic--13876-f5zPl2Dq3h2g
+info => Using default Webpack5 setup
+info Using tsconfig paths for react-docgen
+WARN asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+WARN This can impact web performance.
+WARN Assets: 
+WARN   static/media/addon-library.7d60eaf1.png (456 KiB)
+WARN   static/media/SpoqaHanSansNeo-Light.341aef6c.eot (323 KiB)
+WARN   static/media/SpoqaHanSansNeo-Light.1cb73b3a.woff (410 KiB)
+WARN   295.5b8cc503.iframe.bundle.js (435 KiB)
+WARN   457.7974791f.iframe.bundle.js (674 KiB)
+WARN   651.d595b046.iframe.bundle.js (2.01 MiB)
+WARN entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+WARN Entrypoints:
+WARN   main (2.03 MiB)
+WARN       runtime~main.d043728a.iframe.bundle.js
+WARN       651.d595b046.iframe.bundle.js
+WARN       main.f94f195e.iframe.bundle.js
+WARN 
+info => Preview built (30 s)
+info => Output directory: C:\Users\82103\AppData\Local\Temp\chromatic--13876-f5zPl2Dq3h2g
+Done in 40.16s.

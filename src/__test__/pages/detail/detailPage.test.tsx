@@ -8,7 +8,7 @@ import { useCreateId } from "@/app/handler/detail/pageInfoHandler";
 import useFavoriteMutate from "@/app/handler/detail/useMutationHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import DetailPage from "@/app/pages/detail/[id]/page";
-import { pageInfoStore, popupMessageStore } from "@/app/store/common";
+import { pageInfoStore, popupMessageStore } from "@/store/common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,

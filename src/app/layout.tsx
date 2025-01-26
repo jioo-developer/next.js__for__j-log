@@ -3,11 +3,11 @@ import "./globals.css";
 import "@/app/_asset/theme.scss";
 import "@/app/_asset/home.scss";
 import "@/app/_asset/common.scss";
-import { childrenProps } from "@/app/type_global/commonType";
-import ReactQueryProvider from "./provider/ReactQueryProvider";
-import Header from "./components/Header";
+import { childrenProps } from "@/type/commonType";
+import ReactQueryProvider from "../provider/ReactQueryProvider";
+import Header from "../components/atoms/Header";
 import { ReturnPopup } from "@/app/handler/error/ErrorHandler";
-import MiddleWareProvider from "./provider/middlewareProvider";
+import MiddleWareProvider from "../provider/middlewareProvider";
 
 export const metadata: Metadata = {
   title: "J-LOG",

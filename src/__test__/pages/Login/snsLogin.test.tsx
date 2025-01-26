@@ -6,7 +6,7 @@ import {
 } from "@/app/api_hooks/login/snsLogin/googleLogin";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import SocialLoginPage from "@/app/pages/login/snsLogin/sosialLogin";
-import { popupMessageStore } from "@/app/store/common";
+import { popupMessageStore } from "@/store/common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,

@@ -26,7 +26,7 @@ import {
 } from "@/app/handler/Reply/useMutationHandler";
 import { MyContextProvider } from "@/app/pages/detail/_reply/context";
 import ReplyItem from "@/app/pages/detail/_reply/ReplyItem";
-import { pageInfoStore, popupMessageStore } from "@/app/store/common";
+import { pageInfoStore, popupMessageStore } from "@/store/common";
 import ReplyUpdate from "@/app/handler/Reply/replyUpdateHandler";
 
 jest.mock("@/app/Firebase", () => ({

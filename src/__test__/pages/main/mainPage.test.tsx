@@ -4,7 +4,7 @@ import SkeletonItem from "@/stories/modules/utils/SkeletonItem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { usePathname } from "next/navigation";
-import { searchStore } from "@/app/store/common";
+import { searchStore } from "@/store/common";
 
 jest.mock("@/app/Firebase", () => ({
   authService: {},

@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { useRouter, usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Header from "@/app/components/Header";
+import Header from "@/components/atoms/Header";
 import { useLogOut } from "@/app/handler/commonHandler";
 import { authService } from "@/app/Firebase";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";

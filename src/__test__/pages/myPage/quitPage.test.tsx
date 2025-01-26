@@ -5,7 +5,7 @@ import originDeleteHandler from "@/app/handler/quit/originquit";
 import SocialDeleteHandler from "@/app/handler/quit/socialquit";
 import isCredential from "@/app/handler/quit/userCredential/credentialHandler";
 import QuitPage from "@/app/pages/member/quit/page";
-import { popupMessageStore } from "@/app/store/common";
+import { popupMessageStore } from "@/store/common";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,

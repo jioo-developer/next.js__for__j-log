@@ -17,7 +17,7 @@ import { CreateImgUrl } from "@/app/handler/detail/crud/imageCrudHandler";
 import { useRouter } from "next/navigation";
 import { setDoc } from "firebase/firestore";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
-import { pageInfoStore, popupMessageStore } from "@/app/store/common";
+import { pageInfoStore, popupMessageStore } from "@/store/common";
 import useCashQueryHook from "@/app/api_hooks/common/getCashHook";
 
 // 필요한 훅과 모듈을 모킹

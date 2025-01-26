@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     paths:
-      - "src/app/pages/**/*.tsx"
+      - "src/app/**/*.tsx"
       - "src/app/provider/**/*.tsx"
         # src/app/pages 디렉토리 내 .tsx 파일 변경 시 실행
 
@@ -84,7 +84,7 @@ jobs:
         run: |
           echo "Changed files: $ALL_CHANGED_FILES"
 
-          TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/pages/.*\.tsx$' | sed -E 's/\.tsx$/.test.tsx/; s/\.test\.test\.tsx$/.test.tsx/' || true)
+          TEST_FILES=$(echo "$ALL_CHANGED_FILES" | grep 'src/app/.*\.tsx$' | sed -E 's/\.tsx$/.test.tsx/; s/\.test\.test\.tsx$/.test.tsx/' || true)
 
           if echo "$TEST_FILES" | grep -q '\[.*\]'; then
               TEST_FILES=$(echo "$TEST_FILES" | sed 's/\[/\\[/g; s/\]/\\]/g')
