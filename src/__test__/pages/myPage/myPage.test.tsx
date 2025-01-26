@@ -14,7 +14,7 @@ import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import { updateProfile, User } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/app/Firebase";
+import { db } from "@/Firebase";
 import storageUpload from "@/app/handler/file/storageUploadHandler";
 import onFileChange from "@/app/handler/file/onFileChangeHandler";
 

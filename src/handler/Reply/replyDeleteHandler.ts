@@ -1,4 +1,4 @@
-import { db } from "@/app/Firebase";
+import { db } from "@/Firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 
 async function ReplyDelete({ id, replyId }: { id: string; replyId: string }) {

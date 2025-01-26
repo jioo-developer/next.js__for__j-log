@@ -1,4 +1,4 @@
-import { db } from "@/app/Firebase";
+import { db } from "@/Firebase";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { useReplyProps } from "@/app/handler/Reply/useMutationHandler";
 

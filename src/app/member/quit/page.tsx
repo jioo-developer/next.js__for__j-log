@@ -11,7 +11,7 @@ import deleteDB from "@/app/handler/quit/deleteDB";
 import { Popup } from "@/stories/atoms/Popup";
 import ButtonGroup from "@/stories/modules/ButtonGroup/ButtonGroup";
 import { Button } from "@/stories/atoms/Button";
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { useRouter } from "next/navigation";
 
 const QuitPage = ({ setQuit }: any) => {

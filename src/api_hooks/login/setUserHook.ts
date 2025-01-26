@@ -1,4 +1,4 @@
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { LoginErrorHandler } from "./LoginErrorHandler";

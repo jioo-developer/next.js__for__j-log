@@ -1,5 +1,5 @@
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";
-import { db } from "@/app/Firebase";
+import { db } from "@/Firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";

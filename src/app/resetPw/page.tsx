@@ -1,6 +1,6 @@
 "use client";
 import "@/app/_asset/Sign.scss";
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { LoginErrorHandler } from "@/app/api_hooks/login/LoginErrorHandler";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useRouter } from "next/navigation";

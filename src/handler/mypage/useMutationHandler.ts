@@ -1,5 +1,5 @@
 import { deleteField, doc, updateDoc } from "firebase/firestore";
-import { authService, db } from "@/app/Firebase";
+import { authService, db } from "@/Firebase";
 import { updateProfile, User } from "firebase/auth";
 import { changeHanlderType, userData } from "@/type/commonType";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

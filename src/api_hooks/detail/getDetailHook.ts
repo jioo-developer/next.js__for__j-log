@@ -5,7 +5,7 @@ import {
   getDocs,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "@/app/Firebase";
+import { db } from "@/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 
 export type FirebaseData = {

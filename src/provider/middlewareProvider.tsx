@@ -5,7 +5,7 @@ import { popupInit, popuprHandler } from "../handler/error/ErrorHandler";
 import { isSecondaryPw } from "../api_hooks/login/snsLogin/googleLogin";
 import { childrenProps } from "../type/commonType";
 import { User } from "firebase/auth";
-import { authService } from "../app/Firebase";
+import { authService } from "../Firebase";
 import { usePathname, useRouter } from "next/navigation";
 import { isPathHandler } from "../handler/commonHandler";
 

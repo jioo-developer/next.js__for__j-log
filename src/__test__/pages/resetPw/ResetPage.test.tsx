@@ -1,5 +1,5 @@
 import { sendPasswordResetEmail } from "firebase/auth";
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";

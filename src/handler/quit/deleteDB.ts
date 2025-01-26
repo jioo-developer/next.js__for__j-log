@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { db, storageService } from "@/app/Firebase";
+import { db, storageService } from "@/Firebase";
 import { deleteObject, listAll, ref } from "firebase/storage";
 import { deleteDoc, doc, getDoc } from "firebase/firestore";
 

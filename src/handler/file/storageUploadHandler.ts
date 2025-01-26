@@ -1,4 +1,4 @@
-import { authService, storageService } from "@/app/Firebase";
+import { authService, storageService } from "@/Firebase";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { userData } from "@/type/commonType";
 

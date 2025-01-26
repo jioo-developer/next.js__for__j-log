@@ -1,4 +1,4 @@
-import { authService, db } from "@/app/Firebase";
+import { authService, db } from "@/Firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { objType } from "@/app/pages/login/snsLogin/sosialLogin";

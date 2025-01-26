@@ -1,4 +1,4 @@
-import { db, storageService } from "@/app/Firebase";
+import { db, storageService } from "@/Firebase";
 import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc } from "firebase/firestore";
 import { FirebaseData } from "@/app/api_hooks/detail/getDetailHook";

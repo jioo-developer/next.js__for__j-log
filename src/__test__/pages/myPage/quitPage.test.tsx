@@ -1,4 +1,4 @@
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import deleteDB from "@/app/handler/quit/deleteDB";
 import originDeleteHandler from "@/app/handler/quit/originquit";

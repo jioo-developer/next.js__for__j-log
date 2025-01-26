@@ -1,6 +1,6 @@
 import useUserQueryHook from "@/app/api_hooks/login/getUserHook";
 import useLoginHook from "@/app/api_hooks/login/setUserHook";
-import { authService } from "@/app/Firebase";
+import { authService } from "@/Firebase";
 import { useLogOut } from "@/app/handler/commonHandler";
 import { popuprHandler } from "@/app/handler/error/ErrorHandler";
 import LoginPage from "@/app/pages/login/page";

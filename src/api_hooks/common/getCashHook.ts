@@ -1,4 +1,4 @@
-import { authService, db } from "@/app/Firebase";
+import { authService, db } from "@/Firebase";
 import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { User } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
